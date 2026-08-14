@@ -8,8 +8,17 @@ type Props = { evento: Event; rsvps: Rsvp[]; isNovo: boolean }
 
 export default function DashboardClient({ evento, rsvps, isNovo }: Props) {
   const [copiado, setCopiado] = useState(false)
-  const base        = typeof window !== 'undefined' ? window.location.origin : 'https://vaikeuvou.app'
-  const linkEvento  = `${base}/e/${evento.slug}`
+
+  // Editar campos
+  const [editOpen,    setEditOpen]    = useState(false)
+  const [extUrl,      setExtUrl]      = useState(evento.external_url ?? '')
+  const [extLabel,    setExtLabel]    = useState(evento.external_url_label ?? '')
+  const [videoUrl,    setVideoUrl]    = useState(evento.video_url ?? '')
+  const [editSaving,  setEditSaving]  = useState(false)
+  const [editMsg,     setEditMsg]     = useState('')
+
+  const base          = typeof window !== 'undefined' ? window.location.origin : 'https://vaikeuvou.app'
+  const linkEvento    = `${base}/e/${evento.slug}`
   const linkDashboard = `${base}/dashboard/${evento.edit_token}`
 
   const nivel1 = rsvps.filter(r => r.depth_level === 1)
@@ -22,6 +31,24 @@ export default function DashboardClient({ evento, rsvps, isNovo }: Props) {
     setTimeout(() => setCopiado(false), 2000)
   }
 
+  async function salvarEdicao() {
+    setEditSaving(true)
+    setEditMsg('')
+    const res = await fetch('/api/eventos/editar', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        edit_token:         evento.edit_token,
+        external_url:       extUrl,
+        external_url_label: extLabel,
+        video_url:          videoUrl,
+      }),
+    })
+    const json = await res.json()
+    setEditMsg(res.ok ? 'Salvo! Recarregue a página do evento para ver.' : (json.error ?? 'Erro ao salvar.'))
+    setEditSaving(false)
+  }
+
   const whatsappTxt = `Você está convidado para "${evento.title}"! Confirme sua presença: ${linkEvento}`
 
   return (
@@ -30,6 +57,9 @@ export default function DashboardClient({ evento, rsvps, isNovo }: Props) {
 
         {/* Header */}
         <div>
+          <div className="flex items-center gap-2 mb-1">
+            <a href="/meus-eventos" className="text-gray-500 text-xs hover:text-gray-400">← Meus eventos</a>
+          </div>
           <p className="text-violet-400 text-xs font-bold uppercase tracking-widest mb-1">vaikeuvou.app</p>
           <h1 className="text-2xl font-extrabold leading-tight">{evento.title}</h1>
           <p className="text-gray-400 text-sm mt-1">{fmtDate(evento.event_date)}</p>
@@ -49,8 +79,8 @@ export default function DashboardClient({ evento, rsvps, isNovo }: Props) {
         {/* Contadores */}
         <div className="grid grid-cols-3 gap-3">
           {[
-            { label: 'Total', count: rsvps.length, cor: 'text-violet-400' },
-            { label: 'Nível 1', count: nivel1.length, cor: 'text-blue-400' },
+            { label: 'Total',    count: rsvps.length,                  cor: 'text-violet-400' },
+            { label: 'Nível 1',  count: nivel1.length,                 cor: 'text-blue-400' },
             { label: 'Nível 2+', count: nivel2.length + nivel3.length, cor: 'text-pink-400' },
           ].map(c => (
             <div key={c.label} className="bg-gray-900 rounded-2xl p-4 text-center">
@@ -82,6 +112,73 @@ export default function DashboardClient({ evento, rsvps, isNovo }: Props) {
           >
             Compartilhar no WhatsApp
           </a>
+        </div>
+
+        {/* Editar evento */}
+        <div className="bg-gray-900 rounded-2xl overflow-hidden">
+          <button
+            onClick={() => setEditOpen(v => !v)}
+            className="w-full flex items-center justify-between px-4 py-3 text-left"
+          >
+            <p className="text-xs font-bold text-gray-400 uppercase tracking-wide">Editar evento</p>
+            <span className="text-gray-500 text-sm">{editOpen ? '▲' : '▼'}</span>
+          </button>
+
+          {editOpen && (
+            <div className="px-4 pb-4 space-y-4 border-t border-gray-800 pt-4">
+
+              <div>
+                <label className="block text-xs font-semibold text-gray-400 mb-1.5 uppercase tracking-wide">
+                  Link externo
+                </label>
+                <input
+                  value={extUrl}
+                  onChange={e => setExtUrl(e.target.value)}
+                  placeholder="https://..."
+                  type="url"
+                  className="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2.5 text-white placeholder-gray-600 outline-none focus:border-violet-500 text-sm"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-gray-400 mb-1.5 uppercase tracking-wide">
+                  Texto do botão
+                </label>
+                <input
+                  value={extLabel}
+                  onChange={e => setExtLabel(e.target.value)}
+                  placeholder="Ex: Comprar ingresso 🎟️"
+                  className="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2.5 text-white placeholder-gray-600 outline-none focus:border-violet-500 text-sm"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-gray-400 mb-1.5 uppercase tracking-wide">
+                  Vídeo (YouTube ou Vimeo)
+                </label>
+                <input
+                  value={videoUrl}
+                  onChange={e => setVideoUrl(e.target.value)}
+                  placeholder="https://youtube.com/watch?v=..."
+                  type="url"
+                  className="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2.5 text-white placeholder-gray-600 outline-none focus:border-violet-500 text-sm"
+                />
+                <p className="text-[10px] text-gray-600 mt-1">Aparece abaixo do botão BORA na página do evento</p>
+              </div>
+
+              {editMsg && (
+                <p className={`text-xs ${editMsg.includes('Salvo') ? 'text-green-400' : 'text-red-400'}`}>{editMsg}</p>
+              )}
+
+              <button
+                onClick={salvarEdicao}
+                disabled={editSaving}
+                className="w-full py-3 rounded-xl bg-violet-600 hover:bg-violet-500 disabled:opacity-50 text-white font-bold text-sm transition-colors"
+              >
+                {editSaving ? 'Salvando…' : 'Salvar alterações'}
+              </button>
+            </div>
+          )}
         </div>
 
         {/* Lista de confirmados */}

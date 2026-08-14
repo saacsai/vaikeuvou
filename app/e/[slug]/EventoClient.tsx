@@ -15,6 +15,14 @@ type Props = {
   criador: Criador | null
 }
 
+function getVideoEmbed(url: string): string | null {
+  const yt = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([a-zA-Z0-9_-]{11})/)
+  if (yt) return `https://www.youtube.com/embed/${yt[1]}`
+  const vimeo = url.match(/vimeo\.com\/(\d+)/)
+  if (vimeo) return `https://player.vimeo.com/video/${vimeo[1]}`
+  return null
+}
+
 export default function EventoClient({ evento, rsvps, parentRsvpId, criador }: Props) {
   const [etapa,    setEtapa]    = useState<'convite' | 'form' | 'sucesso'>('convite')
   const [nome,     setNome]     = useState('')
@@ -30,9 +38,13 @@ export default function EventoClient({ evento, rsvps, parentRsvpId, criador }: P
   const gradient = titleToGradient(evento.title)
   const accent   = titleToAccent(evento.title)
 
-  const criadorNome    = criador?.name ?? 'Anfitrião'
-  const criadorAvatar  = criador?.avatar_url
+  const criadorNome     = criador?.name ?? 'Anfitrião'
+  const criadorAvatar   = criador?.avatar_url
   const criadorIniciais = criadorNome.slice(0, 2).toUpperCase()
+
+  const embedUrl    = evento.video_url ? getVideoEmbed(evento.video_url) : null
+  const linkLabel   = evento.external_url_label ?? 'Saiba mais'
+  const podeConvidar = evento.max_depth > 1
 
   async function confirmar() {
     if (!nome.trim() || !telefone.trim()) { setErro('Preencha seu nome e WhatsApp.'); return }
@@ -58,12 +70,10 @@ export default function EventoClient({ evento, rsvps, parentRsvpId, criador }: P
     setSaving(false)
   }
 
-  const podeConvidar = evento.max_depth > 1
-
   return (
     <div className="min-h-screen bg-gray-950 text-white flex flex-col">
 
-      {/* Card do evento — hero */}
+      {/* Hero */}
       <div style={{ background: gradient }} className="px-5 pt-8 pb-10">
 
         {/* Confirmados (avatares) */}
@@ -91,13 +101,26 @@ export default function EventoClient({ evento, rsvps, parentRsvpId, criador }: P
         <h1 className="text-3xl font-extrabold leading-tight mb-4 text-white">{evento.title}</h1>
 
         {/* Detalhes */}
-        <div className="space-y-1.5 text-sm mb-6" style={{ color: accent }}>
+        <div className="space-y-1.5 text-sm mb-5" style={{ color: accent }}>
           <p>📅 {fmtDate(evento.event_date)}</p>
           {evento.location  && <p>📍 {evento.location}</p>}
           {evento.description && (
             <p className="text-white/60 text-xs mt-3 leading-relaxed">{evento.description}</p>
           )}
         </div>
+
+        {/* Link externo */}
+        {evento.external_url && (
+          <a
+            href={evento.external_url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-bold mb-5"
+            style={{ backgroundColor: accent + '22', color: accent, border: `1px solid ${accent}44` }}
+          >
+            {linkLabel} ↗
+          </a>
+        )}
 
         {/* Assinatura do anfitrião */}
         <div className="flex items-center gap-3 mt-2">
@@ -220,6 +243,22 @@ export default function EventoClient({ evento, rsvps, parentRsvpId, criador }: P
           </div>
         )}
       </div>
+
+      {/* Vídeo embed */}
+      {embedUrl && (
+        <div className="px-5 pb-10 max-w-lg w-full mx-auto">
+          <div className="rounded-2xl overflow-hidden aspect-video">
+            <iframe
+              src={embedUrl}
+              title="Vídeo do evento"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+              className="w-full h-full"
+            />
+          </div>
+        </div>
+      )}
+
     </div>
   )
 }

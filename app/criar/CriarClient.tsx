@@ -18,6 +18,9 @@ type Form = {
   location: string
   description: string
   max_depth: number
+  external_url: string
+  external_url_label: string
+  video_url: string
 }
 
 type Props = {
@@ -111,6 +114,7 @@ export default function CriarClient({ userName, userAvatar }: Props) {
   const [form, setForm] = useState<Form>({
     title: '', event_date: '', event_time: '19:00',
     location: '', description: '', max_depth: 2,
+    external_url: '', external_url_label: '', video_url: '',
   })
   const [saving, setSaving] = useState(false)
   const [erro,   setErro]   = useState('')
@@ -226,6 +230,45 @@ export default function CriarClient({ userName, userAvatar }: Props) {
                   </button>
                 ))}
               </div>
+            </div>
+
+            {/* Link externo */}
+            <div>
+              <label className="block text-xs font-semibold text-gray-400 mb-1.5 uppercase tracking-wide">Link externo</label>
+              <input
+                value={form.external_url}
+                onChange={e => set('external_url', e.target.value)}
+                placeholder="https://... (ingresso, site, maps…)"
+                type="url"
+                className="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-3 text-white placeholder-gray-600 outline-none focus:border-violet-500 text-sm"
+              />
+            </div>
+
+            {form.external_url && (
+              <div>
+                <label className="block text-xs font-semibold text-gray-400 mb-1.5 uppercase tracking-wide">Texto do botão</label>
+                <input
+                  value={form.external_url_label}
+                  onChange={e => set('external_url_label', e.target.value)}
+                  placeholder="Ex: Comprar ingresso 🎟️"
+                  className="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-3 text-white placeholder-gray-600 outline-none focus:border-violet-500 text-sm"
+                />
+              </div>
+            )}
+
+            {/* Vídeo */}
+            <div>
+              <label className="block text-xs font-semibold text-gray-400 mb-1.5 uppercase tracking-wide">
+                Vídeo do evento
+              </label>
+              <input
+                value={form.video_url}
+                onChange={e => set('video_url', e.target.value)}
+                placeholder="YouTube ou Vimeo"
+                type="url"
+                className="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-3 text-white placeholder-gray-600 outline-none focus:border-violet-500 text-sm"
+              />
+              <p className="text-[10px] text-gray-600 mt-1">Aparece abaixo do botão BORA na página do evento</p>
             </div>
 
             {erro && <p className="text-red-400 text-sm">{erro}</p>}

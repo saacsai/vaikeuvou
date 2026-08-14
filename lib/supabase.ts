@@ -21,6 +21,9 @@ export type Event = {
   location: string | null
   description: string | null
   bg_image_url: string | null
+  external_url: string | null
+  external_url_label: string | null
+  video_url: string | null
   max_depth: number
   creator_phone: string
   edit_token: string
