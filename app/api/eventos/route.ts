@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getSupabaseAdmin } from '@/lib/supabase'
 import { generateSlug, fmtPhone } from '@/lib/slug'
+import { getSession } from '@/lib/auth'
 
 export async function POST(req: NextRequest) {
   const { title, event_date, location, description, creator_phone, max_depth } = await req.json()
@@ -26,6 +27,8 @@ export async function POST(req: NextRequest) {
     tentativas++
   }
 
+  const session = await getSession()
+
   const { data, error } = await sb
     .from('events')
     .insert({
@@ -36,6 +39,7 @@ export async function POST(req: NextRequest) {
       description:   description || null,
       max_depth:     max_depth ?? 2,
       creator_phone: phone,
+      user_id:       session?.user_id ?? null,
     })
     .select('id, slug, edit_token')
     .single()
