@@ -10,14 +10,14 @@ export async function POST(req: NextRequest) {
   const file = form.get('avatar') as File | null
   if (!file) return NextResponse.json({ error: 'Arquivo obrigatório.' }, { status: 400 })
 
-  const ext      = file.name.split('.').pop() ?? 'jpg'
-  const path     = `${session.user_id}/avatar.${ext}`
-  const buffer   = Buffer.from(await file.arrayBuffer())
-  const sb       = getSupabaseAdmin()
+  // Sempre salva como jpg (o cliente já envia blob jpeg do canvas)
+  const path  = `${session.user_id}/avatar.jpg`
+  const bytes = await file.arrayBuffer()
+  const sb    = getSupabaseAdmin()
 
   const { error: upErr } = await sb.storage
     .from('avatars')
-    .upload(path, buffer, { contentType: file.type, upsert: true })
+    .upload(path, bytes, { contentType: 'image/jpeg', upsert: true })
 
   if (upErr) return NextResponse.json({ error: upErr.message }, { status: 500 })
 
