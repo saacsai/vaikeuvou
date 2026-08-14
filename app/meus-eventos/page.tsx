@@ -28,7 +28,12 @@ export default async function MeusEventosPage() {
             <h1 className="text-2xl font-extrabold">Meus eventos</h1>
             <p className="text-gray-500 text-xs mt-0.5">{user.phone}</p>
           </div>
-          <LogoutButton />
+          <div className="flex items-center gap-2">
+            <a href="/perfil" className="text-gray-400 text-xs hover:text-white px-3 py-2 rounded-xl bg-gray-900 hover:bg-gray-800">
+              Perfil
+            </a>
+            <LogoutButton />
+          </div>
         </div>
 
         {/* Criar novo */}

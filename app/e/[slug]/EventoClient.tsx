@@ -1,16 +1,21 @@
 'use client'
 
 import { useState } from 'react'
+import Image from 'next/image'
 import type { Event, Rsvp } from '@/lib/supabase'
 import { fmtDate } from '@/lib/slug'
+import { titleToGradient, titleToAccent } from '@/lib/gradient'
+
+type Criador = { name: string | null; avatar_url: string | null }
 
 type Props = {
   evento: Event
   rsvps: Pick<Rsvp, 'id' | 'user_name' | 'depth_level' | 'created_at'>[]
   parentRsvpId: string | null
+  criador: Criador | null
 }
 
-export default function EventoClient({ evento, rsvps, parentRsvpId }: Props) {
+export default function EventoClient({ evento, rsvps, parentRsvpId, criador }: Props) {
   const [etapa,    setEtapa]    = useState<'convite' | 'form' | 'sucesso'>('convite')
   const [nome,     setNome]     = useState('')
   const [telefone, setTelefone] = useState('')
@@ -18,9 +23,16 @@ export default function EventoClient({ evento, rsvps, parentRsvpId }: Props) {
   const [erro,     setErro]     = useState('')
   const [meuRsvpId, setMeuRsvpId] = useState('')
 
-  const base      = typeof window !== 'undefined' ? window.location.origin : 'https://vaikeuvou.app'
+  const base        = typeof window !== 'undefined' ? window.location.origin : 'https://vaikeuvou.app'
   const linkConvite = `${base}/e/${evento.slug}?ref=${meuRsvpId}`
   const whatsappTxt = `Vou no "${evento.title}"! Vai você também? 👉 ${linkConvite}`
+
+  const gradient = titleToGradient(evento.title)
+  const accent   = titleToAccent(evento.title)
+
+  const criadorNome    = criador?.name ?? 'Anfitrião'
+  const criadorAvatar  = criador?.avatar_url
+  const criadorIniciais = criadorNome.slice(0, 2).toUpperCase()
 
   async function confirmar() {
     if (!nome.trim() || !telefone.trim()) { setErro('Preencha seu nome e WhatsApp.'); return }
@@ -51,50 +63,79 @@ export default function EventoClient({ evento, rsvps, parentRsvpId }: Props) {
   return (
     <div className="min-h-screen bg-gray-950 text-white flex flex-col">
 
-      {/* Card do evento */}
-      <div className="bg-gradient-to-br from-violet-900 via-purple-900 to-indigo-900 px-5 pt-8 pb-10">
-        <p className="text-violet-300 text-xs font-bold uppercase tracking-widest mb-3">vaikeuvou.app</p>
-        <h1 className="text-3xl font-extrabold leading-tight mb-4">{evento.title}</h1>
+      {/* Card do evento — hero */}
+      <div style={{ background: gradient }} className="px-5 pt-8 pb-10">
 
-        <div className="space-y-2 text-sm text-violet-200">
-          <p>📅 {fmtDate(evento.event_date)}</p>
-          {evento.location  && <p>📍 {evento.location}</p>}
-          {evento.description && (
-            <p className="text-violet-300 text-xs mt-3 leading-relaxed">{evento.description}</p>
-          )}
-        </div>
-
-        {/* Confirmados */}
+        {/* Confirmados (avatares) */}
         {rsvps.length > 0 && (
-          <div className="mt-5 flex items-center gap-2 flex-wrap">
+          <div className="flex items-center gap-2 mb-5 flex-wrap">
             <div className="flex -space-x-2">
               {rsvps.slice(0, 5).map((r, i) => (
                 <div key={r.id}
-                  className="w-8 h-8 rounded-full bg-violet-500 border-2 border-violet-900 flex items-center justify-center text-xs font-bold text-white"
-                  style={{ zIndex: 5 - i }}
+                  className="w-7 h-7 rounded-full border-2 border-black/30 flex items-center justify-center text-xs font-bold text-white"
+                  style={{ backgroundColor: titleToAccent(r.user_name), zIndex: 5 - i }}
                 >
                   {r.user_name[0].toUpperCase()}
                 </div>
               ))}
             </div>
-            <p className="text-xs text-violet-300">
+            <p className="text-xs" style={{ color: accent }}>
               {rsvps.length === 1
                 ? `${rsvps[0].user_name} confirmou`
                 : `${rsvps[0].user_name} e mais ${rsvps.length - 1} confirmaram`}
             </p>
           </div>
         )}
+
+        {/* Título */}
+        <h1 className="text-3xl font-extrabold leading-tight mb-4 text-white">{evento.title}</h1>
+
+        {/* Detalhes */}
+        <div className="space-y-1.5 text-sm mb-6" style={{ color: accent }}>
+          <p>📅 {fmtDate(evento.event_date)}</p>
+          {evento.location  && <p>📍 {evento.location}</p>}
+          {evento.description && (
+            <p className="text-white/60 text-xs mt-3 leading-relaxed">{evento.description}</p>
+          )}
+        </div>
+
+        {/* Assinatura do anfitrião */}
+        <div className="flex items-center gap-3 mt-2">
+          {criadorAvatar ? (
+            <Image
+              src={criadorAvatar}
+              alt={criadorNome}
+              width={36} height={36}
+              className="w-9 h-9 rounded-full object-cover border-2 border-white/20"
+            />
+          ) : (
+            <div
+              className="w-9 h-9 rounded-full flex items-center justify-center text-xs font-bold border-2 border-white/20"
+              style={{ backgroundColor: accent, color: '#111' }}
+            >
+              {criadorIniciais}
+            </div>
+          )}
+          <div>
+            <p className="text-xs text-white/50">organizado por</p>
+            <p className="text-sm font-semibold text-white">{criadorNome}</p>
+          </div>
+          <div className="ml-auto">
+            <p className="text-xs font-bold text-white/40 uppercase tracking-widest">vaikeuvou</p>
+          </div>
+        </div>
       </div>
 
-      {/* Área de ação */}
+      {/* CTA */}
       <div className="flex-1 px-5 py-8 max-w-lg w-full mx-auto">
 
         {etapa === 'convite' && (
           <div className="space-y-4">
-            <p className="text-gray-300 text-center text-lg font-semibold">Você vai?</p>
+            <p className="text-white text-center text-xl font-bold">E aí? Vamos? 🎉</p>
             <button
               onClick={() => setEtapa('form')}
-              className="w-full py-5 rounded-2xl bg-green-500 hover:bg-green-400 text-white font-extrabold text-2xl transition-colors shadow-lg shadow-green-500/20"
+              className="w-full py-5 rounded-2xl text-white font-extrabold text-2xl transition-colors shadow-lg"
+              style={{ backgroundColor: titleToAccent(evento.title).replace('75%', '45%') }}
             >
               BORA! 🚀
             </button>
@@ -171,7 +212,7 @@ export default function EventoClient({ evento, rsvps, parentRsvpId }: Props) {
                   rel="noopener noreferrer"
                   className="flex items-center justify-center gap-2 w-full py-3 rounded-xl bg-[#25D366] text-white font-bold text-sm"
                 >
-                  <span>Enviar no WhatsApp</span>
+                  Enviar no WhatsApp
                 </a>
               </div>
             )}
