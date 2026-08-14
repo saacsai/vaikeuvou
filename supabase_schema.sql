@@ -1,35 +1,68 @@
 -- ============================================================
--- vaikeuvou.app — Schema inicial
--- Rodar no Supabase SQL Editor
+-- vaikeuvou.app — Schema completo (estado atual)
+-- Rodar no Supabase SQL Editor (projeto lntgfqbuqfiukgnhdvxe)
 -- ============================================================
 
--- Tabela de Eventos
-CREATE TABLE events (
-  id            UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  title         VARCHAR(255) NOT NULL,
-  slug          VARCHAR(160) UNIQUE NOT NULL,
-  event_date    TIMESTAMP WITH TIME ZONE NOT NULL,
-  location      TEXT,
-  description   TEXT,
-  bg_image_url  TEXT,
-  max_depth     INT DEFAULT 2,        -- 1: Privado, 2: Amigos, 999: Aberto
-  creator_phone VARCHAR(20) NOT NULL,
-  edit_token    UUID NOT NULL DEFAULT gen_random_uuid(),
-  created_at    TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+-- USUÁRIOS (auth própria via OTP WhatsApp)
+CREATE TABLE IF NOT EXISTS users (
+  id         UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  phone      VARCHAR(20) UNIQUE NOT NULL,
+  name       TEXT,
+  avatar_url TEXT,
+  email      TEXT,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- Tabela de RSVPs (confirmações + árvore viral)
-CREATE TABLE rsvps (
+-- OTP para login
+CREATE TABLE IF NOT EXISTS otp_codes (
+  id         UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  phone      VARCHAR(20) NOT NULL,
+  code       VARCHAR(10) NOT NULL,
+  expires_at TIMESTAMP WITH TIME ZONE NOT NULL,
+  used       BOOLEAN DEFAULT FALSE,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- Sessões com sliding expiry (72h)
+CREATE TABLE IF NOT EXISTS sessions (
+  id         UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  token      UUID UNIQUE NOT NULL DEFAULT gen_random_uuid(),
+  user_id    UUID REFERENCES users(id) ON DELETE CASCADE,
+  expires_at TIMESTAMP WITH TIME ZONE NOT NULL,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- EVENTOS
+CREATE TABLE IF NOT EXISTS events (
+  id                  UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  title               VARCHAR(255) NOT NULL,
+  slug                VARCHAR(160) UNIQUE NOT NULL,
+  event_date          TIMESTAMP WITH TIME ZONE NOT NULL,
+  location            TEXT,
+  description         TEXT,
+  bg_image_url        TEXT,
+  external_url        TEXT,
+  external_url_label  TEXT,
+  video_url           TEXT,
+  max_depth           INT DEFAULT 2,
+  creator_phone       VARCHAR(20) NOT NULL,
+  user_id             UUID REFERENCES users(id),
+  edit_token          UUID NOT NULL DEFAULT gen_random_uuid(),
+  created_at          TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- RSVPs (confirmações + árvore viral)
+CREATE TABLE IF NOT EXISTS rsvps (
   id             UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   event_id       UUID REFERENCES events(id) ON DELETE CASCADE,
   user_name      VARCHAR(100) NOT NULL,
   user_phone     VARCHAR(20) NOT NULL,
-  parent_rsvp_id UUID REFERENCES rsvps(id),   -- NULL = convidado direto do criador
-  depth_level    INT NOT NULL DEFAULT 1,       -- calculado via trigger
+  parent_rsvp_id UUID REFERENCES rsvps(id),
+  depth_level    INT NOT NULL DEFAULT 1,
   created_at     TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- Trigger: calcula depth_level automaticamente a partir do pai
+-- Trigger: depth_level calculado pelo pai
 CREATE OR REPLACE FUNCTION set_rsvp_depth()
 RETURNS TRIGGER AS $$
 BEGIN
@@ -43,41 +76,29 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+DROP TRIGGER IF EXISTS trg_set_rsvp_depth ON rsvps;
 CREATE TRIGGER trg_set_rsvp_depth
 BEFORE INSERT ON rsvps
 FOR EACH ROW EXECUTE FUNCTION set_rsvp_depth();
 
--- Carteira de créditos (identificada por telefone do criador)
-CREATE TABLE creator_credits (
-  creator_phone   VARCHAR(20) PRIMARY KEY,
-  credits_balance INT NOT NULL DEFAULT 0,
-  updated_at      TIMESTAMP WITH TIME ZONE DEFAULT NOW()
-);
-
--- Ledger de transações de crédito (auditável)
-CREATE TABLE credit_transactions (
-  id            UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  creator_phone VARCHAR(20) NOT NULL,
-  type          VARCHAR(20) NOT NULL,   -- 'purchase' | 'consumption'
-  amount        INT NOT NULL,           -- positivo p/ compra, negativo p/ consumo
-  reference     VARCHAR(255),           -- stripe_payment_intent_id ou ação consumida
-  created_at    TIMESTAMP WITH TIME ZONE DEFAULT NOW()
-);
-
 -- ============================================================
--- RLS (Row Level Security)
+-- RLS
 -- ============================================================
 
 ALTER TABLE events ENABLE ROW LEVEL SECURITY;
-ALTER TABLE rsvps ENABLE ROW LEVEL SECURITY;
-ALTER TABLE creator_credits ENABLE ROW LEVEL SECURITY;
-ALTER TABLE credit_transactions ENABLE ROW LEVEL SECURITY;
+ALTER TABLE rsvps  ENABLE ROW LEVEL SECURITY;
+ALTER TABLE users  ENABLE ROW LEVEL SECURITY;
 
--- events: leitura pública, escrita só via Edge Function (service_role)
 CREATE POLICY "events_select_public" ON events FOR SELECT TO anon USING (true);
+CREATE POLICY "rsvps_select_public"  ON rsvps  FOR SELECT TO anon USING (true);
 
--- rsvps: leitura pública (mostrar quem confirmou), escrita só via Edge Function
-CREATE POLICY "rsvps_select_public" ON rsvps FOR SELECT TO anon USING (true);
+-- ============================================================
+-- Storage: avatars (publico)
+-- ============================================================
 
--- creator_credits e credit_transactions: sem acesso público
--- (só service_role via Edge Function lê/escreve)
+INSERT INTO storage.buckets (id, name, public)
+VALUES ('avatars', 'avatars', true)
+ON CONFLICT (id) DO NOTHING;
+
+CREATE POLICY "avatars_select_public" ON storage.objects
+FOR SELECT TO anon USING (bucket_id = 'avatars');
