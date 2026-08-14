@@ -107,6 +107,7 @@ export default function EventoClient({ evento, rsvps, parentRsvpId, criador }: P
               alt={criadorNome}
               width={36} height={36}
               className="w-9 h-9 rounded-full object-cover border-2 border-white/20"
+              unoptimized
             />
           ) : (
             <div
