@@ -25,7 +25,7 @@ export async function getSession() {
     .update({ expires_at: new Date(Date.now() + SLIDING_MS).toISOString() })
     .eq('token', token)
 
-  return session as { id: string; token: string; user_id: string; users: { id: string; phone: string; name: string | null; email: string | null } }
+  return session as { id: string; token: string; user_id: string; users: { id: string; phone: string; name: string | null; email: string | null; avatar_url: string | null } }
 }
 
 export function normalizePhone(raw: string): string {
