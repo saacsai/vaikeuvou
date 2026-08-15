@@ -12,16 +12,16 @@ export default function Home() {
           alt="vaikeuvou — Vamo aí?"
           width={261}
           height={223}
-          className="w-[150px] md:w-[200px] h-auto mb-6 md:mb-[42px]"
+          className="w-[165px] md:w-[220px] h-auto mb-6 md:mb-[42px]"
           priority
         />
 
-        <p className="w-full max-w-md text-gray-400 text-base md:text-lg mb-3 md:mb-[24px] leading-snug">
+        <p className="w-full max-w-md text-gray-400 text-[14.7px] md:text-[16.7px] mb-3 md:mb-[24px] leading-snug">
           Balada, festa, show, academia, correr, caminhar, surfar, andar de bike, viajar,
           restaurante, pizza, boteco, cinema, churrasco, tomar uma, o que te der na cabeça
           fazer&hellip;
         </p>
-        <p className="w-full max-w-md text-gray-400 text-base md:text-lg mb-6 md:mb-[40px] leading-snug">
+        <p className="w-full max-w-md text-gray-400 text-[14.7px] md:text-[16.7px] mb-6 md:mb-[40px] leading-snug">
           Tudo isso é muito legal!<br />
           Muito mais legal é junto com os amigos!
         </p>
