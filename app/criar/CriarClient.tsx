@@ -165,7 +165,7 @@ export default function CriarClient({ userName, userAvatar }: Props) {
     <div className="min-h-screen bg-white text-gray-900">
       <div className="max-w-5xl mx-auto px-4 py-8">
 
-        <Image src="/logo.png" alt="vaikeuvou" width={137} height={47} className="h-6 w-auto mb-6" />
+        <Image src="/logo.png" alt="vaikeuvou" width={137} height={47} className="h-9 w-auto mb-6" />
 
         <a href="/meus-eventos" className="text-gray-400 text-sm hover:text-gray-600">← Meus eventos</a>
         <h1 className="text-3xl font-bold mt-3 mb-1 text-gray-900">Criar evento</h1>
