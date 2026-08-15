@@ -54,6 +54,7 @@ function EventoPreview({ form, userName, userAvatar }: { form: Form; userName: s
       </div>
 
       <div className="px-5 pt-5 pb-6" style={{ backgroundColor: header.bg }}>
+        <Image src="/logo.png" alt="vaikeuvou" width={137} height={47} className="h-7 w-auto mb-0.5" />
         <h1 className={`text-xl font-bold leading-tight mb-3 ${hasTitle ? 'text-gray-900' : 'text-gray-300'}`}>
           {hasTitle ? form.title : 'Nome do evento'}
         </h1>
@@ -165,10 +166,18 @@ export default function CriarClient({ userName, userAvatar }: Props) {
     <div className="min-h-screen bg-white text-gray-900">
       <div className="max-w-5xl mx-auto px-4 py-8">
 
-        <Image src="/logo.png" alt="vaikeuvou" width={137} height={47} className="h-9 w-auto mb-6" />
+        <a href="/">
+          <Image src="/logo.png" alt="vaikeuvou" width={137} height={47} className="h-[43px] w-auto mb-6" />
+        </a>
 
-        <a href="/meus-eventos" className="text-gray-400 text-sm hover:text-gray-600">← Meus eventos</a>
-        <h1 className="text-3xl font-bold mt-3 mb-1 text-gray-900">Criar evento</h1>
+        <div className="flex items-center gap-2 text-sm mb-3">
+          <a href="/" className="text-gray-400 hover:text-gray-600">vaikeuvou</a>
+          <span className="text-gray-300">»</span>
+          <a href="/meus-eventos" className="text-gray-400 hover:text-gray-600">Meus eventos</a>
+          <span className="text-gray-300">»</span>
+          <span className="text-brand font-semibold">Criar convite</span>
+        </div>
+        <h1 className="text-3xl font-bold mb-1 text-gray-900">Criar convite</h1>
         <p className="text-gray-400 text-sm mb-8">Pronto em segundos.</p>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
@@ -300,7 +309,7 @@ export default function CriarClient({ userName, userAvatar }: Props) {
               disabled={saving}
               className="w-full py-4 rounded-xl bg-brand hover:bg-brand-dark disabled:opacity-50 text-white font-bold text-lg transition-colors"
             >
-              {saving ? 'Criando…' : 'Criar evento 🎉'}
+              {saving ? 'Criando…' : 'Criar convite'}
             </button>
           </div>
 
