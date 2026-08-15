@@ -86,7 +86,7 @@ export default function EventoClient({ evento, rsvps, parentRsvpId, criador }: P
           <Image src="/logo.png" alt="vaikeuvou" width={137} height={47} className="h-6 w-auto mb-4" />
 
           {/* Título */}
-          <h1 className="font-display text-3xl font-bold leading-tight text-gray-900 mb-3">{evento.title}</h1>
+          <h1 className="text-3xl font-bold leading-tight text-gray-900 mb-3">{evento.title}</h1>
 
           {/* Detalhes */}
           <div className="space-y-1 text-sm text-gray-500 mb-4">
@@ -149,10 +149,10 @@ export default function EventoClient({ evento, rsvps, parentRsvpId, criador }: P
           {/* CTA */}
           {etapa === 'convite' && (
             <div className="space-y-3">
-              <p className="text-gray-900 font-display font-semibold text-lg">Vamo aí?</p>
+              <p className="text-gray-900 font-semibold text-lg">Vamo aí?</p>
               <button
                 onClick={() => setEtapa('form')}
-                className="w-full py-4 rounded-xl bg-brand hover:bg-brand-dark text-white font-display font-bold text-xl tracking-wide transition-colors shadow-lg shadow-brand/20"
+                className="w-full py-4 rounded-xl bg-brand hover:bg-brand-dark text-white font-bold text-xl tracking-wide transition-colors shadow-lg shadow-brand/20"
               >
                 BORA 🏃
               </button>
@@ -186,7 +186,7 @@ export default function EventoClient({ evento, rsvps, parentRsvpId, criador }: P
               <button
                 onClick={confirmar}
                 disabled={saving}
-                className="w-full py-4 rounded-xl bg-brand hover:bg-brand-dark disabled:opacity-50 text-white font-display font-bold text-lg transition-colors"
+                className="w-full py-4 rounded-xl bg-brand hover:bg-brand-dark disabled:opacity-50 text-white font-bold text-lg transition-colors"
               >
                 {saving ? 'Confirmando…' : 'Confirmar BORA! 🎉'}
               </button>
@@ -200,7 +200,7 @@ export default function EventoClient({ evento, rsvps, parentRsvpId, criador }: P
             <div className="text-center space-y-5">
               <div className="text-5xl">🎉</div>
               <div>
-                <h2 className="text-xl font-display font-bold text-gray-900 mb-1">BORA confirmado!</h2>
+                <h2 className="text-xl font-bold text-gray-900 mb-1">BORA confirmado!</h2>
                 <p className="text-gray-500 text-sm">Você está na lista. Nos vemos lá!</p>
               </div>
 
