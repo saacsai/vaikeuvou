@@ -3,7 +3,7 @@ import Link from 'next/link'
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-white text-gray-900 flex flex-col">
+    <div className="font-display min-h-screen bg-white text-gray-900 flex flex-col">
       <div className="flex-1 flex flex-col items-center px-5 pt-[60px] md:pt-[104px] text-center">
 
         {/* Marca — ícone + wordmark + "Vamo aí?" já vêm com espaçamento definido nessa peça */}
