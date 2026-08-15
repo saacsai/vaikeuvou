@@ -32,7 +32,7 @@ export default function Home() {
 
         <Link
           href="/criar"
-          className="font-display px-10 py-4 md:py-[18px] rounded-xl bg-brand hover:bg-brand-dark text-white font-bold text-lg tracking-wide transition-colors shadow-lg shadow-brand/20"
+          className="font-display px-[27px] py-4 md:py-[18px] rounded-xl bg-brand hover:bg-brand-dark text-white font-bold text-lg tracking-wide transition-colors shadow-lg shadow-brand/20"
         >
           CRIAR CONVITE
         </Link>
