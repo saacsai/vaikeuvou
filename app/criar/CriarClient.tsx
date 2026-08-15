@@ -54,7 +54,7 @@ function EventoPreview({ form, userName, userAvatar }: { form: Form; userName: s
       </div>
 
       <div className="px-5 pt-5 pb-6" style={{ backgroundColor: header.bg }}>
-        <Image src="/logo.png" alt="vaikeuvou" width={137} height={47} className="h-7 w-auto mb-0.5" />
+        <Image src="/logo.png" alt="vaikeuvou" width={480} height={108} className="h-7 w-auto mb-0.5" />
         <h1 className={`text-xl font-bold leading-tight mb-3 ${hasTitle ? 'text-gray-900' : 'text-gray-300'}`}>
           {hasTitle ? form.title : 'Nome do evento'}
         </h1>
@@ -168,7 +168,7 @@ export default function CriarClient({ userName, userAvatar }: Props) {
 
         <div className="flex items-center gap-2 text-sm mb-6">
           <a href="/">
-            <Image src="/logo.png" alt="vaikeuvou" width={137} height={47} className="h-[43px] w-auto" />
+            <Image src="/logo.png" alt="vaikeuvou" width={480} height={108} className="h-[52px] w-auto" />
           </a>
           <span className="text-gray-300">»</span>
           <a href="/meus-eventos" className="text-gray-400 hover:text-gray-600">Meus eventos</a>
