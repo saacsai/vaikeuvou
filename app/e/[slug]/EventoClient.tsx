@@ -4,7 +4,7 @@ import { useState } from 'react'
 import Image from 'next/image'
 import type { Event, Rsvp } from '@/lib/supabase'
 import { fmtDate } from '@/lib/slug'
-import { titleToGradient, titleToAccent } from '@/lib/gradient'
+import { titleToHeader } from '@/lib/headers'
 
 type Criador = { name: string | null; avatar_url: string | null }
 
@@ -35,8 +35,9 @@ export default function EventoClient({ evento, rsvps, parentRsvpId, criador }: P
   const linkConvite = `${base}/e/${evento.slug}?ref=${meuRsvpId}`
   const whatsappTxt = `Vou no "${evento.title}"! Vai você também? 👉 ${linkConvite}`
 
-  const gradient = titleToGradient(evento.title)
-  const accent   = titleToAccent(evento.title)
+  const header = evento.bg_image_url
+    ? { src: evento.bg_image_url, bg: '#f5f5f4' }
+    : titleToHeader(evento.title)
 
   const criadorNome     = criador?.name ?? 'Anfitrião'
   const criadorAvatar   = criador?.avatar_url
@@ -71,194 +72,183 @@ export default function EventoClient({ evento, rsvps, parentRsvpId, criador }: P
   }
 
   return (
-    <div className="min-h-screen bg-gray-950 text-white flex flex-col">
+    <div className="min-h-screen flex flex-col items-center" style={{ backgroundColor: header.bg }}>
+      <div className="w-full max-w-lg bg-white sm:my-8 sm:rounded-3xl sm:shadow-xl overflow-hidden">
 
-      {/* Hero */}
-      <div style={{ background: gradient }} className="px-5 pt-8 pb-10">
-
-        {/* Confirmados (avatares) */}
-        {rsvps.length > 0 && (
-          <div className="flex items-center gap-2 mb-5 flex-wrap">
-            <div className="flex -space-x-2">
-              {rsvps.slice(0, 5).map((r, i) => (
-                <div key={r.id}
-                  className="w-7 h-7 rounded-full border-2 border-black/30 flex items-center justify-center text-xs font-bold text-white"
-                  style={{ backgroundColor: titleToAccent(r.user_name), zIndex: 5 - i }}
-                >
-                  {r.user_name[0].toUpperCase()}
-                </div>
-              ))}
-            </div>
-            <p className="text-xs" style={{ color: accent }}>
-              {rsvps.length === 1
-                ? `${rsvps[0].user_name} confirmou`
-                : `${rsvps[0].user_name} e mais ${rsvps.length - 1} confirmaram`}
-            </p>
-          </div>
-        )}
-
-        {/* Título */}
-        <h1 className="text-3xl font-extrabold leading-tight mb-4 text-white">{evento.title}</h1>
-
-        {/* Detalhes */}
-        <div className="space-y-1.5 text-sm mb-5" style={{ color: accent }}>
-          <p>📅 {fmtDate(evento.event_date)}</p>
-          {evento.location  && <p>📍 {evento.location}</p>}
-          {evento.description && (
-            <p className="text-white/60 text-xs mt-3 leading-relaxed">{evento.description}</p>
-          )}
+        {/* Banner — proporção medida do mockup: ~22% da altura do card */}
+        <div className="relative w-full aspect-[2.4/1]">
+          <Image src={header.src} alt="" fill unoptimized className="object-cover" />
         </div>
 
-        {/* Link externo */}
-        {evento.external_url && (
-          <a
-            href={evento.external_url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-bold mb-5"
-            style={{ backgroundColor: accent + '22', color: accent, border: `1px solid ${accent}44` }}
-          >
-            {linkLabel} ↗
-          </a>
-        )}
+        <div className="px-6 pt-6 pb-8" style={{ backgroundColor: header.bg }}>
 
-        {/* Assinatura do anfitrião */}
-        <div className="flex items-center gap-3 mt-2">
-          {criadorAvatar ? (
-            <Image
-              src={criadorAvatar}
-              alt={criadorNome}
-              width={36} height={36}
-              className="w-9 h-9 rounded-full object-cover border-2 border-white/20"
-              unoptimized
-            />
-          ) : (
-            <div
-              className="w-9 h-9 rounded-full flex items-center justify-center text-xs font-bold border-2 border-white/20"
-              style={{ backgroundColor: accent, color: '#111' }}
-            >
-              {criadorIniciais}
-            </div>
-          )}
-          <div>
-            <p className="text-xs text-white/50">organizado por</p>
-            <p className="text-sm font-semibold text-white">{criadorNome}</p>
+          {/* Marca */}
+          <Image src="/logo.png" alt="vaikeuvou" width={137} height={47} className="h-6 w-auto mb-4" />
+
+          {/* Título */}
+          <h1 className="font-display text-3xl font-bold leading-tight text-gray-900 mb-3">{evento.title}</h1>
+
+          {/* Detalhes */}
+          <div className="space-y-1 text-sm text-gray-500 mb-4">
+            <p>📅 {fmtDate(evento.event_date)}</p>
+            {evento.location && <p>📍 {evento.location}</p>}
           </div>
-          <div className="ml-auto">
-            <p className="text-xs font-bold text-white/40 uppercase tracking-widest">vaikeuvou</p>
-          </div>
-        </div>
-      </div>
 
-      {/* CTA */}
-      <div className="flex-1 px-5 py-8 max-w-lg w-full mx-auto">
-
-        {etapa === 'convite' && (
-          <div className="space-y-4">
-            <p className="text-white text-center text-xl font-bold">E aí? Vamos? 🎉</p>
-            <button
-              onClick={() => setEtapa('form')}
-              className="w-full py-5 rounded-2xl text-white font-extrabold text-2xl transition-colors shadow-lg"
-              style={{ backgroundColor: titleToAccent(evento.title).replace('75%', '45%') }}
-            >
-              BORA! 🚀
-            </button>
-            <p className="text-gray-500 text-xs text-center">
-              Confirme sua presença em segundos
-            </p>
-          </div>
-        )}
-
-        {etapa === 'form' && (
-          <div className="space-y-4">
-            <h2 className="text-xl font-bold text-center">Só mais dois campos 😄</h2>
-            <div>
-              <label className="block text-xs text-gray-400 mb-1.5 font-semibold uppercase tracking-wide">Seu nome</label>
-              <input
-                value={nome}
-                onChange={e => setNome(e.target.value)}
-                placeholder="Como te chamam?"
-                autoFocus
-                className="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-3 text-white placeholder-gray-600 outline-none focus:border-violet-500 text-base"
-              />
-            </div>
-            <div>
-              <label className="block text-xs text-gray-400 mb-1.5 font-semibold uppercase tracking-wide">Seu WhatsApp</label>
-              <input
-                type="tel"
-                value={telefone}
-                onChange={e => setTelefone(e.target.value)}
-                placeholder="11 99999-0000"
-                className="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-3 text-white placeholder-gray-600 outline-none focus:border-violet-500 text-base"
-              />
-            </div>
-            {erro && <p className="text-red-400 text-sm">{erro}</p>}
-            <button
-              onClick={confirmar}
-              disabled={saving}
-              className="w-full py-4 rounded-2xl bg-green-500 hover:bg-green-400 disabled:opacity-50 text-white font-extrabold text-xl transition-colors"
-            >
-              {saving ? 'Confirmando…' : 'Confirmar BORA! 🎉'}
-            </button>
-            <button onClick={() => setEtapa('convite')} className="w-full text-gray-500 text-sm py-2">
-              Voltar
-            </button>
-          </div>
-        )}
-
-        {etapa === 'sucesso' && (
-          <div className="text-center space-y-6">
-            <div className="text-6xl">🎉</div>
-            <div>
-              <h2 className="text-2xl font-extrabold mb-1">BORA confirmado!</h2>
-              <p className="text-gray-400 text-sm">Você está na lista. Nos vemos lá!</p>
-            </div>
-
-            {podeConvidar && (
-              <div className="bg-gray-900 rounded-2xl p-5 text-left space-y-3">
-                <p className="font-bold text-white text-sm">Chama sua galera também 👇</p>
-                <div className="flex gap-2">
-                  <input
-                    readOnly
-                    value={linkConvite}
-                    className="flex-1 bg-gray-800 rounded-xl px-3 py-2 text-xs text-gray-400 font-mono outline-none"
-                  />
-                  <button
-                    onClick={() => navigator.clipboard.writeText(linkConvite)}
-                    className="px-3 py-2 rounded-xl bg-gray-700 text-xs text-white font-semibold whitespace-nowrap hover:bg-gray-600"
+          {/* Confirmados */}
+          {rsvps.length > 0 && (
+            <div className="flex items-center gap-2 mb-4 flex-wrap">
+              <div className="flex -space-x-2">
+                {rsvps.slice(0, 5).map((r, i) => (
+                  <div key={r.id}
+                    className="w-7 h-7 rounded-full border-2 border-white bg-brand flex items-center justify-center text-xs font-bold text-white"
+                    style={{ zIndex: 5 - i }}
                   >
-                    Copiar
-                  </button>
-                </div>
-                <a
-                  href={`https://wa.me/?text=${encodeURIComponent(whatsappTxt)}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center justify-center gap-2 w-full py-3 rounded-xl bg-[#25D366] text-white font-bold text-sm"
-                >
-                  Enviar no WhatsApp
-                </a>
+                    {r.user_name[0].toUpperCase()}
+                  </div>
+                ))}
+              </div>
+              <p className="text-xs text-gray-500">
+                {rsvps.length === 1
+                  ? `${rsvps[0].user_name} confirmou`
+                  : `${rsvps[0].user_name} e mais ${rsvps.length - 1} confirmaram`}
+              </p>
+            </div>
+          )}
+
+          {/* Anfitrião + recado */}
+          <div className="flex items-start gap-3 mb-5">
+            {criadorAvatar ? (
+              <Image src={criadorAvatar} alt={criadorNome} width={40} height={40}
+                className="w-10 h-10 rounded-full object-cover flex-shrink-0" unoptimized />
+            ) : (
+              <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-xs font-bold text-gray-600 flex-shrink-0">
+                {criadorIniciais}
               </div>
             )}
+            <div>
+              {evento.description ? (
+                <p className="text-sm text-gray-700 italic">&ldquo;{evento.description}&rdquo;</p>
+              ) : (
+                <p className="text-sm text-gray-400">Organizado por {criadorNome}</p>
+              )}
+            </div>
           </div>
-        )}
-      </div>
 
-      {/* Vídeo embed */}
-      {embedUrl && (
-        <div className="px-5 pb-10 max-w-lg w-full mx-auto">
-          <div className="rounded-2xl overflow-hidden aspect-video">
-            <iframe
-              src={embedUrl}
-              title="Vídeo do evento"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              allowFullScreen
-              className="w-full h-full"
-            />
-          </div>
+          {/* Link externo */}
+          {evento.external_url && (
+            <a
+              href={evento.external_url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-bold mb-5 bg-gray-100 text-gray-700 hover:bg-gray-200"
+            >
+              {linkLabel} ↗
+            </a>
+          )}
+
+          {/* CTA */}
+          {etapa === 'convite' && (
+            <div className="space-y-3">
+              <p className="text-gray-900 font-display font-semibold text-lg">Vamo aí?</p>
+              <button
+                onClick={() => setEtapa('form')}
+                className="w-full py-4 rounded-xl bg-brand hover:bg-brand-dark text-white font-display font-bold text-xl tracking-wide transition-colors shadow-lg shadow-brand/20"
+              >
+                BORA 🏃
+              </button>
+            </div>
+          )}
+
+          {etapa === 'form' && (
+            <div className="space-y-4">
+              <h2 className="text-lg font-bold text-gray-900">Só mais dois campos 😄</h2>
+              <div>
+                <label className="block text-xs text-gray-500 mb-1.5 font-semibold uppercase tracking-wide">Seu nome</label>
+                <input
+                  value={nome}
+                  onChange={e => setNome(e.target.value)}
+                  placeholder="Como te chamam?"
+                  autoFocus
+                  className="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 outline-none focus:border-brand text-base"
+                />
+              </div>
+              <div>
+                <label className="block text-xs text-gray-500 mb-1.5 font-semibold uppercase tracking-wide">Seu WhatsApp</label>
+                <input
+                  type="tel"
+                  value={telefone}
+                  onChange={e => setTelefone(e.target.value)}
+                  placeholder="11 99999-0000"
+                  className="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 outline-none focus:border-brand text-base"
+                />
+              </div>
+              {erro && <p className="text-red-500 text-sm">{erro}</p>}
+              <button
+                onClick={confirmar}
+                disabled={saving}
+                className="w-full py-4 rounded-xl bg-brand hover:bg-brand-dark disabled:opacity-50 text-white font-display font-bold text-lg transition-colors"
+              >
+                {saving ? 'Confirmando…' : 'Confirmar BORA! 🎉'}
+              </button>
+              <button onClick={() => setEtapa('convite')} className="w-full text-gray-400 text-sm py-2">
+                Voltar
+              </button>
+            </div>
+          )}
+
+          {etapa === 'sucesso' && (
+            <div className="text-center space-y-5">
+              <div className="text-5xl">🎉</div>
+              <div>
+                <h2 className="text-xl font-display font-bold text-gray-900 mb-1">BORA confirmado!</h2>
+                <p className="text-gray-500 text-sm">Você está na lista. Nos vemos lá!</p>
+              </div>
+
+              {podeConvidar && (
+                <div className="bg-gray-50 rounded-2xl p-5 text-left space-y-3">
+                  <p className="font-bold text-gray-900 text-sm">Chama sua galera também 👇</p>
+                  <div className="flex gap-2">
+                    <input
+                      readOnly
+                      value={linkConvite}
+                      className="flex-1 bg-white border border-gray-200 rounded-xl px-3 py-2 text-xs text-gray-500 font-mono outline-none"
+                    />
+                    <button
+                      onClick={() => navigator.clipboard.writeText(linkConvite)}
+                      className="px-3 py-2 rounded-xl bg-gray-200 text-xs text-gray-700 font-semibold whitespace-nowrap hover:bg-gray-300"
+                    >
+                      Copiar
+                    </button>
+                  </div>
+                  <a
+                    href={`https://wa.me/?text=${encodeURIComponent(whatsappTxt)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center justify-center gap-2 w-full py-3 rounded-xl bg-[#25D366] text-white font-bold text-sm"
+                  >
+                    Enviar no WhatsApp
+                  </a>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Vídeo embed */}
+          {embedUrl && (
+            <div className="mt-6 rounded-2xl overflow-hidden aspect-video">
+              <iframe
+                src={embedUrl}
+                title="Vídeo do evento"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+                className="w-full h-full"
+              />
+            </div>
+          )}
+
+          <p className="text-xs text-gray-400 mt-6">Organizado por <span className="font-semibold text-gray-500">{criadorNome}</span></p>
         </div>
-      )}
-
+      </div>
     </div>
   )
 }

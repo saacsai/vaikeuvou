@@ -3,20 +3,18 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  --brand: #e36811;
+  --brand-dark: #c2570c;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-brand: var(--brand);
+  --color-brand-dark: var(--brand-dark);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --font-display: var(--font-oswald);
 }
 
 body {
