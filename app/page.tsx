@@ -12,7 +12,7 @@ export default function Home() {
           alt="vaikeuvou — Vamo aí?"
           width={261}
           height={223}
-          className="w-[182px] md:w-[242px] h-auto mb-6 md:mb-[42px]"
+          className="w-[200px] md:w-[242px] h-auto mb-6 md:mb-[42px]"
           priority
         />
 
