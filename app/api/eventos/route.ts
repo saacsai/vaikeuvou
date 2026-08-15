@@ -7,7 +7,7 @@ export async function POST(req: NextRequest) {
   const session = await getSession()
   if (!session) return NextResponse.json({ error: 'Não autenticado.' }, { status: 401 })
 
-  const { title, event_date, location, description, max_depth } = await req.json()
+  const { title, event_date, location, description, max_depth, bg_image_url } = await req.json()
 
   if (!title || !event_date) {
     return NextResponse.json({ error: 'título e data são obrigatórios' }, { status: 400 })
@@ -34,6 +34,7 @@ export async function POST(req: NextRequest) {
       location:      location || null,
       description:   description || null,
       max_depth:     max_depth ?? 2,
+      bg_image_url:  bg_image_url || null,
       creator_phone: phone,
       user_id:       session.user_id,
     })

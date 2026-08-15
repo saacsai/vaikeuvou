@@ -5,7 +5,7 @@ export async function PATCH(req: NextRequest) {
   const { edit_token, ...fields } = await req.json()
   if (!edit_token) return NextResponse.json({ error: 'edit_token obrigatório' }, { status: 400 })
 
-  const allowed = ['external_url', 'external_url_label', 'video_url', 'title', 'location', 'description', 'event_date']
+  const allowed = ['external_url', 'external_url_label', 'video_url', 'title', 'location', 'description', 'event_date', 'bg_image_url']
   const updates: Record<string, unknown> = {}
   for (const key of allowed) {
     if (key in fields) updates[key] = fields[key] || null

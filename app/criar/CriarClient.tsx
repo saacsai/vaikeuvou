@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
-import { titleToGradient, titleToAccent } from '@/lib/gradient'
+import { HEADER_PRESETS, titleToHeader } from '@/lib/headers'
 
 const PRIVACIDADE = [
   { value: 1,   label: 'Privado',          desc: 'Só você convida' },
@@ -21,15 +21,13 @@ type Form = {
   external_url: string
   external_url_label: string
   video_url: string
+  bg_image_url: string
 }
 
 type Props = {
   userName: string | null
   userAvatar: string | null
 }
-
-const DEFAULT_GRADIENT = 'linear-gradient(135deg, hsl(270,65%,18%) 0%, hsl(315,55%,12%) 50%, hsl(0,45%,8%) 100%)'
-const DEFAULT_ACCENT   = 'hsl(270, 80%, 75%)'
 
 function fmtPreviewDate(date: string, time: string): string {
   if (!date) return ''
@@ -42,68 +40,86 @@ function fmtPreviewDate(date: string, time: string): string {
 
 function EventoPreview({ form, userName, userAvatar }: { form: Form; userName: string | null; userAvatar: string | null }) {
   const hasTitle  = form.title.trim().length > 0
-  const gradient  = hasTitle ? titleToGradient(form.title) : DEFAULT_GRADIENT
-  const accent    = hasTitle ? titleToAccent(form.title) : DEFAULT_ACCENT
+  const header    = form.bg_image_url
+    ? { src: form.bg_image_url, bg: '#f5f5f4' }
+    : titleToHeader(hasTitle ? form.title : 'vaikeuvou')
   const nome      = userName ?? 'Você'
   const iniciais  = nome.slice(0, 2).toUpperCase()
   const dateLabel = fmtPreviewDate(form.event_date, form.event_time)
 
   return (
-    <div className="rounded-3xl overflow-hidden shadow-2xl border border-white/5">
-      {/* Hero */}
-      <div style={{ background: gradient }} className="px-5 pt-6 pb-8">
-        <h1 className={`text-xl font-extrabold leading-tight mb-3 ${hasTitle ? 'text-white' : 'text-white/25'}`}>
+    <div className="rounded-3xl overflow-hidden shadow-lg border border-gray-100">
+      <div className="relative w-full aspect-[2.4/1]">
+        <Image src={header.src} alt="" fill unoptimized className="object-cover" />
+      </div>
+
+      <div className="px-5 pt-5 pb-6" style={{ backgroundColor: header.bg }}>
+        <h1 className={`text-xl font-bold leading-tight mb-3 ${hasTitle ? 'text-gray-900' : 'text-gray-300'}`}>
           {hasTitle ? form.title : 'Nome do evento'}
         </h1>
 
-        <div className="space-y-1 text-xs mb-5" style={{ color: hasTitle ? accent : 'rgba(255,255,255,0.2)' }}>
-          {dateLabel
-            ? <p>📅 {dateLabel}</p>
-            : <p>📅 Data e horário</p>
-          }
-          {form.location
-            ? <p>📍 {form.location}</p>
-            : <p>📍 Local</p>
-          }
+        <div className="space-y-1 text-xs text-gray-500 mb-4">
+          <p>📅 {dateLabel || 'Data e horário'}</p>
+          <p>📍 {form.location || 'Local'}</p>
           {form.description && (
-            <p className="text-white/50 mt-2 leading-relaxed">{form.description}</p>
+            <p className="text-gray-500 mt-2 leading-relaxed italic">&ldquo;{form.description}&rdquo;</p>
           )}
         </div>
 
-        <div className="flex items-center gap-2 mt-2">
+        <div className="flex items-center gap-2 mb-4">
           {userAvatar ? (
-            <Image
-              src={userAvatar} alt={nome}
-              width={28} height={28}
-              className="w-7 h-7 rounded-full object-cover border border-white/20"
-              unoptimized
-            />
+            <Image src={userAvatar} alt={nome} width={28} height={28}
+              className="w-7 h-7 rounded-full object-cover" unoptimized />
           ) : (
-            <div
-              className="w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-bold border border-white/20"
-              style={{ backgroundColor: hasTitle ? accent : DEFAULT_ACCENT, color: '#111' }}
-            >
+            <div className="w-7 h-7 rounded-full bg-gray-200 flex items-center justify-center text-[10px] font-bold text-gray-600">
               {iniciais}
             </div>
           )}
-          <div>
-            <p className="text-[10px] text-white/40">organizado por</p>
-            <p className="text-xs font-semibold text-white">{nome}</p>
-          </div>
-          <p className="ml-auto text-[10px] font-bold text-white/30 uppercase tracking-widest">vaikeuvou</p>
+          <p className="text-xs text-gray-400">organizado por <span className="font-semibold text-gray-600">{nome}</span></p>
+        </div>
+
+        <p className="text-gray-900 font-semibold text-sm mb-2">Vamo aí?</p>
+        <div className="w-full py-3 rounded-xl bg-brand text-white font-bold text-sm text-center select-none">
+          BORA 🏃
         </div>
       </div>
+    </div>
+  )
+}
 
-      {/* CTA */}
-      <div className="px-5 py-5 bg-gray-950 space-y-3">
-        <p className="text-white text-center text-sm font-bold">E aí? Vamos? 🎉</p>
-        <div
-          className="w-full py-3 rounded-2xl text-white font-extrabold text-base text-center select-none"
-          style={{ backgroundColor: hasTitle ? titleToAccent(form.title).replace('75%', '45%') : '#4c1d95' }}
+function BgSelector({ value, onChange, title }: { value: string; onChange: (v: string) => void; title: string }) {
+  const auto = titleToHeader(title.trim() || 'vaikeuvou')
+  return (
+    <div className="rounded-2xl bg-white border border-gray-100 p-4 space-y-3">
+      <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Imagem do cabeçalho</p>
+      <div className="grid grid-cols-4 gap-2">
+        <button
+          onClick={() => onChange('')}
+          title="Automático — escolhido a partir do título"
+          className={`relative aspect-square rounded-lg overflow-hidden border-2 ${value === '' ? 'border-brand' : 'border-transparent'}`}
         >
-          BORA! 🚀
+          <Image src={auto.src} alt="Automático" fill unoptimized className="object-cover" />
+          <span className="absolute inset-0 bg-black/40 flex items-center justify-center text-white text-[9px] font-bold uppercase">
+            Auto ✓
+          </span>
+        </button>
+        {HEADER_PRESETS.map(p => (
+          <button
+            key={p.id}
+            onClick={() => onChange(p.src)}
+            title={p.label}
+            className={`relative aspect-square rounded-lg overflow-hidden border-2 ${value === p.src ? 'border-brand' : 'border-transparent hover:border-gray-200'}`}
+          >
+            <Image src={p.src} alt={p.label} fill unoptimized className="object-cover" />
+          </button>
+        ))}
+        <div
+          title="Upload de imagem própria — plano PRO"
+          className="aspect-square rounded-lg bg-gray-50 border border-dashed border-gray-200 flex flex-col items-center justify-center gap-0.5 cursor-not-allowed"
+        >
+          <span className="text-sm text-gray-400 font-bold">↑</span>
+          <span className="text-[7px] text-gray-400 font-bold uppercase">PRO</span>
         </div>
-        <p className="text-gray-600 text-[10px] text-center">Confirme sua presença em segundos</p>
       </div>
     </div>
   )
@@ -115,6 +131,7 @@ export default function CriarClient({ userName, userAvatar }: Props) {
     title: '', event_date: '', event_time: '19:00',
     location: '', description: '', max_depth: 2,
     external_url: '', external_url_label: '', video_url: '',
+    bg_image_url: '',
   })
   const [saving, setSaving] = useState(false)
   const [erro,   setErro]   = useState('')
@@ -144,14 +161,14 @@ export default function CriarClient({ userName, userAvatar }: Props) {
     router.push(`/dashboard/${json.edit_token}?novo=1`)
   }
 
-  const gradient = form.title ? titleToGradient(form.title) : DEFAULT_GRADIENT
-
   return (
-    <div className="min-h-screen bg-gray-950 text-white">
-      <div className="max-w-5xl mx-auto px-4 py-10">
+    <div className="min-h-screen bg-white text-gray-900">
+      <div className="max-w-5xl mx-auto px-4 py-8">
 
-        <a href="/meus-eventos" className="text-gray-500 text-sm hover:text-gray-400">← Meus eventos</a>
-        <h1 className="text-3xl font-extrabold mt-3 mb-1">Criar evento</h1>
+        <Image src="/logo.png" alt="vaikeuvou" width={137} height={47} className="h-6 w-auto mb-6" />
+
+        <a href="/meus-eventos" className="text-gray-400 text-sm hover:text-gray-600">← Meus eventos</a>
+        <h1 className="text-3xl font-bold mt-3 mb-1 text-gray-900">Criar evento</h1>
         <p className="text-gray-400 text-sm mb-8">Pronto em segundos.</p>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
@@ -160,60 +177,60 @@ export default function CriarClient({ userName, userAvatar }: Props) {
           <div className="space-y-5">
 
             <div>
-              <label className="block text-xs font-semibold text-gray-400 mb-1.5 uppercase tracking-wide">Nome do evento *</label>
+              <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Nome do evento *</label>
               <input
                 value={form.title}
                 onChange={e => set('title', e.target.value)}
                 placeholder="Ex: Churrasco de Sábado"
                 autoFocus
-                className="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-3 text-white placeholder-gray-600 outline-none focus:border-violet-500 text-base"
+                className="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 outline-none focus:border-brand text-base"
               />
             </div>
 
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-xs font-semibold text-gray-400 mb-1.5 uppercase tracking-wide">Data *</label>
+                <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Data *</label>
                 <input
                   type="date"
                   value={form.event_date}
                   onChange={e => set('event_date', e.target.value)}
-                  className="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-3 text-white outline-none focus:border-violet-500 text-sm"
+                  className="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-gray-900 outline-none focus:border-brand text-sm"
                 />
               </div>
               <div>
-                <label className="block text-xs font-semibold text-gray-400 mb-1.5 uppercase tracking-wide">Horário</label>
+                <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Horário</label>
                 <input
                   type="time"
                   value={form.event_time}
                   onChange={e => set('event_time', e.target.value)}
-                  className="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-3 text-white outline-none focus:border-violet-500 text-sm"
+                  className="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-gray-900 outline-none focus:border-brand text-sm"
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-gray-400 mb-1.5 uppercase tracking-wide">Local</label>
+              <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Local</label>
               <input
                 value={form.location}
                 onChange={e => set('location', e.target.value)}
                 placeholder="Endereço ou nome do lugar"
-                className="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-3 text-white placeholder-gray-600 outline-none focus:border-violet-500 text-sm"
+                className="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 outline-none focus:border-brand text-sm"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-gray-400 mb-1.5 uppercase tracking-wide">Detalhes</label>
+              <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Detalhes</label>
               <textarea
                 value={form.description}
                 onChange={e => set('description', e.target.value)}
                 placeholder="O que rolar, o que levar, dress code…"
                 rows={3}
-                className="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-3 text-white placeholder-gray-600 outline-none focus:border-violet-500 text-sm resize-none"
+                className="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 outline-none focus:border-brand text-sm resize-none"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-gray-400 mb-2 uppercase tracking-wide">Quem pode convidar?</label>
+              <label className="block text-xs font-semibold text-gray-500 mb-2 uppercase tracking-wide">Quem pode convidar?</label>
               <div className="grid grid-cols-3 gap-2">
                 {PRIVACIDADE.map(p => (
                   <button
@@ -221,44 +238,49 @@ export default function CriarClient({ userName, userAvatar }: Props) {
                     onClick={() => set('max_depth', p.value)}
                     className={`rounded-xl p-3 text-left border transition-colors ${
                       form.max_depth === p.value
-                        ? 'border-violet-500 bg-violet-500/10'
-                        : 'border-gray-700 bg-gray-900 hover:border-gray-500'
+                        ? 'border-brand bg-brand/5'
+                        : 'border-gray-200 bg-white hover:border-gray-300'
                     }`}
                   >
-                    <p className="text-xs font-bold text-white">{p.label}</p>
+                    <p className="text-xs font-bold text-gray-900">{p.label}</p>
                     <p className="text-[10px] text-gray-400 mt-0.5">{p.desc}</p>
                   </button>
                 ))}
               </div>
             </div>
 
+            {/* BG selector — mobile (some antes do botão, no desktop fica junto ao preview) */}
+            <div className="lg:hidden">
+              <BgSelector value={form.bg_image_url} onChange={v => set('bg_image_url', v)} title={form.title} />
+            </div>
+
             {/* Link externo */}
             <div>
-              <label className="block text-xs font-semibold text-gray-400 mb-1.5 uppercase tracking-wide">Link externo</label>
+              <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Link externo</label>
               <input
                 value={form.external_url}
                 onChange={e => set('external_url', e.target.value)}
                 placeholder="https://... (ingresso, site, maps…)"
                 type="url"
-                className="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-3 text-white placeholder-gray-600 outline-none focus:border-violet-500 text-sm"
+                className="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 outline-none focus:border-brand text-sm"
               />
             </div>
 
             {form.external_url && (
               <div>
-                <label className="block text-xs font-semibold text-gray-400 mb-1.5 uppercase tracking-wide">Texto do botão</label>
+                <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Texto do botão</label>
                 <input
                   value={form.external_url_label}
                   onChange={e => set('external_url_label', e.target.value)}
                   placeholder="Ex: Comprar ingresso 🎟️"
-                  className="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-3 text-white placeholder-gray-600 outline-none focus:border-violet-500 text-sm"
+                  className="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 outline-none focus:border-brand text-sm"
                 />
               </div>
             )}
 
             {/* Vídeo */}
             <div>
-              <label className="block text-xs font-semibold text-gray-400 mb-1.5 uppercase tracking-wide">
+              <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">
                 Vídeo do evento
               </label>
               <input
@@ -266,17 +288,17 @@ export default function CriarClient({ userName, userAvatar }: Props) {
                 onChange={e => set('video_url', e.target.value)}
                 placeholder="YouTube ou Vimeo"
                 type="url"
-                className="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-3 text-white placeholder-gray-600 outline-none focus:border-violet-500 text-sm"
+                className="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 outline-none focus:border-brand text-sm"
               />
-              <p className="text-[10px] text-gray-600 mt-1">Aparece abaixo do botão BORA na página do evento</p>
+              <p className="text-[10px] text-gray-400 mt-1">Aparece abaixo do botão BORA na página do evento</p>
             </div>
 
-            {erro && <p className="text-red-400 text-sm">{erro}</p>}
+            {erro && <p className="text-red-500 text-sm">{erro}</p>}
 
             <button
               onClick={criar}
               disabled={saving}
-              className="w-full py-4 rounded-2xl bg-violet-600 hover:bg-violet-500 disabled:opacity-50 text-white font-extrabold text-lg transition-colors"
+              className="w-full py-4 rounded-xl bg-brand hover:bg-brand-dark disabled:opacity-50 text-white font-bold text-lg transition-colors"
             >
               {saving ? 'Criando…' : 'Criar evento 🎉'}
             </button>
@@ -284,41 +306,10 @@ export default function CriarClient({ userName, userAvatar }: Props) {
 
           {/* Preview — desktop only */}
           <div className="hidden lg:block">
-            <p className="text-xs text-gray-500 uppercase tracking-widest font-semibold mb-3 text-center">Preview</p>
+            <p className="text-xs text-gray-400 uppercase tracking-widest font-semibold mb-3 text-center">Preview</p>
             <div className="sticky top-6 space-y-3">
               <EventoPreview form={form} userName={userName} userAvatar={userAvatar} />
-
-              {/* BG selector */}
-              <div className="rounded-xl bg-gray-900 p-3 space-y-2">
-                <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide">Plano de fundo</p>
-                <div className="flex items-center gap-3">
-                  <div className="flex items-center gap-2 flex-1 min-w-0">
-                    <div className="w-8 h-8 rounded-lg border-2 border-violet-500 overflow-hidden flex-shrink-0">
-                      <div style={{ background: gradient }} className="w-full h-full" />
-                    </div>
-                    <div className="min-w-0">
-                      <p className="text-xs text-white font-semibold">Automático ✓</p>
-                      <p className="text-[10px] text-gray-500 truncate">Gerado pelo título</p>
-                    </div>
-                  </div>
-                  <div className="flex gap-1.5 flex-shrink-0">
-                    <div
-                      className="w-9 h-9 rounded-lg bg-gray-800 border border-gray-700 flex flex-col items-center justify-center gap-0.5 cursor-not-allowed"
-                      title="Presets — em breve"
-                    >
-                      <span className="text-sm">🎨</span>
-                      <span className="text-[7px] text-gray-500 font-bold uppercase">PRO</span>
-                    </div>
-                    <div
-                      className="w-9 h-9 rounded-lg bg-gray-800 border border-gray-700 flex flex-col items-center justify-center gap-0.5 cursor-not-allowed"
-                      title="Upload de arte — em breve"
-                    >
-                      <span className="text-sm text-gray-500 font-bold">↑</span>
-                      <span className="text-[7px] text-gray-500 font-bold uppercase">PRO</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
+              <BgSelector value={form.bg_image_url} onChange={v => set('bg_image_url', v)} title={form.title} />
             </div>
           </div>
 
