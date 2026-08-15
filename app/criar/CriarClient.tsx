@@ -166,12 +166,10 @@ export default function CriarClient({ userName, userAvatar }: Props) {
     <div className="min-h-screen bg-white text-gray-900">
       <div className="max-w-5xl mx-auto px-4 py-8">
 
-        <a href="/">
-          <Image src="/logo.png" alt="vaikeuvou" width={137} height={47} className="h-[43px] w-auto mb-6" />
-        </a>
-
-        <div className="flex items-center gap-2 text-sm mb-3">
-          <a href="/" className="text-gray-400 hover:text-gray-600">vaikeuvou</a>
+        <div className="flex items-center gap-2 text-sm mb-6">
+          <a href="/">
+            <Image src="/logo.png" alt="vaikeuvou" width={137} height={47} className="h-[43px] w-auto" />
+          </a>
           <span className="text-gray-300">»</span>
           <a href="/meus-eventos" className="text-gray-400 hover:text-gray-600">Meus eventos</a>
           <span className="text-gray-300">»</span>
