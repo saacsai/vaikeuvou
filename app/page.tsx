@@ -26,7 +26,7 @@ export default function Home() {
           Muito mais legal é junto com os amigos!
         </p>
 
-        <p className="w-full max-w-md text-lg md:text-xl font-semibold mb-6 md:mb-[36px]">
+        <p className="w-full max-w-md text-[14.7px] md:text-[16.7px] font-semibold mb-6 md:mb-[36px]">
           Crie. Convide. Compartilhe. Confirme quem vai.
         </p>
 
