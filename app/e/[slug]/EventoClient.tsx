@@ -83,7 +83,7 @@ export default function EventoClient({ evento, rsvps, parentRsvpId, criador }: P
         <div className="px-6 pt-6 pb-8" style={{ backgroundColor: header.bg }}>
 
           {/* Marca */}
-          <Image src="/logo.png" alt="vaikeuvou" width={137} height={47} className="h-6 w-auto mb-4" />
+          <Image src="/logo.png" alt="vaikeuvou" width={137} height={47} className="h-9 w-auto mb-4" />
 
           {/* Título */}
           <h1 className="text-3xl font-bold leading-tight text-gray-900 mb-3">{evento.title}</h1>
