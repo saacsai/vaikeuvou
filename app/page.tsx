@@ -3,7 +3,7 @@ import Link from 'next/link'
 
 export default function Home() {
   return (
-    <div className="font-display min-h-screen bg-white text-gray-900 flex flex-col">
+    <div className="min-h-screen bg-white text-gray-900 flex flex-col">
       <div className="flex-1 flex flex-col items-center px-5 pt-[60px] md:pt-[104px] text-center">
 
         {/* Marca — ícone + wordmark + "Vamo aí?" já vêm com espaçamento definido nessa peça */}
@@ -26,13 +26,13 @@ export default function Home() {
           Muito mais legal é junto com os amigos!
         </p>
 
-        <p className="w-full max-w-md font-display text-lg md:text-xl font-semibold mb-6 md:mb-[36px]">
+        <p className="w-full max-w-md text-lg md:text-xl font-semibold mb-6 md:mb-[36px]">
           Crie. Convide. Compartilhe. Confirme quem vai.
         </p>
 
         <Link
           href="/criar"
-          className="font-display px-[27px] py-4 md:py-[18px] rounded-xl bg-brand hover:bg-brand-dark text-white font-bold text-lg tracking-wide transition-colors shadow-lg shadow-brand/20"
+          className="px-[27px] py-4 md:py-[18px] rounded-xl bg-brand hover:bg-brand-dark text-white font-bold text-lg tracking-wide transition-colors shadow-lg shadow-brand/20"
         >
           CRIAR CONVITE
         </Link>
