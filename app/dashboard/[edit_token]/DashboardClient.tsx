@@ -149,8 +149,16 @@ export default function DashboardClient({ evento, rsvps, isNovo, userName, userA
         {/* Status rápido — contadores + compartilhar */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-10">
           <div className="grid grid-cols-3 gap-3">
+            <div className="bg-white border border-gray-100 rounded-xl p-4 text-center shadow-sm flex flex-col justify-center">
+              <p className="text-2xl font-extrabold text-brand">{rsvps.length}</p>
+              <p className="text-gray-500 text-xs mt-1">Total</p>
+              {rsvps.length > 0 && (
+                <a href={`/dashboard/${evento.edit_token}/convidados`} className="text-[10px] font-semibold text-brand mt-1">
+                  Ver quem vai
+                </a>
+              )}
+            </div>
             {[
-              { label: 'Total',    count: rsvps.length },
               { label: 'Nível 1',  count: nivel1.length },
               { label: 'Nível 2+', count: nivel2.length + nivel3.length },
             ].map(c => (
