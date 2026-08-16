@@ -89,7 +89,7 @@ export default function EventoClient({ evento, rsvps, parentRsvpId, criador }: P
           <h1 className="text-3xl font-bold leading-tight text-gray-900 mb-3">{evento.title}</h1>
 
           {/* Detalhes */}
-          <div className="space-y-3 text-sm text-gray-500 mb-[21px]">
+          <div className="space-y-3 text-sm text-gray-500 mb-[26px]">
             <p>📅 {fmtDate(evento.event_date)}</p>
             {evento.location && (
               <a
@@ -242,7 +242,7 @@ export default function EventoClient({ evento, rsvps, parentRsvpId, criador }: P
 
           {/* Vídeo embed */}
           {embedUrl && (
-            <div className="mt-6 rounded-2xl overflow-hidden aspect-video">
+            <div className="mt-6 rounded-lg overflow-hidden aspect-video">
               <iframe
                 src={embedUrl}
                 title="Vídeo do evento"
