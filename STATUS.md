@@ -1,6 +1,61 @@
 # vaikeuvou.app — Status
 
-Última atualização: 2026-08-15
+Última atualização: 2026-08-16
+
+## Sessão 2026-08-16 — acabamento da página do evento + modelo de negócio
+
+### Feito
+- **Botão BORA vira imagem**: `letra_bora.png` + `icone_bora.png` (assets em
+  `/public`, vieram de `Vaikeuvou/logos e botoes/`) substituem o texto "BORA
+  🏃" nos botões CTA e "Confirmar BORA" — botão continua sendo `<button>` de
+  CSS normal (fundo, hover, `w-full` responsivo), só o conteúdo interno
+  virou duas imagens lado a lado. Aplicado no card real e no preview do
+  `/criar`.
+- **Local do evento vira link pro Google Maps** (URL de busca universal,
+  não precisa de geocoding).
+- **Degradê de marca no corpo do card**: branco → `#fcede1` (laranja bem
+  diluído), substituindo o pastel-por-foto que variava por header
+  escolhido — decisão consciente de simplificar pra identidade consistente
+  em vez de variar por imagem. Fundo da página (atrás do card) continua
+  usando o pastel-por-foto.
+- **Ajustes finos do card**: borda 8px (acompanha o raio do ícone da
+  marca), logo 250px, avatar 100px, texto ao lado do avatar centralizado
+  na altura, "Vamo aí?" 23px, vídeo com a mesma borda do card.
+- **Campos Data/Horário do `/criar` viraram texto com máscara própria**
+  (`DD/MM/AAAA` e `HH:MM`, digitação livre, sem seletor nativo). Motivo:
+  bug do WebKit em `input type="date"/"time"` no Safari iOS que ignora
+  `width:100%` e estoura a borda do card — **3 tentativas de CSS falharam**
+  (min-w-0, position:absolute, width:1px+min-width:100% — essa última
+  chegou a regredir o desktop, ficou 1px). Trade-off aceito: perde o
+  calendário/relógio nativo do sistema, ganha controle total de tamanho.
+  Se quiser o seletor visual de volta no futuro, precisa construir um
+  datepicker customizado (não nativo).
+- Dois bugs de mobile corrigidos no caminho: breadcrumb quebrando texto no
+  meio da palavra (`flex-wrap` + `whitespace-nowrap` + logo menor só no
+  mobile, `h-8 md:h-[52px]`), e `overflow-x: hidden` global como rede de
+  segurança contra estouro horizontal.
+
+### Decisão de modelo de negócio (discutida, NADA implementado ainda)
+Luciano quer **créditos pré-pagos** (pacotes 10/20/50/100), não assinatura
+— combina melhor com uso esporádico de evento do que recorrência. Regra:
+tudo editável de graça até a data do evento, **exceto**: 2ª mudança de data
+(2 créditos), trocar imagem customizada (1 crédito/troca — imagem de
+template continua grátis), trocar vídeo do YouTube (1 crédito), imagem
+gerada por IA (3 créditos/troca), verificar nome de quem vai (3 créditos).
+Duas dessas ações (IA e verificação de convidado) **ainda não existem como
+feature**, não é só destravar paywall.
+
+Combinado: **não** construir tudo liberado pra depois travar (gera
+sensação de perda no usuário) — nascer já com o sinal visual da trava
+(quadradinho cadeado → clica → mensagem "precisa de crédito" → link pra
+página "Almoço grátis", que ainda não existe, vira a explicação do modelo).
+Mas o **motor de crédito de verdade (saldo, Stripe, débito por ação)** fica
+pra uma rodada própria — grande demais pra misturar com ajuste de layout.
+Sequência combinada: primeiro terminar o layout das páginas que faltam
+(dashboard, auth/perfil), DEPOIS os sinais de trava, DEPOIS o motor de
+crédito.
+
+---
 
 ## Identidade visual — sessão de hoje
 
