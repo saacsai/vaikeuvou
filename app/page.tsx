@@ -17,13 +17,13 @@ export default function Home() {
         />
 
         <p className="w-full max-w-md text-gray-400 text-[14.7px] md:text-[16.7px] mb-3 md:mb-[24px] leading-snug">
-          Balada, festa, show, academia, correr, caminhar, surfar, andar de bike, viajar,
-          restaurante, pizza, boteco, cinema, churrasco, tomar uma, o que te der na cabeça
-          fazer&hellip;
+          Balada, festa, show, academia, correr, caminhar, surfar, andar de bike, bater uma
+          bola, viajar, restaurante, pizza, boteco, cinema, teatro, churrasco, tomar uma,
+          trocar ideia&hellip;
         </p>
         <p className="w-full max-w-md text-gray-400 text-[14.7px] md:text-[16.7px] mb-6 md:mb-[40px] leading-snug">
-          Tudo isso é muito legal!<br />
-          Muito mais legal é junto com os amigos!
+          Fazer tudo isso é muito legal! Mas, fala a verdade, junto com a galera, junto com
+          os amigos, é muito melhor!
         </p>
 
         <p className="w-full max-w-md text-[14.7px] md:text-[16.7px] font-semibold mb-6 md:mb-[36px]">
