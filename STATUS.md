@@ -2,6 +2,26 @@
 
 Última atualização: 2026-08-16 (parte 3)
 
+## Pós-login inteligente (mesma parte 3, adicionado depois)
+
+Investigando o fluxo "cheguei na home sem convite, cliquei em Criar
+convite", achamos um atrito: `/criar` exigia login, mas depois do OTP o
+redirect ia sempre pra `/meus-convites` (vazio), obrigando um clique extra
+até chegar de fato em `/criar`.
+
+Corrigido com pós-login inteligente:
+- Rotas protegidas (`/criar`, `/meus-convites`) redirecionam pro login com
+  `?next=<rota original>`; o login carrega esse `next` por toda a jornada
+  (`/login` → `/login/verificar` → pós-OTP) e volta exatamente pra lá.
+- Sem `next` (login "solto", não veio de um CTA específico): decide pelo
+  estado do usuário — `/api/auth/verificar-otp` agora retorna `hasEvents`;
+  sem nenhum convite ainda → `/criar` (primeiro passo natural); já tendo
+  convites → `/meus-convites`.
+- Arquivos: `middleware.ts`, `app/criar/page.tsx`, `app/login/page.tsx`,
+  `app/login/verificar/page.tsx`, `app/api/auth/verificar-otp/route.ts`.
+
+---
+
 ## Sessão 2026-08-16 (parte 3) — dashboard convertido, árvore de convidados, paginação
 
 ### Feito
