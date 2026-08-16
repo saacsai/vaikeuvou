@@ -8,6 +8,7 @@ function VerificarForm() {
   const router  = useRouter()
   const params  = useSearchParams()
   const phone   = params.get('p') ?? ''
+  const next    = params.get('next') ?? ''
 
   const [code,   setCode]   = useState('')
   const [saving, setSaving] = useState(false)
@@ -32,7 +33,10 @@ function VerificarForm() {
 
     if (!res.ok) { setErro(json.error ?? 'Código inválido.'); setSaving(false); return }
 
-    router.push('/meus-convites')
+    // Sem destino explícito (login não veio de um CTA como "Criar convite"):
+    // decide pelo estado do usuário — sem convites ainda, o primeiro passo
+    // natural é criar um; já tendo, cai na lista.
+    router.push(next || (json.hasEvents ? '/meus-convites' : '/criar'))
   }
 
   async function reenviar() {

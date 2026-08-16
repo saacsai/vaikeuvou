@@ -4,7 +4,7 @@ import CriarClient from './CriarClient'
 
 export default async function CriarPage() {
   const session = await getSession()
-  if (!session) redirect('/login')
+  if (!session) redirect('/login?next=/criar')
 
   return (
     <CriarClient

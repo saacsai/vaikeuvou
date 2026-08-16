@@ -1,10 +1,12 @@
 'use client'
 
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useState, Suspense } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 
-export default function LoginPage() {
+function LoginForm() {
   const router  = useRouter()
+  const params  = useSearchParams()
+  const next    = params.get('next') ?? ''
   const [phone, setPhone]   = useState('')
   const [saving, setSaving] = useState(false)
   const [erro,   setErro]   = useState('')
@@ -23,7 +25,8 @@ export default function LoginPage() {
 
     if (!res.ok) { setErro(json.error ?? 'Erro ao enviar.'); setSaving(false); return }
 
-    router.push(`/login/verificar?p=${encodeURIComponent(phone)}`)
+    const nextParam = next ? `&next=${encodeURIComponent(next)}` : ''
+    router.push(`/login/verificar?p=${encodeURIComponent(phone)}${nextParam}`)
   }
 
   return (
@@ -71,5 +74,13 @@ export default function LoginPage() {
         </div>
       </div>
     </div>
+  )
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense>
+      <LoginForm />
+    </Suspense>
   )
 }

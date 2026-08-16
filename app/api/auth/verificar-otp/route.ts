@@ -30,10 +30,16 @@ export async function POST(req: NextRequest) {
 
   // Criar ou recuperar usuário
   let userId: string
+  let hasEvents = false
   const { data: existing } = await sb.from('users').select('id').eq('phone', normalized).single()
 
   if (existing) {
     userId = existing.id
+    const { count } = await sb
+      .from('events')
+      .select('id', { count: 'exact', head: true })
+      .eq('user_id', userId)
+    hasEvents = (count ?? 0) > 0
   } else {
     const { data: newUser } = await sb.from('users').insert({ phone: normalized }).select('id').single()
     userId = newUser!.id
@@ -47,7 +53,7 @@ export async function POST(req: NextRequest) {
     .select('token')
     .single()
 
-  const res = NextResponse.json({ ok: true })
+  const res = NextResponse.json({ ok: true, hasEvents })
   res.cookies.set('vkv_session', session!.token, {
     httpOnly: true,
     secure:   process.env.NODE_ENV === 'production',

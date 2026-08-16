@@ -4,7 +4,9 @@ import type { NextRequest } from 'next/server'
 export function middleware(request: NextRequest) {
   const token = request.cookies.get('vkv_session')?.value
   if (!token) {
-    return NextResponse.redirect(new URL('/login', request.url))
+    const url = new URL('/login', request.url)
+    url.searchParams.set('next', request.nextUrl.pathname)
+    return NextResponse.redirect(url)
   }
   return NextResponse.next()
 }
