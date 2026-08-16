@@ -1,9 +1,20 @@
 import Image from 'next/image'
 import Link from 'next/link'
+import { getSession } from '@/lib/auth'
+import { MenuPopover, ProfilePopover } from '@/components/AppHeaderNav'
 
-export default function Home() {
+export default async function Home() {
+  const session = await getSession()
+
   return (
     <div className="min-h-screen bg-white text-gray-900 flex flex-col">
+      {session && (
+        <div className="flex items-center justify-end gap-1 px-5 pt-4">
+          <MenuPopover />
+          <ProfilePopover userName={session.users.name} userAvatar={session.users.avatar_url} />
+        </div>
+      )}
+
       <div className="flex-1 flex flex-col items-center px-5 pt-[60px] md:pt-[104px] text-center">
 
         {/* Marca — ícone + wordmark + "Vamo aí?" já vêm com espaçamento definido nessa peça */}
