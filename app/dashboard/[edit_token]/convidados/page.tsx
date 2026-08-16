@@ -20,16 +20,21 @@ function fmtHora(iso: string) {
   return new Date(iso).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })
 }
 
-function TreeNode({ rsvp, byParent }: { rsvp: Rsvp; byParent: Map<string, Rsvp[]> }) {
+function TreeNode({ rsvp, byParent, avatarByPhone }: { rsvp: Rsvp; byParent: Map<string, Rsvp[]>; avatarByPhone: Map<string, string> }) {
   const filhos = byParent.get(rsvp.id) ?? []
   const cor = NIVEL_COR[(rsvp.depth_level - 1) % NIVEL_COR.length]
+  const avatar = avatarByPhone.get(rsvp.user_phone)
 
   return (
     <div className="flex flex-col items-center">
       <div className="flex flex-col items-center gap-1 w-[90px]">
-        <div className={`w-11 h-11 rounded-full ${cor} flex items-center justify-center text-sm font-bold text-white flex-shrink-0`}>
-          {rsvp.user_name[0].toUpperCase()}
-        </div>
+        {avatar ? (
+          <Image src={avatar} alt={rsvp.user_name} width={44} height={44} className="w-11 h-11 rounded-full object-cover flex-shrink-0" />
+        ) : (
+          <div className={`w-11 h-11 rounded-full ${cor} flex items-center justify-center text-sm font-bold text-white flex-shrink-0`}>
+            {rsvp.user_name[0].toUpperCase()}
+          </div>
+        )}
         <p className="text-xs font-semibold text-gray-900 text-center leading-tight truncate w-full">{rsvp.user_name}</p>
         <p className="text-[10px] text-gray-400">{fmtHora(rsvp.created_at)}</p>
       </div>
@@ -45,7 +50,7 @@ function TreeNode({ rsvp, byParent }: { rsvp: Rsvp; byParent: Map<string, Rsvp[]
                   className="absolute top-0 h-px bg-gray-200"
                   style={{ left: i === 0 ? '50%' : 0, right: i === filhos.length - 1 ? '50%' : 0 }}
                 />
-                <TreeNode rsvp={f} byParent={byParent} />
+                <TreeNode rsvp={f} byParent={byParent} avatarByPhone={avatarByPhone} />
               </div>
             ))}
           </div>
@@ -75,6 +80,17 @@ export default async function ConvidadosPage({ params }: Props) {
     .order('created_at', { ascending: true })
 
   const rsvps = rsvpsData ?? []
+
+  const avatarByPhone = new Map<string, string>()
+  if (rsvps.length > 0) {
+    const { data: usersData } = await sb
+      .from('users')
+      .select('phone, avatar_url')
+      .in('phone', rsvps.map(r => r.user_phone))
+    for (const u of usersData ?? []) {
+      if (u.avatar_url) avatarByPhone.set(u.phone, u.avatar_url)
+    }
+  }
 
   const byParent = new Map<string, Rsvp[]>()
   for (const r of rsvps) {
@@ -120,7 +136,7 @@ export default async function ConvidadosPage({ params }: Props) {
         {raizes.length > 0 ? (
           <div className="bg-white border border-gray-100 rounded-xl p-5 shadow-sm overflow-x-auto">
             <div className="flex justify-center gap-6 min-w-fit mx-auto">
-              {raizes.map(r => <TreeNode key={r.id} rsvp={r} byParent={byParent} />)}
+              {raizes.map(r => <TreeNode key={r.id} rsvp={r} byParent={byParent} avatarByPhone={avatarByPhone} />)}
             </div>
           </div>
         ) : (
