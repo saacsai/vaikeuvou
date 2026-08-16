@@ -92,24 +92,30 @@ export default function EventoClient({ evento, rsvps, parentRsvpId, criador }: P
           <div className="space-y-3 text-sm text-gray-500 mb-[26px]">
             <p>📅 {fmtDate(evento.event_date)}</p>
             {evento.location && (
-              <a
-                href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(evento.location)}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-1.5 w-fit hover:text-brand"
-              >
-                📍 {evento.location}
-              </a>
+              <div className="flex items-center gap-1.5 w-fit">
+                <span>📍</span>
+                <a
+                  href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(evento.location)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-brand"
+                >
+                  {evento.location}
+                </a>
+              </div>
             )}
             {evento.external_url && (
-              <a
-                href={evento.external_url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-1.5 w-fit hover:text-brand"
-              >
-                🔗 {linkLabel}
-              </a>
+              <div className="flex items-center gap-1.5 w-fit">
+                <span>🔗</span>
+                <a
+                  href={evento.external_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-brand"
+                >
+                  {linkLabel}
+                </a>
+              </div>
             )}
           </div>
 
