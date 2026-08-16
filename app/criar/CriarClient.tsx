@@ -7,6 +7,7 @@ import { HEADER_PRESETS, titleToHeader } from '@/lib/headers'
 import DatePicker from '@/components/DatePicker'
 import TimePicker from '@/components/TimePicker'
 import { ProfilePopover } from '@/components/AppHeaderNav'
+import AppFooter from '@/components/AppFooter'
 
 const PRIVACIDADE = [
   { value: 1,   label: 'Privado',          desc: 'Só você convida' },
@@ -326,6 +327,8 @@ export default function CriarClient({ userName, userAvatar }: Props) {
 
         </div>
       </div>
+
+      <AppFooter />
     </div>
   )
 }

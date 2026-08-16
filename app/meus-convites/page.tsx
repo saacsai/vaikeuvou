@@ -4,6 +4,7 @@ import { getSession } from '@/lib/auth'
 import { getSupabaseAdmin } from '@/lib/supabase'
 import { fmtDate } from '@/lib/slug'
 import { ProfilePopover } from '@/components/AppHeaderNav'
+import AppFooter from '@/components/AppFooter'
 
 export default async function MeusEventosPage() {
   const session = await getSession()
@@ -90,6 +91,8 @@ export default async function MeusEventosPage() {
         )}
 
       </div>
+
+      <AppFooter />
     </div>
   )
 }

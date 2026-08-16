@@ -2,6 +2,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { getSession } from '@/lib/auth'
 import { ProfilePopover } from '@/components/AppHeaderNav'
+import AppFooter from '@/components/AppFooter'
 
 export default async function Home() {
   const session = await getSession()
@@ -48,21 +49,7 @@ export default async function Home() {
         </Link>
       </div>
 
-      {/* Rodapé — flex-1 acima empurra isso pra base da viewport (mesmo princípio do Google) */}
-      <div className="pb-10 pt-6 px-5 flex flex-col items-center gap-3">
-        <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-xs text-gray-400">
-          <span>18 anos depois</span>
-          <span>·</span>
-          <span>Almoço grátis</span>
-          <span>·</span>
-          <span>Termos de uso</span>
-          <span>·</span>
-          <span>Política de privacidade</span>
-          <span>·</span>
-          <span>Fale conosco</span>
-        </div>
-        <p className="text-gray-300 text-xs">© 2026 vaikeuvou.app</p>
-      </div>
+      <AppFooter />
     </div>
   )
 }
