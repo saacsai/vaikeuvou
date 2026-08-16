@@ -20,26 +20,36 @@ function fmtHora(iso: string) {
   return new Date(iso).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })
 }
 
-function TreeNode({ rsvp, byParent, depth }: { rsvp: Rsvp; byParent: Map<string, Rsvp[]>; depth: number }) {
+function TreeNode({ rsvp, byParent }: { rsvp: Rsvp; byParent: Map<string, Rsvp[]> }) {
   const filhos = byParent.get(rsvp.id) ?? []
   const cor = NIVEL_COR[(rsvp.depth_level - 1) % NIVEL_COR.length]
 
   return (
-    <div>
-      <div className="flex items-center gap-3 py-2">
-        <div className={`w-9 h-9 rounded-full ${cor} flex items-center justify-center text-xs font-bold text-white flex-shrink-0`}>
+    <div className="flex flex-col items-center">
+      <div className="flex flex-col items-center gap-1 w-[90px]">
+        <div className={`w-11 h-11 rounded-full ${cor} flex items-center justify-center text-sm font-bold text-white flex-shrink-0`}>
           {rsvp.user_name[0].toUpperCase()}
         </div>
-        <div className="min-w-0">
-          <p className="text-sm font-semibold text-gray-900 truncate">{rsvp.user_name}</p>
-          <p className="text-xs text-gray-400">{fmtHora(rsvp.created_at)}</p>
-        </div>
+        <p className="text-xs font-semibold text-gray-900 text-center leading-tight truncate w-full">{rsvp.user_name}</p>
+        <p className="text-[10px] text-gray-400">{fmtHora(rsvp.created_at)}</p>
       </div>
 
       {filhos.length > 0 && (
-        <div className="ml-[18px] pl-5 border-l-2 border-gray-100 space-y-0.5">
-          {filhos.map(f => <TreeNode key={f.id} rsvp={f} byParent={byParent} depth={depth + 1} />)}
-        </div>
+        <>
+          <div className="w-px h-5 bg-gray-200" />
+          <div className="flex justify-center">
+            {filhos.map((f, i) => (
+              <div key={f.id} className="relative px-3 pt-5">
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-px h-5 bg-gray-200" />
+                <div
+                  className="absolute top-0 h-px bg-gray-200"
+                  style={{ left: i === 0 ? '50%' : 0, right: i === filhos.length - 1 ? '50%' : 0 }}
+                />
+                <TreeNode rsvp={f} byParent={byParent} />
+              </div>
+            ))}
+          </div>
+        </>
       )}
     </div>
   )
@@ -108,9 +118,9 @@ export default async function ConvidadosPage({ params }: Props) {
         </p>
 
         {raizes.length > 0 ? (
-          <div className="bg-white border border-gray-100 rounded-xl p-5 shadow-sm">
-            <div className="space-y-1">
-              {raizes.map(r => <TreeNode key={r.id} rsvp={r} byParent={byParent} depth={0} />)}
+          <div className="bg-white border border-gray-100 rounded-xl p-5 shadow-sm overflow-x-auto">
+            <div className="flex justify-center gap-6 min-w-fit mx-auto">
+              {raizes.map(r => <TreeNode key={r.id} rsvp={r} byParent={byParent} />)}
             </div>
           </div>
         ) : (
