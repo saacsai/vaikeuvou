@@ -20,7 +20,7 @@ export default async function MeusEventosPage() {
 
   return (
     <div className="min-h-screen bg-white text-gray-900 px-4 py-8">
-      <div className="max-w-lg mx-auto space-y-6">
+      <div className="max-w-5xl mx-auto space-y-6">
 
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center gap-x-2 gap-y-1">
@@ -48,14 +48,14 @@ export default async function MeusEventosPage() {
         {/* Criar novo */}
         <a
           href="/criar"
-          className="flex items-center justify-center gap-2 w-full py-4 rounded-xl bg-brand hover:bg-brand-dark text-white font-bold text-base transition-colors"
+          className="inline-flex items-center justify-center gap-2 w-full sm:w-auto px-8 py-4 rounded-xl bg-brand hover:bg-brand-dark text-white font-bold text-base transition-colors"
         >
           + Criar novo evento
         </a>
 
         {/* Lista */}
         {eventos && eventos.length > 0 ? (
-          <div className="space-y-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {eventos.map(e => (
               <div key={e.id} className="bg-white border border-gray-100 rounded-xl p-4 shadow-sm">
                 <div className="flex items-start justify-between gap-3">
@@ -84,7 +84,7 @@ export default async function MeusEventosPage() {
             ))}
           </div>
         ) : (
-          <div className="bg-white border border-gray-100 rounded-xl p-8 text-center">
+          <div className="max-w-md mx-auto bg-white border border-gray-100 rounded-xl p-8 text-center">
             <p className="text-3xl mb-2">🎉</p>
             <p className="text-gray-500 text-sm">Nenhum evento ainda.</p>
             <p className="text-gray-400 text-xs mt-1">Crie seu primeiro evento acima!</p>
