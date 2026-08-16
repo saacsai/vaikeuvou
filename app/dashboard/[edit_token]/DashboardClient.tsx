@@ -26,8 +26,24 @@ type Props = {
 }
 
 function parseEventDate(iso: string): { date: string; time: string } {
-  const m = iso.match(/^(\d{4}-\d{2}-\d{2})T(\d{2}:\d{2})/)
-  return m ? { date: m[1], time: m[2] } : { date: '', time: '' }
+  const d = new Date(iso)
+  if (isNaN(d.getTime())) return { date: '', time: '' }
+
+  // Supabase devolve o timestamp em UTC — precisa converter pro fuso de
+  // exibição (America/Sao_Paulo) antes de extrair data/hora, senão o
+  // horário salvo em -03:00 vem deslocado (ex: 21:00 vira 00:00 do dia
+  // seguinte se lido cru da string).
+  const parts = new Intl.DateTimeFormat('en-US', {
+    timeZone: 'America/Sao_Paulo',
+    year: 'numeric', month: '2-digit', day: '2-digit',
+    hour: '2-digit', minute: '2-digit', hour12: false,
+  }).formatToParts(d)
+  const get = (type: string) => parts.find(p => p.type === type)?.value ?? ''
+
+  return {
+    date: `${get('year')}-${get('month')}-${get('day')}`,
+    time: `${get('hour')}:${get('minute')}`,
+  }
 }
 
 function toForm(evento: Event): EventFormFields {
