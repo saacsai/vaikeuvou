@@ -61,8 +61,8 @@ export default function CriarClient({ userName, userAvatar }: Props) {
   }
 
   return (
-    <div className="min-h-screen bg-white text-gray-900">
-      <div className="max-w-5xl mx-auto px-4 py-8">
+    <div className="min-h-screen bg-white text-gray-900 flex flex-col">
+      <div className="flex-1 max-w-5xl w-full mx-auto px-4 py-8">
 
         <div className="flex flex-col md:flex-row md:items-center gap-x-2 gap-y-1 mb-8">
           <div className="flex items-center justify-between md:contents">
