@@ -3,7 +3,7 @@ import { redirect } from 'next/navigation'
 import { getSession } from '@/lib/auth'
 import { getSupabaseAdmin } from '@/lib/supabase'
 import { fmtDate } from '@/lib/slug'
-import { MenuPopover, ProfilePopover } from '@/components/AppHeaderNav'
+import { ProfilePopover } from '@/components/AppHeaderNav'
 
 export default async function MeusEventosPage() {
   const session = await getSession()
@@ -29,7 +29,6 @@ export default async function MeusEventosPage() {
               <Image src="/logo.png" alt="vaikeuvou" width={480} height={108} className="h-[43px] md:h-[47px] w-auto" />
             </a>
             <div className="flex items-center gap-1 md:hidden">
-              <MenuPopover />
               <ProfilePopover userName={user.name} userAvatar={user.avatar_url} />
             </div>
           </div>
@@ -40,7 +39,6 @@ export default async function MeusEventosPage() {
           </div>
 
           <div className="hidden md:flex items-center gap-1 flex-shrink-0">
-            <MenuPopover />
             <ProfilePopover userName={user.name} userAvatar={user.avatar_url} />
           </div>
         </div>

@@ -6,7 +6,7 @@ import Image from 'next/image'
 import { HEADER_PRESETS, titleToHeader } from '@/lib/headers'
 import DatePicker from '@/components/DatePicker'
 import TimePicker from '@/components/TimePicker'
-import { MenuPopover, ProfilePopover } from '@/components/AppHeaderNav'
+import { ProfilePopover } from '@/components/AppHeaderNav'
 
 const PRIVACIDADE = [
   { value: 1,   label: 'Privado',          desc: 'Só você convida' },
@@ -176,7 +176,6 @@ export default function CriarClient({ userName, userAvatar }: Props) {
               <Image src="/logo.png" alt="vaikeuvou" width={480} height={108} className="h-[43px] md:h-[47px] w-auto" />
             </a>
             <div className="flex items-center gap-1 md:hidden">
-              <MenuPopover />
               <ProfilePopover userName={userName} userAvatar={userAvatar} />
             </div>
           </div>
@@ -189,7 +188,6 @@ export default function CriarClient({ userName, userAvatar }: Props) {
           </div>
 
           <div className="hidden md:flex items-center gap-1 flex-shrink-0">
-            <MenuPopover />
             <ProfilePopover userName={userName} userAvatar={userAvatar} />
           </div>
         </div>

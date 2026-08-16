@@ -14,30 +14,6 @@ function GridIcon() {
   )
 }
 
-const PAGINAS = [
-  { href: '/', label: 'Início' },
-  { href: '/meus-convites', label: 'Meus convites' },
-  { href: '/criar', label: 'Criar convite' },
-]
-
-export function MenuPopover() {
-  return (
-    <HeaderPopover label="Menu" trigger={<GridIcon />}>
-      <nav className="space-y-1 pt-1">
-        {PAGINAS.map(p => (
-          <a
-            key={p.href}
-            href={p.href}
-            className="block px-3 py-2.5 rounded-lg hover:bg-gray-50 text-sm font-medium text-gray-700"
-          >
-            {p.label}
-          </a>
-        ))}
-      </nav>
-    </HeaderPopover>
-  )
-}
-
 type ProfileProps = {
   userName: string | null
   userAvatar: string | null
@@ -53,16 +29,8 @@ export function ProfilePopover({ userName, userAvatar }: ProfileProps) {
     router.push('/')
   }
 
-  const trigger = userAvatar ? (
-    <Image src={userAvatar} alt={nome} width={32} height={32} className="w-8 h-8 md:w-[35px] md:h-[35px] rounded-full object-cover" unoptimized />
-  ) : (
-    <span className="w-8 h-8 md:w-[35px] md:h-[35px] rounded-full bg-brand text-white text-xs font-bold flex items-center justify-center">
-      {iniciais}
-    </span>
-  )
-
   return (
-    <HeaderPopover label="Perfil" trigger={trigger}>
+    <HeaderPopover label="Perfil" trigger={<GridIcon />}>
       <div className="pt-1">
         <div className="flex flex-col items-center text-center gap-2 pb-4 border-b border-gray-100">
           {userAvatar ? (

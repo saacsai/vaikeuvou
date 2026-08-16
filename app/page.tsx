@@ -1,7 +1,7 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { getSession } from '@/lib/auth'
-import { MenuPopover, ProfilePopover } from '@/components/AppHeaderNav'
+import { ProfilePopover } from '@/components/AppHeaderNav'
 
 export default async function Home() {
   const session = await getSession()
@@ -10,7 +10,6 @@ export default async function Home() {
     <div className="min-h-screen bg-white text-gray-900 flex flex-col">
       {session && (
         <div className="flex items-center justify-end gap-1 px-5 pt-4">
-          <MenuPopover />
           <ProfilePopover userName={session.users.name} userAvatar={session.users.avatar_url} />
         </div>
       )}
