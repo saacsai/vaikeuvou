@@ -169,7 +169,7 @@ export default function CriarClient({ userName, userAvatar }: Props) {
 
         <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-sm mb-6">
           <a href="/" className="flex-shrink-0">
-            <Image src="/logo.png" alt="vaikeuvou" width={480} height={108} className="h-[52px] w-auto" />
+            <Image src="/logo.png" alt="vaikeuvou" width={480} height={108} className="h-8 md:h-[52px] w-auto" />
           </a>
           <span className="text-gray-300 whitespace-nowrap">»</span>
           <a href="/meus-eventos" className="text-gray-400 hover:text-gray-600 whitespace-nowrap">Meus eventos</a>
@@ -195,7 +195,7 @@ export default function CriarClient({ userName, userAvatar }: Props) {
               />
             </div>
 
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div className="min-w-0">
                 <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Data *</label>
                 <input
