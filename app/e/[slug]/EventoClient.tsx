@@ -83,15 +83,25 @@ export default function EventoClient({ evento, rsvps, parentRsvpId, criador }: P
         <div className="px-6 pt-6 pb-8" style={{ backgroundColor: header.bg }}>
 
           {/* Marca */}
-          <Image src="/logo.png" alt="vaikeuvou" width={480} height={108} className="w-[298px] max-w-full h-auto mb-4" />
+          <Image src="/logo.png" alt="vaikeuvou" width={480} height={108} className="w-[278px] max-w-full h-auto mb-4" />
 
           {/* Título — continua a frase do wordmark: "vai que eu vou" + título */}
           <h1 className="text-3xl font-bold leading-tight text-gray-900 mb-3">{evento.title}</h1>
 
           {/* Detalhes */}
-          <div className="space-y-1 text-sm text-gray-500 mb-4">
+          <div className="space-y-3 text-sm text-gray-500 mb-4">
             <p>📅 {fmtDate(evento.event_date)}</p>
             {evento.location && <p>📍 {evento.location}</p>}
+            {evento.external_url && (
+              <a
+                href={evento.external_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-1.5 w-fit hover:text-brand"
+              >
+                🔗 {linkLabel}
+              </a>
+            )}
           </div>
 
           {/* Confirmados */}
@@ -118,10 +128,10 @@ export default function EventoClient({ evento, rsvps, parentRsvpId, criador }: P
           {/* Anfitrião + recado */}
           <div className="flex items-start gap-3 mb-5">
             {criadorAvatar ? (
-              <Image src={criadorAvatar} alt={criadorNome} width={40} height={40}
-                className="w-10 h-10 rounded-full object-cover flex-shrink-0" unoptimized />
+              <Image src={criadorAvatar} alt={criadorNome} width={70} height={70}
+                className="w-[70px] h-[70px] rounded-full object-cover flex-shrink-0" unoptimized />
             ) : (
-              <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-xs font-bold text-gray-600 flex-shrink-0">
+              <div className="w-[70px] h-[70px] rounded-full bg-gray-200 flex items-center justify-center text-sm font-bold text-gray-600 flex-shrink-0">
                 {criadorIniciais}
               </div>
             )}
@@ -133,18 +143,6 @@ export default function EventoClient({ evento, rsvps, parentRsvpId, criador }: P
               )}
             </div>
           </div>
-
-          {/* Link externo */}
-          {evento.external_url && (
-            <a
-              href={evento.external_url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-bold mb-5 bg-gray-100 text-gray-700 hover:bg-gray-200"
-            >
-              {linkLabel} ↗
-            </a>
-          )}
 
           {/* CTA */}
           {etapa === 'convite' && (
