@@ -1,6 +1,100 @@
 # vaikeuvou.app — Status
 
-Última atualização: 2026-08-16 (parte 2)
+Última atualização: 2026-08-16 (parte 3)
+
+## Sessão 2026-08-16 (parte 3) — dashboard convertido, árvore de convidados, paginação
+
+### Feito
+- **Header consolidado**: ícone de menu (grade de bolinhas) e avatar de
+  perfil viraram um só — o ícone de bolinhas agora abre o `ProfilePopover`
+  (nome, créditos "Em breve", editar perfil, sair). `MenuPopover` e sua
+  lista `PAGINAS` foram removidos de `AppHeaderNav.tsx`.
+- **Rodapé padronizado em todas as páginas** (`components/AppFooter.tsx`):
+  "18 anos depois" · "Termos de uso" · "Política de Privacidade". "Almoço
+  grátis" foi removido (risco de leitura como cupom promocional num
+  contexto de eventos) e virou o conceito "Como funciona?" — junto com
+  "Fale conosco", fica pro menu de bolinhas mais adiante, ainda não
+  linkado em lugar nenhum. Criadas as páginas-stub (header+rodapé, conteúdo
+  em branco, `InfoPageShell.tsx`, `max-w-5xl`): `/historia`, `/termos`,
+  `/privacidade`, `/fale`, `/como-funciona`.
+- **Home**: regressão visual corrigida — o ícone de perfil empurrou o bloco
+  logo→botão pra baixo no desktop; recentralizado via flex (mobile não
+  alterado).
+- **`/dashboard/[edit_token]` inteiro reconstruído** (`DashboardClient.tsx`)
+  — era a última página em tema escuro/layout antigo, agora segue o padrão:
+  - `EventPreviewCard`, `BgSelector` e o tipo `EventFormFields` foram
+    extraídos do `/criar` (`components/EventPreviewCard.tsx`,
+    `components/BgSelector.tsx`, `lib/eventForm.ts`) pra reuso nos dois
+    lugares.
+  - Edição completa de todos os campos (antes só 3), pré-preenchidos,
+    botão Salvar com dirty-state (desabilitado até algo mudar).
+  - **O formulário de edição agora fica recolhido por padrão**, atrás de
+    um botão "✏️ Editar convite"; abre as 2 colunas (form+preview, igual
+    ao `/criar`). "Fechar ✕" em laranja, colado no label "Editar convite".
+  - Bloco antigo "link do painel (salve!)" eliminado (não fazia mais
+    sentido com auth).
+  - Bloco "Nenhuma confirmação ainda" removido — a seção "Confirmados"
+    simplesmente não renderiza quando não há RSVPs (os cards de estatística
+    já cobrem esse estado).
+  - `allowed` em `app/api/eventos/editar/route.ts` estava faltando
+    `max_depth` — edição de privacidade nunca persistia, corrigido.
+  - **Bug de timezone corrigido**: `parseEventDate` fazia regex ingênuo na
+    string UTC crua; horário salvo em -03:00 (ex: 21:00) aparecia deslocado
+    (00:00 do dia seguinte) ao reabrir o form. Reescrito com
+    `Intl.DateTimeFormat(timeZone: 'America/Sao_Paulo')`, mesmo padrão já
+    usado em `lib/slug.ts`.
+- **Nova página `/dashboard/[edit_token]/convidados`** — árvore de quem
+  confirmou e quem convidou quem (`parent_rsvp_id`/`depth_level`, já
+  existiam no schema, zero migração). Layout **vertical (cima→baixo)**, não
+  indentação lateral — cada nó centralizado, filhos conectados por linha
+  vertical abaixo do pai, estilo organograma. Cor do avatar por nível
+  (`bg-blue-500`, `bg-pink-500`, `bg-orange-500`, `bg-purple-500`,
+  `bg-teal-500`, cíclico). **Foto de perfil real** quando o telefone do
+  RSVP bate com um `users.avatar_url` existente (lookup por telefone,
+  fallback pra inicial colorida quando a pessoa ainda não tem conta/foto)
+  — validado com a conta real do Luciano.
+  - Card "Total" do painel ganhou o link "Ver quem vai" (só aparece com
+    ≥1 confirmação), indo direto pra essa página. **Sem gate de créditos
+    por enquanto** — decisão explícita do Luciano ("linka por enquanto,
+    não estou liberando nada, vou fazer isso só qdo tiver tudo
+    funcionando"). O paywall de 3 créditos (já combinado no modelo de
+    créditos) fica pra quando o motor de créditos existir de verdade, e aí
+    precisa cobrir tanto essa página quanto a lista "Confirmados" que já
+    existe no painel (hoje as duas mostram nome ungated).
+- **`/meus-convites` ganhou paginação**: 15 convites por página (grid 5×3
+  no desktop), "‹ Anterior"/"Próxima ›" via `?page=N` (server-side,
+  `.range()` no Supabase), redirect automático se a página pedida não
+  existir mais.
+- **Rodapé "subindo" corrigido em todas as páginas curtas** — mesmo padrão
+  já usado na home (`min-h-screen flex flex-col` no container + `flex-1`
+  no conteúdo, sem gap fixo) aplicado em `/meus-convites`, `/dashboard`,
+  `/dashboard/.../convidados` e `/criar`. `InfoPageShell` já seguia o
+  padrão. Cobertura completa: com pouco conteúdo o rodapé fica fixo no fim
+  da viewport; quando o conteúdo cresce, rola normalmente.
+
+### Como foi validado
+Toda mudança que mexia com dados reais (árvore de convidados, paginação,
+vínculo de foto) foi testada contra o **Supabase de produção com a conta
+real do Luciano** (telefone `11964480411`) — inserindo RSVPs/eventos de
+teste via script Node temporário (`.mjs` descartável, lendo `.env.local`),
+tirando screenshot, e apagando os dados logo em seguida. Nenhum dado de
+teste ficou para trás. `npm run build` limpo depois de cada mudança.
+
+### Pendências conhecidas (status atualizado 2026-08-16 parte 3)
+1. **`app/api/og/route.tsx`** — preview do link no WhatsApp ainda no
+   gradiente escuro antigo. Resolver antes de divulgar link de verdade.
+2. **`/login`, `/login/verificar`, `/perfil`** — únicas páginas que ainda
+   não seguem o tema claro/padrão atual.
+3. **Motor de créditos real** (saldo, Stripe, débito por ação) — ainda não
+   implementado. Quando existir, precisa gatear "Ver quem vai" e a lista
+   "Confirmados" do painel (ambas ungated hoje, de propósito).
+4. **"Como funciona?" e "Fale conosco"** — páginas existem mas não estão
+   linkadas em lugar nenhum; entram no menu de bolinhas quando esse
+   popover for desenhado.
+5. 10 imagens de header ainda são placeholder (Picsum) — Sandro entrega as
+   definitivas depois.
+
+---
 
 ## Sessão 2026-08-16 (parte 2) — DatePicker/TimePicker, header Google-style, /meus-convites
 
