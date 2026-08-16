@@ -262,7 +262,7 @@ export default function EventoClient({ evento, rsvps, parentRsvpId, criador }: P
             <div className="mt-6 rounded-lg overflow-hidden aspect-video">
               <iframe
                 src={embedUrl}
-                title="Vídeo do evento"
+                title="Vídeo do convite"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                 allowFullScreen
                 className="w-full h-full"

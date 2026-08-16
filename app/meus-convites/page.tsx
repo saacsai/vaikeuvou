@@ -36,7 +36,7 @@ export default async function MeusEventosPage() {
 
           <div className="flex items-center gap-x-2 flex-wrap md:flex-1">
             <span className="text-gray-300 text-sm whitespace-nowrap">»</span>
-            <span className="text-brand font-bold text-[25px] whitespace-nowrap">Meus eventos</span>
+            <span className="text-brand font-bold text-[25px] whitespace-nowrap">Meus convites</span>
           </div>
 
           <div className="hidden md:flex items-center gap-1 flex-shrink-0">
@@ -50,7 +50,7 @@ export default async function MeusEventosPage() {
           href="/criar"
           className="inline-flex items-center justify-center gap-2 w-full sm:w-auto px-8 py-4 rounded-xl bg-brand hover:bg-brand-dark text-white font-bold text-base transition-colors"
         >
-          + Criar novo evento
+          + Criar novo convite
         </a>
 
         {/* Lista */}
@@ -76,7 +76,7 @@ export default async function MeusEventosPage() {
                       className="px-3 py-1.5 rounded-lg bg-gray-50 hover:bg-gray-100 text-xs font-semibold text-gray-500 text-center"
                       target="_blank"
                     >
-                      Ver evento
+                      Ver convite
                     </a>
                   </div>
                 </div>
@@ -86,8 +86,8 @@ export default async function MeusEventosPage() {
         ) : (
           <div className="max-w-md mx-auto bg-white border border-gray-100 rounded-xl p-8 text-center">
             <p className="text-3xl mb-2">🎉</p>
-            <p className="text-gray-500 text-sm">Nenhum evento ainda.</p>
-            <p className="text-gray-400 text-xs mt-1">Crie seu primeiro evento acima!</p>
+            <p className="text-gray-500 text-sm">Nenhum convite ainda.</p>
+            <p className="text-gray-400 text-xs mt-1">Crie seu primeiro convite acima!</p>
           </div>
         )}
 

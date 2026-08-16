@@ -32,7 +32,7 @@ function VerificarForm() {
 
     if (!res.ok) { setErro(json.error ?? 'Código inválido.'); setSaving(false); return }
 
-    router.push('/meus-eventos')
+    router.push('/meus-convites')
   }
 
   async function reenviar() {

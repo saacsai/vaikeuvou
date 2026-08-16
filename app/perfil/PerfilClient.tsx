@@ -156,7 +156,7 @@ export default function PerfilClient({ phone, name: initialName, avatarUrl: init
       <div className="max-w-sm mx-auto space-y-8">
 
         <div>
-          <a href="/meus-eventos" className="text-gray-500 text-sm hover:text-gray-400">← Meus eventos</a>
+          <a href="/meus-convites" className="text-gray-500 text-sm hover:text-gray-400">← Meus convites</a>
           <h1 className="text-2xl font-extrabold mt-3">Meu perfil</h1>
           <p className="text-gray-500 text-xs mt-0.5">{phone}</p>
         </div>

@@ -162,7 +162,7 @@ export default function CriarClient({ userName, userAvatar }: Props) {
     })
     const json = await res.json()
 
-    if (!res.ok) { setErro(json.error ?? 'Erro ao criar evento.'); setSaving(false); return }
+    if (!res.ok) { setErro(json.error ?? 'Erro ao criar convite.'); setSaving(false); return }
     router.push(`/dashboard/${json.edit_token}?novo=1`)
   }
 
@@ -183,7 +183,7 @@ export default function CriarClient({ userName, userAvatar }: Props) {
 
           <div className="flex items-center gap-x-2 flex-wrap md:flex-1">
             <span className="text-gray-300 text-sm whitespace-nowrap">»</span>
-            <a href="/meus-eventos" className="text-gray-400 hover:text-gray-600 text-sm whitespace-nowrap">Meus eventos</a>
+            <a href="/meus-convites" className="text-gray-400 hover:text-gray-600 text-sm whitespace-nowrap">Meus convites</a>
             <span className="text-gray-300 text-sm whitespace-nowrap">»</span>
             <span className="text-brand font-bold text-[25px] whitespace-nowrap">Criar convite</span>
           </div>
@@ -294,7 +294,7 @@ export default function CriarClient({ userName, userAvatar }: Props) {
             {/* Vídeo */}
             <div>
               <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">
-                Vídeo do evento
+                Vídeo do convite
               </label>
               <input
                 value={form.video_url}
@@ -303,7 +303,7 @@ export default function CriarClient({ userName, userAvatar }: Props) {
                 type="url"
                 className="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 outline-none focus:border-brand text-sm"
               />
-              <p className="text-[10px] text-gray-400 mt-1">Aparece abaixo do botão BORA na página do evento</p>
+              <p className="text-[10px] text-gray-400 mt-1">Aparece abaixo do botão BORA na página do convite</p>
             </div>
 
             {erro && <p className="text-red-500 text-sm">{erro}</p>}

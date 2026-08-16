@@ -45,7 +45,7 @@ export default function DashboardClient({ evento, rsvps, isNovo }: Props) {
       }),
     })
     const json = await res.json()
-    setEditMsg(res.ok ? 'Salvo! Recarregue a página do evento para ver.' : (json.error ?? 'Erro ao salvar.'))
+    setEditMsg(res.ok ? 'Salvo! Recarregue a página do convite para ver.' : (json.error ?? 'Erro ao salvar.'))
     setEditSaving(false)
   }
 
@@ -58,7 +58,7 @@ export default function DashboardClient({ evento, rsvps, isNovo }: Props) {
         {/* Header */}
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <a href="/meus-eventos" className="text-gray-500 text-xs hover:text-gray-400">← Meus eventos</a>
+            <a href="/meus-convites" className="text-gray-500 text-xs hover:text-gray-400">← Meus convites</a>
           </div>
           <p className="text-violet-400 text-xs font-bold uppercase tracking-widest mb-1">vaikeuvou.app</p>
           <h1 className="text-2xl font-extrabold leading-tight">{evento.title}</h1>
@@ -69,7 +69,7 @@ export default function DashboardClient({ evento, rsvps, isNovo }: Props) {
         {/* Aviso evento criado */}
         {isNovo && (
           <div className="bg-green-500/10 border border-green-500/30 rounded-2xl p-4">
-            <p className="text-green-400 font-bold text-sm">🎉 Evento criado com sucesso!</p>
+            <p className="text-green-400 font-bold text-sm">🎉 Convite criado com sucesso!</p>
             <p className="text-green-300 text-xs mt-1">
               Salve este link de painel — é a única forma de acessar este dashboard.
             </p>
@@ -120,7 +120,7 @@ export default function DashboardClient({ evento, rsvps, isNovo }: Props) {
             onClick={() => setEditOpen(v => !v)}
             className="w-full flex items-center justify-between px-4 py-3 text-left"
           >
-            <p className="text-xs font-bold text-gray-400 uppercase tracking-wide">Editar evento</p>
+            <p className="text-xs font-bold text-gray-400 uppercase tracking-wide">Editar convite</p>
             <span className="text-gray-500 text-sm">{editOpen ? '▲' : '▼'}</span>
           </button>
 
@@ -163,7 +163,7 @@ export default function DashboardClient({ evento, rsvps, isNovo }: Props) {
                   type="url"
                   className="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2.5 text-white placeholder-gray-600 outline-none focus:border-violet-500 text-sm"
                 />
-                <p className="text-[10px] text-gray-600 mt-1">Aparece abaixo do botão BORA na página do evento</p>
+                <p className="text-[10px] text-gray-600 mt-1">Aparece abaixo do botão BORA na página do convite</p>
               </div>
 
               {editMsg && (

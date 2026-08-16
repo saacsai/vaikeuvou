@@ -16,7 +16,7 @@ function GridIcon() {
 
 const PAGINAS = [
   { href: '/', label: 'Início' },
-  { href: '/meus-eventos', label: 'Meus eventos' },
+  { href: '/meus-convites', label: 'Meus convites' },
   { href: '/criar', label: 'Criar convite' },
 ]
 
