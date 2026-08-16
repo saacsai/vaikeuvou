@@ -5,7 +5,7 @@ import HeaderPopover from '@/components/HeaderPopover'
 
 function GridIcon() {
   return (
-    <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+    <svg className="w-5 h-5 md:w-[22px] md:h-[22px]" viewBox="0 0 20 20" fill="currentColor">
       {[2, 9, 16].flatMap(cy =>
         [2, 9, 16].map(cx => <circle key={`${cx}-${cy}`} cx={cx} cy={cy} r="1.6" />)
       )}
@@ -47,9 +47,9 @@ export function ProfilePopover({ userName, userAvatar }: ProfileProps) {
   const iniciais = nome.slice(0, 2).toUpperCase()
 
   const trigger = userAvatar ? (
-    <Image src={userAvatar} alt={nome} width={32} height={32} className="w-8 h-8 rounded-full object-cover" unoptimized />
+    <Image src={userAvatar} alt={nome} width={32} height={32} className="w-8 h-8 md:w-[35px] md:h-[35px] rounded-full object-cover" unoptimized />
   ) : (
-    <span className="w-8 h-8 rounded-full bg-brand text-white text-xs font-bold flex items-center justify-center">
+    <span className="w-8 h-8 md:w-[35px] md:h-[35px] rounded-full bg-brand text-white text-xs font-bold flex items-center justify-center">
       {iniciais}
     </span>
   )

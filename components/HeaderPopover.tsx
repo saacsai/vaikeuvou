@@ -28,7 +28,7 @@ export default function HeaderPopover({ trigger, label, children }: Props) {
         type="button"
         onClick={() => setOpen(o => !o)}
         aria-label={label}
-        className="w-10 h-10 rounded-full hover:bg-gray-100 flex items-center justify-center text-gray-600 transition-colors"
+        className="w-10 h-10 md:w-11 md:h-11 rounded-full hover:bg-gray-100 flex items-center justify-center text-gray-600 transition-colors"
       >
         {trigger}
       </button>
