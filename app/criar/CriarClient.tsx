@@ -173,7 +173,7 @@ export default function CriarClient({ userName, userAvatar }: Props) {
         <div className="flex flex-col md:flex-row md:items-center gap-x-2 gap-y-1 mb-8">
           <div className="flex items-center justify-between md:contents">
             <a href="/" className="flex-shrink-0">
-              <Image src="/logo.png" alt="vaikeuvou" width={480} height={108} className="h-12 md:h-[47px] w-auto" />
+              <Image src="/logo.png" alt="vaikeuvou" width={480} height={108} className="h-[43px] md:h-[47px] w-auto" />
             </a>
             <div className="flex items-center gap-1 md:hidden">
               <MenuPopover />
@@ -185,7 +185,7 @@ export default function CriarClient({ userName, userAvatar }: Props) {
             <span className="text-gray-300 text-sm whitespace-nowrap">»</span>
             <a href="/meus-eventos" className="text-gray-400 hover:text-gray-600 text-sm whitespace-nowrap">Meus eventos</a>
             <span className="text-gray-300 text-sm whitespace-nowrap">»</span>
-            <span className="text-brand font-bold text-3xl md:text-[27px] whitespace-nowrap">Criar convite</span>
+            <span className="text-brand font-bold text-[27px] whitespace-nowrap">Criar convite</span>
           </div>
 
           <div className="hidden md:flex items-center gap-1 flex-shrink-0">
