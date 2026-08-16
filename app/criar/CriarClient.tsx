@@ -6,6 +6,7 @@ import Image from 'next/image'
 import { HEADER_PRESETS, titleToHeader } from '@/lib/headers'
 import DatePicker from '@/components/DatePicker'
 import TimePicker from '@/components/TimePicker'
+import { MenuPopover, ProfilePopover } from '@/components/AppHeaderNav'
 
 const PRIVACIDADE = [
   { value: 1,   label: 'Privado',          desc: 'Só você convida' },
@@ -170,14 +171,26 @@ export default function CriarClient({ userName, userAvatar }: Props) {
       <div className="max-w-5xl mx-auto px-4 py-8">
 
         <div className="flex flex-col md:flex-row md:items-center gap-x-2 gap-y-1 mb-8">
-          <a href="/" className="flex-shrink-0">
-            <Image src="/logo.png" alt="vaikeuvou" width={480} height={108} className="h-12 md:h-[52px] w-auto" />
-          </a>
-          <div className="flex items-center gap-x-2 flex-wrap">
+          <div className="flex items-center justify-between md:contents">
+            <a href="/" className="flex-shrink-0">
+              <Image src="/logo.png" alt="vaikeuvou" width={480} height={108} className="h-12 md:h-[52px] w-auto" />
+            </a>
+            <div className="flex items-center gap-1 md:hidden">
+              <MenuPopover />
+              <ProfilePopover userName={userName} userAvatar={userAvatar} />
+            </div>
+          </div>
+
+          <div className="flex items-center gap-x-2 flex-wrap md:flex-1">
             <span className="text-gray-300 text-sm whitespace-nowrap">»</span>
             <a href="/meus-eventos" className="text-gray-400 hover:text-gray-600 text-sm whitespace-nowrap">Meus eventos</a>
             <span className="text-gray-300 text-sm whitespace-nowrap">»</span>
             <span className="text-brand font-bold text-3xl whitespace-nowrap">Criar convite</span>
+          </div>
+
+          <div className="hidden md:flex items-center gap-1 flex-shrink-0">
+            <MenuPopover />
+            <ProfilePopover userName={userName} userAvatar={userAvatar} />
           </div>
         </div>
 
