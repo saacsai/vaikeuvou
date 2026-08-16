@@ -208,9 +208,9 @@ export default function DashboardClient({ evento, rsvps, isNovo, userName, userA
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start mb-12">
 
           <div className="space-y-5">
-            <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
               <p className="text-xs font-bold text-gray-400 uppercase tracking-wide">Editar convite</p>
-              <button onClick={() => setEditando(false)} className="text-xs text-gray-400 hover:text-gray-600">
+              <button onClick={() => setEditando(false)} className="text-xs font-bold text-brand hover:text-brand-dark">
                 Fechar ✕
               </button>
             </div>
@@ -345,7 +345,7 @@ export default function DashboardClient({ evento, rsvps, isNovo, userName, userA
         )}
 
         {/* Confirmados */}
-        {rsvps.length > 0 ? (
+        {rsvps.length > 0 && (
           <div className="bg-white border border-gray-100 rounded-xl p-4 shadow-sm">
             <p className="text-xs font-bold text-gray-400 uppercase tracking-wide mb-3">Confirmados</p>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
@@ -372,12 +372,6 @@ export default function DashboardClient({ evento, rsvps, isNovo, userName, userA
                 </div>
               ))}
             </div>
-          </div>
-        ) : (
-          <div className="bg-white border border-gray-100 rounded-xl p-8 text-center">
-            <p className="text-3xl mb-2">👀</p>
-            <p className="text-gray-500 text-sm">Nenhuma confirmação ainda.</p>
-            <p className="text-gray-400 text-xs mt-1">Compartilhe o link e aguarde o pessoal confirmar!</p>
           </div>
         )}
 
