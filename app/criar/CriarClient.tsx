@@ -3,11 +3,13 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
-import { HEADER_PRESETS, titleToHeader } from '@/lib/headers'
 import DatePicker from '@/components/DatePicker'
 import TimePicker from '@/components/TimePicker'
 import { ProfilePopover } from '@/components/AppHeaderNav'
 import AppFooter from '@/components/AppFooter'
+import EventPreviewCard from '@/components/EventPreviewCard'
+import BgSelector from '@/components/BgSelector'
+import type { EventFormFields } from '@/lib/eventForm'
 
 const PRIVACIDADE = [
   { value: 1,   label: 'Privado',          desc: 'Só você convida' },
@@ -15,120 +17,11 @@ const PRIVACIDADE = [
   { value: 999, label: 'Aberto',           desc: 'Viralização ilimitada' },
 ]
 
-type Form = {
-  title: string
-  event_date: string
-  event_time: string
-  location: string
-  description: string
-  max_depth: number
-  external_url: string
-  external_url_label: string
-  video_url: string
-  bg_image_url: string
-}
+type Form = EventFormFields
 
 type Props = {
   userName: string | null
   userAvatar: string | null
-}
-
-function fmtPreviewDate(date: string, time: string): string {
-  if (!date) return ''
-  const [y, m, d] = date.split('-').map(Number)
-  const obj = new Date(y, m - 1, d)
-  const days   = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb']
-  const months = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez']
-  return `${days[obj.getDay()]}, ${d} ${months[m - 1]}${time ? ` às ${time}` : ''}`
-}
-
-function EventoPreview({ form, userName, userAvatar }: { form: Form; userName: string | null; userAvatar: string | null }) {
-  const hasTitle  = form.title.trim().length > 0
-  const header    = form.bg_image_url
-    ? { src: form.bg_image_url, bg: '#f5f5f4' }
-    : titleToHeader(hasTitle ? form.title : 'vaikeuvou')
-  const nome      = userName ?? 'Você'
-  const iniciais  = nome.slice(0, 2).toUpperCase()
-  const dateLabel = fmtPreviewDate(form.event_date, form.event_time)
-
-  return (
-    <div className="rounded-lg overflow-hidden shadow-lg border border-gray-100">
-      <div className="relative w-full aspect-[2.4/1]">
-        <Image src={header.src} alt="" fill unoptimized className="object-cover" />
-      </div>
-
-      <div className="px-5 pt-5 pb-6 bg-gradient-to-b from-white to-[#fcede1]">
-        <Image src="/logo.png" alt="vaikeuvou" width={480} height={108} className="h-7 w-auto mb-0.5" />
-        <h1 className={`text-xl font-bold leading-tight mb-3 ${hasTitle ? 'text-gray-900' : 'text-gray-300'}`}>
-          {hasTitle ? form.title : 'Nome do evento'}
-        </h1>
-
-        <div className="space-y-1 text-xs text-gray-500 mb-4">
-          <p>📅 {dateLabel || 'Data e horário'}</p>
-          <p>📍 {form.location || 'Local'}</p>
-          {form.description && (
-            <p className="text-gray-500 mt-2 leading-relaxed italic">&ldquo;{form.description}&rdquo;</p>
-          )}
-        </div>
-
-        <div className="flex items-center gap-2 mb-4">
-          {userAvatar ? (
-            <Image src={userAvatar} alt={nome} width={28} height={28}
-              className="w-7 h-7 rounded-full object-cover" unoptimized />
-          ) : (
-            <div className="w-7 h-7 rounded-full bg-gray-200 flex items-center justify-center text-[10px] font-bold text-gray-600">
-              {iniciais}
-            </div>
-          )}
-          <p className="text-xs text-gray-400">organizado por <span className="font-semibold text-gray-600">{nome}</span></p>
-        </div>
-
-        <p className="text-gray-900 font-semibold text-sm mb-2">Vamo aí?</p>
-        <div className="w-full py-3 rounded-lg bg-brand select-none flex items-center justify-center gap-[5px]">
-          <Image src="/letra_bora.png" alt="BORA" width={130} height={53} className="h-5 w-auto" />
-          <Image src="/icone_bora.png" alt="" width={57} height={61} className="h-6 w-auto" />
-        </div>
-      </div>
-    </div>
-  )
-}
-
-function BgSelector({ value, onChange, title }: { value: string; onChange: (v: string) => void; title: string }) {
-  const auto = titleToHeader(title.trim() || 'vaikeuvou')
-  return (
-    <div className="rounded-2xl bg-white border border-gray-100 p-4 space-y-3">
-      <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Imagem do cabeçalho</p>
-      <div className="grid grid-cols-4 gap-2">
-        <button
-          onClick={() => onChange('')}
-          title="Automático — escolhido a partir do título"
-          className={`relative aspect-square rounded-lg overflow-hidden border-2 ${value === '' ? 'border-brand' : 'border-transparent'}`}
-        >
-          <Image src={auto.src} alt="Automático" fill unoptimized className="object-cover" />
-          <span className="absolute inset-0 bg-black/40 flex items-center justify-center text-white text-[9px] font-bold uppercase">
-            Auto ✓
-          </span>
-        </button>
-        {HEADER_PRESETS.map(p => (
-          <button
-            key={p.id}
-            onClick={() => onChange(p.src)}
-            title={p.label}
-            className={`relative aspect-square rounded-lg overflow-hidden border-2 ${value === p.src ? 'border-brand' : 'border-transparent hover:border-gray-200'}`}
-          >
-            <Image src={p.src} alt={p.label} fill unoptimized className="object-cover" />
-          </button>
-        ))}
-        <div
-          title="Upload de imagem própria — plano PRO"
-          className="aspect-square rounded-lg bg-gray-50 border border-dashed border-gray-200 flex flex-col items-center justify-center gap-0.5 cursor-not-allowed"
-        >
-          <span className="text-sm text-gray-400 font-bold">↑</span>
-          <span className="text-[7px] text-gray-400 font-bold uppercase">PRO</span>
-        </div>
-      </div>
-    </div>
-  )
 }
 
 export default function CriarClient({ userName, userAvatar }: Props) {
@@ -320,7 +213,7 @@ export default function CriarClient({ userName, userAvatar }: Props) {
           <div className="hidden lg:block">
             <p className="text-xs text-gray-400 uppercase tracking-widest font-semibold mb-3 text-center">Preview</p>
             <div className="sticky top-6 space-y-3">
-              <EventoPreview form={form} userName={userName} userAvatar={userAvatar} />
+              <EventPreviewCard form={form} userName={userName} userAvatar={userAvatar} />
               <BgSelector value={form.bg_image_url} onChange={v => set('bg_image_url', v)} title={form.title} />
             </div>
           </div>

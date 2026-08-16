@@ -1,0 +1,60 @@
+import Image from 'next/image'
+import { titleToHeader } from '@/lib/headers'
+import { fmtPreviewDate, type EventFormFields } from '@/lib/eventForm'
+
+type Props = {
+  form: EventFormFields
+  userName: string | null
+  userAvatar: string | null
+}
+
+export default function EventPreviewCard({ form, userName, userAvatar }: Props) {
+  const hasTitle  = form.title.trim().length > 0
+  const header    = form.bg_image_url
+    ? { src: form.bg_image_url, bg: '#f5f5f4' }
+    : titleToHeader(hasTitle ? form.title : 'vaikeuvou')
+  const nome      = userName ?? 'Você'
+  const iniciais  = nome.slice(0, 2).toUpperCase()
+  const dateLabel = fmtPreviewDate(form.event_date, form.event_time)
+
+  return (
+    <div className="rounded-lg overflow-hidden shadow-lg border border-gray-100">
+      <div className="relative w-full aspect-[2.4/1]">
+        <Image src={header.src} alt="" fill unoptimized className="object-cover" />
+      </div>
+
+      <div className="px-5 pt-5 pb-6 bg-gradient-to-b from-white to-[#fcede1]">
+        <Image src="/logo.png" alt="vaikeuvou" width={480} height={108} className="h-7 w-auto mb-0.5" />
+        <h1 className={`text-xl font-bold leading-tight mb-3 ${hasTitle ? 'text-gray-900' : 'text-gray-300'}`}>
+          {hasTitle ? form.title : 'Nome do evento'}
+        </h1>
+
+        <div className="space-y-1 text-xs text-gray-500 mb-4">
+          <p>📅 {dateLabel || 'Data e horário'}</p>
+          <p>📍 {form.location || 'Local'}</p>
+          {form.description && (
+            <p className="text-gray-500 mt-2 leading-relaxed italic">&ldquo;{form.description}&rdquo;</p>
+          )}
+        </div>
+
+        <div className="flex items-center gap-2 mb-4">
+          {userAvatar ? (
+            <Image src={userAvatar} alt={nome} width={28} height={28}
+              className="w-7 h-7 rounded-full object-cover" unoptimized />
+          ) : (
+            <div className="w-7 h-7 rounded-full bg-gray-200 flex items-center justify-center text-[10px] font-bold text-gray-600">
+              {iniciais}
+            </div>
+          )}
+          <p className="text-xs text-gray-400">organizado por <span className="font-semibold text-gray-600">{nome}</span></p>
+        </div>
+
+        <p className="text-gray-900 font-semibold text-sm mb-2">Vamo aí?</p>
+        <div className="w-full py-3 rounded-lg bg-brand select-none flex items-center justify-center gap-[5px]">
+          <Image src="/letra_bora.png" alt="BORA" width={130} height={53} className="h-5 w-auto" />
+          <Image src="/icone_bora.png" alt="" width={57} height={61} className="h-6 w-auto" />
+        </div>
+      </div>
+    </div>
+  )
+}
