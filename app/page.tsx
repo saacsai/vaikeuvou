@@ -15,7 +15,7 @@ export default async function Home() {
         </div>
       )}
 
-      <div className="flex-1 flex flex-col items-center px-5 pt-[60px] md:pt-[104px] text-center">
+      <div className="flex-1 flex flex-col items-center px-5 pt-[60px] md:pt-0 md:justify-center text-center">
 
         {/* Marca — ícone + wordmark + "Vamo aí?" já vêm com espaçamento definido nessa peça */}
         <Image

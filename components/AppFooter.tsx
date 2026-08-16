@@ -7,8 +7,6 @@ export default function AppFooter() {
         <a href="/termos">Termos de uso</a>
         <span>·</span>
         <a href="/privacidade">Política de Privacidade</a>
-        <span>·</span>
-        <a href="/fale">Fale conosco</a>
       </div>
       <p className="text-gray-300 text-xs">© 2026 vaikeuvou.app</p>
     </div>
