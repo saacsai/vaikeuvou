@@ -1,6 +1,7 @@
 'use client'
 
 import Image from 'next/image'
+import { useRouter } from 'next/navigation'
 import HeaderPopover from '@/components/HeaderPopover'
 
 function GridIcon() {
@@ -43,8 +44,14 @@ type ProfileProps = {
 }
 
 export function ProfilePopover({ userName, userAvatar }: ProfileProps) {
+  const router = useRouter()
   const nome = userName ?? 'Você'
   const iniciais = nome.slice(0, 2).toUpperCase()
+
+  async function sair() {
+    await fetch('/api/auth/logout', { method: 'POST' })
+    router.push('/')
+  }
 
   const trigger = userAvatar ? (
     <Image src={userAvatar} alt={nome} width={32} height={32} className="w-8 h-8 md:w-[35px] md:h-[35px] rounded-full object-cover" unoptimized />
@@ -79,6 +86,14 @@ export function ProfilePopover({ userName, userAvatar }: ProfileProps) {
         >
           Editar perfil
         </a>
+
+        <button
+          type="button"
+          onClick={sair}
+          className="block w-full text-center mt-2 py-2.5 rounded-lg hover:bg-gray-50 text-sm font-semibold text-gray-400"
+        >
+          Sair
+        </button>
       </div>
     </HeaderPopover>
   )

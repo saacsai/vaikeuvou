@@ -1,8 +1,9 @@
+import Image from 'next/image'
 import { redirect } from 'next/navigation'
 import { getSession } from '@/lib/auth'
 import { getSupabaseAdmin } from '@/lib/supabase'
 import { fmtDate } from '@/lib/slug'
-import LogoutButton from './LogoutButton'
+import { MenuPopover, ProfilePopover } from '@/components/AppHeaderNav'
 
 export default async function MeusEventosPage() {
   const session = await getSession()
@@ -18,28 +19,36 @@ export default async function MeusEventosPage() {
   const user = session.users
 
   return (
-    <div className="min-h-screen bg-gray-950 text-white px-4 py-8">
+    <div className="min-h-screen bg-white text-gray-900 px-4 py-8">
       <div className="max-w-lg mx-auto space-y-6">
 
         {/* Header */}
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-violet-400 text-xs font-bold uppercase tracking-widest mb-1">vaikeuvou.app</p>
-            <h1 className="text-2xl font-extrabold">Meus eventos</h1>
-            <p className="text-gray-500 text-xs mt-0.5">{user.phone}</p>
-          </div>
-          <div className="flex items-center gap-2">
-            <a href="/perfil" className="text-gray-400 text-xs hover:text-white px-3 py-2 rounded-xl bg-gray-900 hover:bg-gray-800">
-              Perfil
+        <div className="flex flex-col md:flex-row md:items-center gap-x-2 gap-y-1">
+          <div className="flex items-center justify-between md:contents">
+            <a href="/" className="flex-shrink-0">
+              <Image src="/logo.png" alt="vaikeuvou" width={480} height={108} className="h-[43px] md:h-[47px] w-auto" />
             </a>
-            <LogoutButton />
+            <div className="flex items-center gap-1 md:hidden">
+              <MenuPopover />
+              <ProfilePopover userName={user.name} userAvatar={user.avatar_url} />
+            </div>
+          </div>
+
+          <div className="flex items-center gap-x-2 flex-wrap md:flex-1">
+            <span className="text-gray-300 text-sm whitespace-nowrap">»</span>
+            <span className="text-brand font-bold text-[25px] whitespace-nowrap">Meus eventos</span>
+          </div>
+
+          <div className="hidden md:flex items-center gap-1 flex-shrink-0">
+            <MenuPopover />
+            <ProfilePopover userName={user.name} userAvatar={user.avatar_url} />
           </div>
         </div>
 
         {/* Criar novo */}
         <a
           href="/criar"
-          className="flex items-center justify-center gap-2 w-full py-4 rounded-2xl bg-violet-600 hover:bg-violet-500 text-white font-extrabold text-base transition-colors"
+          className="flex items-center justify-center gap-2 w-full py-4 rounded-xl bg-brand hover:bg-brand-dark text-white font-bold text-base transition-colors"
         >
           + Criar novo evento
         </a>
@@ -48,23 +57,23 @@ export default async function MeusEventosPage() {
         {eventos && eventos.length > 0 ? (
           <div className="space-y-3">
             {eventos.map(e => (
-              <div key={e.id} className="bg-gray-900 rounded-2xl p-4">
+              <div key={e.id} className="bg-white border border-gray-100 rounded-xl p-4 shadow-sm">
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex-1 min-w-0">
-                    <p className="font-bold text-white truncate">{e.title}</p>
-                    <p className="text-gray-400 text-xs mt-0.5">{fmtDate(e.event_date)}</p>
-                    {e.location && <p className="text-gray-500 text-xs mt-0.5 truncate">📍 {e.location}</p>}
+                    <p className="font-bold text-gray-900 truncate">{e.title}</p>
+                    <p className="text-gray-500 text-xs mt-0.5">{fmtDate(e.event_date)}</p>
+                    {e.location && <p className="text-gray-400 text-xs mt-0.5 truncate">📍 {e.location}</p>}
                   </div>
                   <div className="flex flex-col gap-2 shrink-0">
                     <a
                       href={`/dashboard/${e.edit_token}`}
-                      className="px-3 py-1.5 rounded-xl bg-gray-700 hover:bg-gray-600 text-xs font-semibold text-white text-center"
+                      className="px-3 py-1.5 rounded-lg bg-gray-100 hover:bg-gray-200 text-xs font-semibold text-gray-700 text-center"
                     >
                       Painel
                     </a>
                     <a
                       href={`/e/${e.slug}`}
-                      className="px-3 py-1.5 rounded-xl bg-gray-800 hover:bg-gray-700 text-xs font-semibold text-gray-300 text-center"
+                      className="px-3 py-1.5 rounded-lg bg-gray-50 hover:bg-gray-100 text-xs font-semibold text-gray-500 text-center"
                       target="_blank"
                     >
                       Ver evento
@@ -75,10 +84,10 @@ export default async function MeusEventosPage() {
             ))}
           </div>
         ) : (
-          <div className="bg-gray-900 rounded-2xl p-8 text-center">
+          <div className="bg-white border border-gray-100 rounded-xl p-8 text-center">
             <p className="text-3xl mb-2">🎉</p>
-            <p className="text-gray-400 text-sm">Nenhum evento ainda.</p>
-            <p className="text-gray-500 text-xs mt-1">Crie seu primeiro evento acima!</p>
+            <p className="text-gray-500 text-sm">Nenhum evento ainda.</p>
+            <p className="text-gray-400 text-xs mt-1">Crie seu primeiro evento acima!</p>
           </div>
         )}
 
