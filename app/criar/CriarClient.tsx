@@ -29,6 +29,26 @@ type Props = {
   userAvatar: string | null
 }
 
+function maskDateInput(raw: string): string {
+  const digits = raw.replace(/\D/g, '').slice(0, 8)
+  if (digits.length <= 2) return digits
+  if (digits.length <= 4) return `${digits.slice(0, 2)}/${digits.slice(2)}`
+  return `${digits.slice(0, 2)}/${digits.slice(2, 4)}/${digits.slice(4)}`
+}
+
+function maskTimeInput(raw: string): string {
+  const digits = raw.replace(/\D/g, '').slice(0, 4)
+  if (digits.length <= 2) return digits
+  return `${digits.slice(0, 2)}:${digits.slice(2)}`
+}
+
+function dateDisplayToISO(display: string): string {
+  const m = display.match(/^(\d{2})\/(\d{2})\/(\d{4})$/)
+  if (!m) return ''
+  const [, dd, mm, yyyy] = m
+  return `${yyyy}-${mm}-${dd}`
+}
+
 function fmtPreviewDate(date: string, time: string): string {
   if (!date) return ''
   const [y, m, d] = date.split('-').map(Number)
@@ -137,6 +157,7 @@ export default function CriarClient({ userName, userAvatar }: Props) {
   })
   const [saving, setSaving] = useState(false)
   const [erro,   setErro]   = useState('')
+  const [dateDisplay, setDateDisplay] = useState('')
 
   function set(k: keyof Form, v: string | number) {
     setForm(p => ({ ...p, [k]: v }))
@@ -199,19 +220,27 @@ export default function CriarClient({ userName, userAvatar }: Props) {
               <div className="min-w-0">
                 <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Data *</label>
                 <input
-                  type="date"
-                  value={form.event_date}
-                  onChange={e => set('event_date', e.target.value)}
-                  className="block w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-gray-900 outline-none focus:border-brand text-sm"
+                  type="text"
+                  inputMode="numeric"
+                  placeholder="DD/MM/AAAA"
+                  value={dateDisplay}
+                  onChange={e => {
+                    const masked = maskDateInput(e.target.value)
+                    setDateDisplay(masked)
+                    set('event_date', dateDisplayToISO(masked))
+                  }}
+                  className="block w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 outline-none focus:border-brand text-sm"
                 />
               </div>
               <div className="min-w-0">
                 <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Horário</label>
                 <input
-                  type="time"
+                  type="text"
+                  inputMode="numeric"
+                  placeholder="HH:MM"
                   value={form.event_time}
-                  onChange={e => set('event_time', e.target.value)}
-                  className="block w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-gray-900 outline-none focus:border-brand text-sm"
+                  onChange={e => set('event_time', maskTimeInput(e.target.value))}
+                  className="block w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 outline-none focus:border-brand text-sm"
                 />
               </div>
             </div>
