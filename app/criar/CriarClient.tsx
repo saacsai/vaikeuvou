@@ -132,7 +132,7 @@ function BgSelector({ value, onChange, title }: { value: string; onChange: (v: s
 export default function CriarClient({ userName, userAvatar }: Props) {
   const router = useRouter()
   const [form, setForm] = useState<Form>({
-    title: '', event_date: '', event_time: '19:00',
+    title: '', event_date: '', event_time: '',
     location: '', description: '', max_depth: 2,
     external_url: '', external_url_label: '', video_url: '',
     bg_image_url: '',
@@ -145,8 +145,8 @@ export default function CriarClient({ userName, userAvatar }: Props) {
   }
 
   async function criar() {
-    if (!form.title || !form.event_date) {
-      setErro('Preencha pelo menos o título e a data.')
+    if (!form.title || !form.event_date || !form.event_time) {
+      setErro('Preencha pelo menos o título, a data e o horário.')
       return
     }
     setSaving(true)
@@ -203,7 +203,7 @@ export default function CriarClient({ userName, userAvatar }: Props) {
                 <DatePicker value={form.event_date} onChange={v => set('event_date', v)} />
               </div>
               <div className="min-w-0">
-                <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Horário</label>
+                <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Horário *</label>
                 <TimePicker value={form.event_time} onChange={v => set('event_time', v)} />
               </div>
             </div>
@@ -219,11 +219,11 @@ export default function CriarClient({ userName, userAvatar }: Props) {
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Detalhes</label>
+              <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Comentários</label>
               <textarea
                 value={form.description}
                 onChange={e => set('description', e.target.value)}
-                placeholder="O que rolar, o que levar, dress code…"
+                placeholder="Personalize a mensagem com um convite especial para quem está recebendo."
                 rows={3}
                 className="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 outline-none focus:border-brand text-sm resize-none"
               />
@@ -260,7 +260,7 @@ export default function CriarClient({ userName, userAvatar }: Props) {
               <input
                 value={form.external_url}
                 onChange={e => set('external_url', e.target.value)}
-                placeholder="https://... (ingresso, site, maps…)"
+                placeholder="https://...(ingresso, mais informações, etc...)"
                 type="url"
                 className="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 outline-none focus:border-brand text-sm"
               />
