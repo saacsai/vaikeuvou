@@ -167,14 +167,14 @@ export default function CriarClient({ userName, userAvatar }: Props) {
     <div className="min-h-screen bg-white text-gray-900">
       <div className="max-w-5xl mx-auto px-4 py-8">
 
-        <div className="flex items-center gap-2 text-sm mb-6">
-          <a href="/">
+        <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-sm mb-6">
+          <a href="/" className="flex-shrink-0">
             <Image src="/logo.png" alt="vaikeuvou" width={480} height={108} className="h-[52px] w-auto" />
           </a>
-          <span className="text-gray-300">»</span>
-          <a href="/meus-eventos" className="text-gray-400 hover:text-gray-600">Meus eventos</a>
-          <span className="text-gray-300">»</span>
-          <span className="text-brand font-semibold">Criar convite</span>
+          <span className="text-gray-300 whitespace-nowrap">»</span>
+          <a href="/meus-eventos" className="text-gray-400 hover:text-gray-600 whitespace-nowrap">Meus eventos</a>
+          <span className="text-gray-300 whitespace-nowrap">»</span>
+          <span className="text-brand font-semibold whitespace-nowrap">Criar convite</span>
         </div>
         <h1 className="text-3xl font-bold mb-1 text-gray-900">Criar convite</h1>
         <p className="text-gray-400 text-sm mb-8">Pronto em segundos.</p>
@@ -196,22 +196,22 @@ export default function CriarClient({ userName, userAvatar }: Props) {
             </div>
 
             <div className="grid grid-cols-2 gap-3">
-              <div>
+              <div className="min-w-0">
                 <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Data *</label>
                 <input
                   type="date"
                   value={form.event_date}
                   onChange={e => set('event_date', e.target.value)}
-                  className="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-gray-900 outline-none focus:border-brand text-sm"
+                  className="w-full min-w-0 bg-white border border-gray-300 rounded-xl px-4 py-3 text-gray-900 outline-none focus:border-brand text-sm"
                 />
               </div>
-              <div>
+              <div className="min-w-0">
                 <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Horário</label>
                 <input
                   type="time"
                   value={form.event_time}
                   onChange={e => set('event_time', e.target.value)}
-                  className="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-gray-900 outline-none focus:border-brand text-sm"
+                  className="w-full min-w-0 bg-white border border-gray-300 rounded-xl px-4 py-3 text-gray-900 outline-none focus:border-brand text-sm"
                 />
               </div>
             </div>
