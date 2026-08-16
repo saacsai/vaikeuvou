@@ -194,9 +194,17 @@ export default function EventoClient({ evento, rsvps, parentRsvpId, criador }: P
               <button
                 onClick={confirmar}
                 disabled={saving}
-                className="w-full py-4 rounded-xl bg-brand hover:bg-brand-dark disabled:opacity-50 text-white font-bold text-lg transition-colors"
+                className="w-full py-4 rounded-xl bg-brand hover:bg-brand-dark disabled:opacity-50 text-white font-bold text-lg transition-colors flex items-center justify-center gap-2"
               >
-                {saving ? 'Confirmando…' : 'Confirmar BORA! 🎉'}
+                {saving ? (
+                  'Confirmando…'
+                ) : (
+                  <>
+                    Confirmar
+                    <Image src="/letra_bora.png" alt="BORA" width={130} height={53} className="h-6 w-auto" />
+                    <Image src="/icone_bora.png" alt="" width={57} height={61} className="h-7 w-auto" />
+                  </>
+                )}
               </button>
               <button onClick={() => setEtapa('convite')} className="w-full text-gray-400 text-sm py-2">
                 Voltar
