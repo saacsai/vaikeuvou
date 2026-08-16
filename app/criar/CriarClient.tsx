@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import { HEADER_PRESETS, titleToHeader } from '@/lib/headers'
 import DatePicker from '@/components/DatePicker'
+import TimePicker from '@/components/TimePicker'
 
 const PRIVACIDADE = [
   { value: 1,   label: 'Privado',          desc: 'Só você convida' },
@@ -28,12 +29,6 @@ type Form = {
 type Props = {
   userName: string | null
   userAvatar: string | null
-}
-
-function maskTimeInput(raw: string): string {
-  const digits = raw.replace(/\D/g, '').slice(0, 4)
-  if (digits.length <= 2) return digits
-  return `${digits.slice(0, 2)}:${digits.slice(2)}`
 }
 
 function fmtPreviewDate(date: string, time: string): string {
@@ -209,14 +204,7 @@ export default function CriarClient({ userName, userAvatar }: Props) {
               </div>
               <div className="min-w-0">
                 <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Horário</label>
-                <input
-                  type="text"
-                  inputMode="numeric"
-                  placeholder="HH:MM"
-                  value={form.event_time}
-                  onChange={e => set('event_time', maskTimeInput(e.target.value))}
-                  className="block w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 outline-none focus:border-brand text-sm"
-                />
+                <TimePicker value={form.event_time} onChange={v => set('event_time', v)} />
               </div>
             </div>
 
