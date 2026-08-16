@@ -159,7 +159,7 @@ export default function EventoClient({ evento, rsvps, parentRsvpId, criador }: P
               <p className="text-gray-900 font-semibold text-[23px]">Vamo aí?</p>
               <button
                 onClick={() => setEtapa('form')}
-                className="w-full py-4 rounded-xl bg-brand hover:bg-brand-dark transition-colors shadow-lg shadow-brand/20 flex items-center justify-center gap-1.5"
+                className="w-full py-4 rounded-lg bg-brand hover:bg-brand-dark transition-colors shadow-lg shadow-brand/20 flex items-center justify-center gap-[5px]"
               >
                 <Image src="/letra_bora.png" alt="BORA" width={130} height={53} className="h-7 w-auto" />
                 <Image src="/icone_bora.png" alt="" width={57} height={61} className="h-8 w-auto" />
@@ -194,14 +194,14 @@ export default function EventoClient({ evento, rsvps, parentRsvpId, criador }: P
               <button
                 onClick={confirmar}
                 disabled={saving}
-                className="w-full py-4 rounded-xl bg-brand hover:bg-brand-dark disabled:opacity-50 text-white font-bold text-lg transition-colors flex items-center justify-center gap-2"
+                className="w-full py-4 rounded-lg bg-brand hover:bg-brand-dark disabled:opacity-50 text-white font-bold text-lg transition-colors flex items-center justify-center gap-2"
               >
                 {saving ? (
                   'Confirmando…'
                 ) : (
                   <>
                     Confirmar
-                    <span className="flex items-center gap-1.5">
+                    <span className="flex items-center gap-[5px]">
                       <Image src="/letra_bora.png" alt="BORA" width={130} height={53} className="h-6 w-auto" />
                       <Image src="/icone_bora.png" alt="" width={57} height={61} className="h-7 w-auto" />
                     </span>
