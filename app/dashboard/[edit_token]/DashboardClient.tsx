@@ -63,11 +63,12 @@ function toForm(evento: Event): EventFormFields {
 }
 
 export default function DashboardClient({ evento, rsvps, isNovo, userName, userAvatar }: Props) {
-  const [initial, setInitial] = useState<EventFormFields>(() => toForm(evento))
-  const [form,    setForm]    = useState<EventFormFields>(() => toForm(evento))
-  const [copiado, setCopiado] = useState(false)
-  const [saving,  setSaving]  = useState(false)
-  const [msg,     setMsg]     = useState('')
+  const [initial,  setInitial]  = useState<EventFormFields>(() => toForm(evento))
+  const [form,     setForm]     = useState<EventFormFields>(() => toForm(evento))
+  const [copiado,  setCopiado]  = useState(false)
+  const [saving,   setSaving]   = useState(false)
+  const [msg,      setMsg]      = useState('')
+  const [editando, setEditando] = useState(false)
 
   const dirty = JSON.stringify(form) !== JSON.stringify(initial)
 
@@ -194,10 +195,25 @@ export default function DashboardClient({ evento, rsvps, isNovo, userName, userA
         </div>
 
         {/* Edição completa — mesma estrutura do /criar */}
+        {!editando ? (
+          <div className="mb-12">
+            <button
+              onClick={() => setEditando(true)}
+              className="flex items-center gap-2 px-5 py-3 rounded-xl border border-gray-200 hover:border-brand hover:bg-brand/5 text-gray-700 font-semibold text-sm transition-colors"
+            >
+              ✏️ Editar convite
+            </button>
+          </div>
+        ) : (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start mb-12">
 
           <div className="space-y-5">
-            <p className="text-xs font-bold text-gray-400 uppercase tracking-wide">Editar convite</p>
+            <div className="flex items-center justify-between">
+              <p className="text-xs font-bold text-gray-400 uppercase tracking-wide">Editar convite</p>
+              <button onClick={() => setEditando(false)} className="text-xs text-gray-400 hover:text-gray-600">
+                Fechar ✕
+              </button>
+            </div>
 
             <div>
               <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Nome do evento *</label>
@@ -326,6 +342,7 @@ export default function DashboardClient({ evento, rsvps, isNovo, userName, userA
           </div>
 
         </div>
+        )}
 
         {/* Confirmados */}
         {rsvps.length > 0 ? (
