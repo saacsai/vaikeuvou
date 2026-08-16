@@ -198,25 +198,21 @@ export default function CriarClient({ userName, userAvatar }: Props) {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div className="min-w-0">
                 <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Data *</label>
-                <div className="relative h-[46px] w-full">
-                  <input
-                    type="date"
-                    value={form.event_date}
-                    onChange={e => set('event_date', e.target.value)}
-                    className="absolute inset-0 w-full h-full bg-white border border-gray-300 rounded-xl px-4 text-gray-900 outline-none focus:border-brand text-sm"
-                  />
-                </div>
+                <input
+                  type="date"
+                  value={form.event_date}
+                  onChange={e => set('event_date', e.target.value)}
+                  className="block w-px min-w-full box-border bg-white border border-gray-300 rounded-xl px-4 py-3 text-gray-900 outline-none focus:border-brand text-sm"
+                />
               </div>
               <div className="min-w-0">
                 <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Horário</label>
-                <div className="relative h-[46px] w-full">
-                  <input
-                    type="time"
-                    value={form.event_time}
-                    onChange={e => set('event_time', e.target.value)}
-                    className="absolute inset-0 w-full h-full bg-white border border-gray-300 rounded-xl px-4 text-gray-900 outline-none focus:border-brand text-sm"
-                  />
-                </div>
+                <input
+                  type="time"
+                  value={form.event_time}
+                  onChange={e => set('event_time', e.target.value)}
+                  className="block w-px min-w-full box-border bg-white border border-gray-300 rounded-xl px-4 py-3 text-gray-900 outline-none focus:border-brand text-sm"
+                />
               </div>
             </div>
 
