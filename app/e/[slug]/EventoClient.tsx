@@ -80,7 +80,7 @@ export default function EventoClient({ evento, rsvps, parentRsvpId, criador }: P
           <Image src={header.src} alt="" fill unoptimized className="object-cover" />
         </div>
 
-        <div className="px-6 pt-6 pb-8" style={{ backgroundColor: header.bg }}>
+        <div className="px-6 pt-6 pb-8 bg-gradient-to-b from-white to-[#fcede1]">
 
           {/* Marca */}
           <Image src="/logo.png" alt="vaikeuvou" width={480} height={108} className="w-[250px] max-w-full h-auto mb-4" />

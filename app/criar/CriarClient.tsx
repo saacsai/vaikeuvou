@@ -53,7 +53,7 @@ function EventoPreview({ form, userName, userAvatar }: { form: Form; userName: s
         <Image src={header.src} alt="" fill unoptimized className="object-cover" />
       </div>
 
-      <div className="px-5 pt-5 pb-6" style={{ backgroundColor: header.bg }}>
+      <div className="px-5 pt-5 pb-6 bg-gradient-to-b from-white to-[#fcede1]">
         <Image src="/logo.png" alt="vaikeuvou" width={480} height={108} className="h-7 w-auto mb-0.5" />
         <h1 className={`text-xl font-bold leading-tight mb-3 ${hasTitle ? 'text-gray-900' : 'text-gray-300'}`}>
           {hasTitle ? form.title : 'Nome do evento'}
