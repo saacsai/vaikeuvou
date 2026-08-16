@@ -185,7 +185,7 @@ export default function CriarClient({ userName, userAvatar }: Props) {
             <span className="text-gray-300 text-sm whitespace-nowrap">»</span>
             <a href="/meus-eventos" className="text-gray-400 hover:text-gray-600 text-sm whitespace-nowrap">Meus eventos</a>
             <span className="text-gray-300 text-sm whitespace-nowrap">»</span>
-            <span className="text-brand font-bold text-[27px] whitespace-nowrap">Criar convite</span>
+            <span className="text-brand font-bold text-[25px] whitespace-nowrap">Criar convite</span>
           </div>
 
           <div className="hidden md:flex items-center gap-1 flex-shrink-0">
