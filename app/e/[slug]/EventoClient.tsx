@@ -73,7 +73,7 @@ export default function EventoClient({ evento, rsvps, parentRsvpId, criador }: P
 
   return (
     <div className="min-h-screen flex flex-col items-center" style={{ backgroundColor: header.bg }}>
-      <div className="w-full max-w-lg bg-white sm:my-8 sm:rounded-3xl sm:shadow-xl overflow-hidden">
+      <div className="w-full max-w-lg bg-white sm:my-8 sm:rounded-lg sm:shadow-xl overflow-hidden">
 
         {/* Banner — proporção medida do mockup: ~22% da altura do card */}
         <div className="relative w-full aspect-[2.4/1]">
@@ -83,13 +83,13 @@ export default function EventoClient({ evento, rsvps, parentRsvpId, criador }: P
         <div className="px-6 pt-6 pb-8" style={{ backgroundColor: header.bg }}>
 
           {/* Marca */}
-          <Image src="/logo.png" alt="vaikeuvou" width={480} height={108} className="w-[278px] max-w-full h-auto mb-4" />
+          <Image src="/logo.png" alt="vaikeuvou" width={480} height={108} className="w-[250px] max-w-full h-auto mb-4" />
 
           {/* Título — continua a frase do wordmark: "vai que eu vou" + título */}
           <h1 className="text-3xl font-bold leading-tight text-gray-900 mb-3">{evento.title}</h1>
 
           {/* Detalhes */}
-          <div className="space-y-3 text-sm text-gray-500 mb-4">
+          <div className="space-y-3 text-sm text-gray-500 mb-[21px]">
             <p>📅 {fmtDate(evento.event_date)}</p>
             {evento.location && (
               <a
@@ -135,12 +135,12 @@ export default function EventoClient({ evento, rsvps, parentRsvpId, criador }: P
           )}
 
           {/* Anfitrião + recado */}
-          <div className="flex items-start gap-3 mb-5">
+          <div className="flex items-center gap-3 mb-5">
             {criadorAvatar ? (
-              <Image src={criadorAvatar} alt={criadorNome} width={70} height={70}
-                className="w-[70px] h-[70px] rounded-full object-cover flex-shrink-0" unoptimized />
+              <Image src={criadorAvatar} alt={criadorNome} width={100} height={100}
+                className="w-[100px] h-[100px] rounded-full object-cover flex-shrink-0" unoptimized />
             ) : (
-              <div className="w-[70px] h-[70px] rounded-full bg-gray-200 flex items-center justify-center text-sm font-bold text-gray-600 flex-shrink-0">
+              <div className="w-[100px] h-[100px] rounded-full bg-gray-200 flex items-center justify-center text-base font-bold text-gray-600 flex-shrink-0">
                 {criadorIniciais}
               </div>
             )}
@@ -156,7 +156,7 @@ export default function EventoClient({ evento, rsvps, parentRsvpId, criador }: P
           {/* CTA */}
           {etapa === 'convite' && (
             <div className="space-y-3">
-              <p className="text-gray-900 font-semibold text-lg">Vamo aí?</p>
+              <p className="text-gray-900 font-semibold text-[23px]">Vamo aí?</p>
               <button
                 onClick={() => setEtapa('form')}
                 className="w-full py-4 rounded-xl bg-brand hover:bg-brand-dark text-white font-bold text-xl tracking-wide transition-colors shadow-lg shadow-brand/20"

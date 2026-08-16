@@ -48,7 +48,7 @@ function EventoPreview({ form, userName, userAvatar }: { form: Form; userName: s
   const dateLabel = fmtPreviewDate(form.event_date, form.event_time)
 
   return (
-    <div className="rounded-3xl overflow-hidden shadow-lg border border-gray-100">
+    <div className="rounded-lg overflow-hidden shadow-lg border border-gray-100">
       <div className="relative w-full aspect-[2.4/1]">
         <Image src={header.src} alt="" fill unoptimized className="object-cover" />
       </div>
