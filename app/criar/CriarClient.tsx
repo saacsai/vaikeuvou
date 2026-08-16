@@ -202,7 +202,7 @@ export default function CriarClient({ userName, userAvatar }: Props) {
                   type="date"
                   value={form.event_date}
                   onChange={e => set('event_date', e.target.value)}
-                  className="block w-px min-w-full box-border bg-white border border-gray-300 rounded-xl px-4 py-3 text-gray-900 outline-none focus:border-brand text-sm"
+                  className="block w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-gray-900 outline-none focus:border-brand text-sm"
                 />
               </div>
               <div className="min-w-0">
@@ -211,7 +211,7 @@ export default function CriarClient({ userName, userAvatar }: Props) {
                   type="time"
                   value={form.event_time}
                   onChange={e => set('event_time', e.target.value)}
-                  className="block w-px min-w-full box-border bg-white border border-gray-300 rounded-xl px-4 py-3 text-gray-900 outline-none focus:border-brand text-sm"
+                  className="block w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-gray-900 outline-none focus:border-brand text-sm"
                 />
               </div>
             </div>
