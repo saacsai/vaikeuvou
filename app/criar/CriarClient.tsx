@@ -81,8 +81,8 @@ function EventoPreview({ form, userName, userAvatar }: { form: Form; userName: s
 
         <p className="text-gray-900 font-semibold text-sm mb-2">Vamo aí?</p>
         <div className="w-full py-3 rounded-xl bg-brand select-none flex items-center justify-center gap-1.5">
-          <Image src="/letra_bora.png" alt="BORA" width={137} height={53} className="h-5 w-auto" />
-          <Image src="/icone_bora.png" alt="" width={57} height={62} className="h-6 w-auto" />
+          <Image src="/letra_bora.png" alt="BORA" width={130} height={53} className="h-5 w-auto" />
+          <Image src="/icone_bora.png" alt="" width={57} height={61} className="h-6 w-auto" />
         </div>
       </div>
     </div>
