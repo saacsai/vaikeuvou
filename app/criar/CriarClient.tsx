@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import { HEADER_PRESETS, titleToHeader } from '@/lib/headers'
+import DatePicker from '@/components/DatePicker'
 
 const PRIVACIDADE = [
   { value: 1,   label: 'Privado',          desc: 'Só você convida' },
@@ -29,24 +30,10 @@ type Props = {
   userAvatar: string | null
 }
 
-function maskDateInput(raw: string): string {
-  const digits = raw.replace(/\D/g, '').slice(0, 8)
-  if (digits.length <= 2) return digits
-  if (digits.length <= 4) return `${digits.slice(0, 2)}/${digits.slice(2)}`
-  return `${digits.slice(0, 2)}/${digits.slice(2, 4)}/${digits.slice(4)}`
-}
-
 function maskTimeInput(raw: string): string {
   const digits = raw.replace(/\D/g, '').slice(0, 4)
   if (digits.length <= 2) return digits
   return `${digits.slice(0, 2)}:${digits.slice(2)}`
-}
-
-function dateDisplayToISO(display: string): string {
-  const m = display.match(/^(\d{2})\/(\d{2})\/(\d{4})$/)
-  if (!m) return ''
-  const [, dd, mm, yyyy] = m
-  return `${yyyy}-${mm}-${dd}`
 }
 
 function fmtPreviewDate(date: string, time: string): string {
@@ -157,7 +144,6 @@ export default function CriarClient({ userName, userAvatar }: Props) {
   })
   const [saving, setSaving] = useState(false)
   const [erro,   setErro]   = useState('')
-  const [dateDisplay, setDateDisplay] = useState('')
 
   function set(k: keyof Form, v: string | number) {
     setForm(p => ({ ...p, [k]: v }))
@@ -219,18 +205,7 @@ export default function CriarClient({ userName, userAvatar }: Props) {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div className="min-w-0">
                 <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Data *</label>
-                <input
-                  type="text"
-                  inputMode="numeric"
-                  placeholder="DD/MM/AAAA"
-                  value={dateDisplay}
-                  onChange={e => {
-                    const masked = maskDateInput(e.target.value)
-                    setDateDisplay(masked)
-                    set('event_date', dateDisplayToISO(masked))
-                  }}
-                  className="block w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 outline-none focus:border-brand text-sm"
-                />
+                <DatePicker value={form.event_date} onChange={v => set('event_date', v)} />
               </div>
               <div className="min-w-0">
                 <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Horário</label>
