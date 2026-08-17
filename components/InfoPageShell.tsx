@@ -27,7 +27,7 @@ export default function InfoPageShell({ title, userName, userAvatar, userCredits
               <ProfilePopover userName={userName} userAvatar={userAvatar} userCredits={userCredits} />
             </div>
 
-            <div className="relative w-full aspect-[2.4/1] rounded-2xl overflow-hidden mb-6">
+            <div className="relative w-full aspect-[2.4/1] rounded-lg overflow-hidden mb-6">
               <Image src={heroImage} alt={title} fill priority className="object-cover" />
             </div>
 
