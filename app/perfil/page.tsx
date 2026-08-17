@@ -1,11 +1,12 @@
 import { redirect } from 'next/navigation'
 import { getSession } from '@/lib/auth'
 import { getSupabaseAdmin } from '@/lib/supabase'
+import InfoPageShell from '@/components/InfoPageShell'
 import PerfilClient from './PerfilClient'
 
 export default async function PerfilPage() {
   const session = await getSession()
-  if (!session) redirect('/login')
+  if (!session) redirect('/login?next=/perfil')
 
   const { data: user } = await getSupabaseAdmin()
     .from('users')
@@ -13,14 +14,16 @@ export default async function PerfilPage() {
     .eq('id', session.user_id)
     .single()
 
-  if (!user) redirect('/login')
+  if (!user) redirect('/login?next=/perfil')
 
   return (
-    <PerfilClient
-      userId={user.id}
-      phone={user.phone}
-      name={user.name}
-      avatarUrl={user.avatar_url}
-    />
+    <InfoPageShell title="Meu perfil" userName={user.name} userAvatar={user.avatar_url}>
+      <PerfilClient
+        userId={user.id}
+        phone={user.phone}
+        name={user.name}
+        avatarUrl={user.avatar_url}
+      />
+    </InfoPageShell>
   )
 }

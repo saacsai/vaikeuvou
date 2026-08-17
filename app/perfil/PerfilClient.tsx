@@ -152,131 +152,125 @@ export default function PerfilClient({ phone, name: initialName, avatarUrl: init
   const minScale = crop ? Math.max(CROP_SIZE / crop.naturalW, CROP_SIZE / crop.naturalH) : 1
 
   return (
-    <div className="min-h-screen bg-gray-950 text-white px-4 py-8">
-      <div className="max-w-sm mx-auto space-y-8">
+    <div className="max-w-sm mx-auto space-y-8">
 
-        <div>
-          <a href="/meus-convites" className="text-gray-500 text-sm hover:text-gray-400">← Meus convites</a>
-          <h1 className="text-2xl font-extrabold mt-3">Meu perfil</h1>
-          <p className="text-gray-500 text-xs mt-0.5">{phone}</p>
-        </div>
+      <p className="text-gray-400 text-xs">{phone}</p>
 
-        {/* Avatar atual */}
-        {!crop && (
-          <div className="flex flex-col items-center gap-4">
-            <button onClick={() => fileRef.current?.click()} className="relative group">
-              {avatar ? (
-                <Image
-                  src={avatar} alt="avatar" width={96} height={96}
-                  className="w-24 h-24 rounded-full object-cover border-2 border-violet-500"
-                  unoptimized
-                />
-              ) : (
-                <div className="w-24 h-24 rounded-full bg-violet-600 flex items-center justify-center text-3xl font-extrabold border-2 border-violet-500">
-                  {initials}
-                </div>
-              )}
-              <div className="absolute inset-0 rounded-full bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                <span className="text-white text-xs font-semibold">✏️ alterar</span>
+      {/* Avatar atual */}
+      {!crop && (
+        <div className="flex flex-col items-center gap-4">
+          <button onClick={() => fileRef.current?.click()} className="relative group">
+            {avatar ? (
+              <Image
+                src={avatar} alt="avatar" width={96} height={96}
+                className="w-24 h-24 rounded-full object-cover border-2 border-brand"
+                unoptimized
+              />
+            ) : (
+              <div className="w-24 h-24 rounded-full bg-brand flex items-center justify-center text-3xl font-extrabold text-white border-2 border-brand">
+                {initials}
               </div>
-            </button>
-            <p className="text-gray-500 text-xs">Toque na foto para alterar</p>
-            <input ref={fileRef} type="file" accept="image/*" onChange={onFileChange} className="hidden" />
-          </div>
-        )}
-
-        {/* Crop */}
-        {crop && (
-          <div className="space-y-4">
-            <p className="text-sm font-semibold text-gray-300 text-center">Arraste para centralizar</p>
-
-            <div
-              className="mx-auto rounded-full border-4 border-violet-500 overflow-hidden select-none"
-              style={{ width: CROP_SIZE, height: CROP_SIZE, position: 'relative', cursor: crop.dragging ? 'grabbing' : 'grab' }}
-              onPointerDown={onPointerDown}
-              onPointerMove={onPointerMove}
-              onPointerUp={onPointerUp}
-              onPointerCancel={onPointerUp}
-            >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={crop.src}
-                alt="crop"
-                draggable={false}
-                style={{
-                  position: 'absolute',
-                  width:    crop.naturalW * crop.scale,
-                  height:   crop.naturalH * crop.scale,
-                  maxWidth: 'none',   // cancela max-width: 100% do Tailwind
-                  left:     crop.x,
-                  top:      crop.y,
-                  userSelect: 'none',
-                  pointerEvents: 'none',
-                }}
-              />
+            )}
+            <div className="absolute inset-0 rounded-full bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+              <span className="text-white text-xs font-semibold">✏️ alterar</span>
             </div>
+          </button>
+          <p className="text-gray-400 text-xs">Toque na foto para alterar</p>
+          <input ref={fileRef} type="file" accept="image/*" onChange={onFileChange} className="hidden" />
+        </div>
+      )}
 
-            <div className="space-y-1">
-              <p className="text-xs text-gray-500 text-center">Zoom</p>
-              <input
-                type="range"
-                min={minScale}
-                max={Math.min(minScale * 4, 3)}
-                step={0.005}
-                value={crop.scale}
-                onChange={onZoom}
-                className="w-full accent-violet-500"
-              />
-            </div>
+      {/* Crop */}
+      {crop && (
+        <div className="space-y-4">
+          <p className="text-sm font-semibold text-gray-700 text-center">Arraste para centralizar</p>
 
-            <div className="flex gap-3">
-              <button
-                onClick={() => setCrop(null)}
-                className="flex-1 py-3 rounded-xl bg-gray-800 text-gray-300 font-semibold text-sm"
-              >
-                Cancelar
-              </button>
-              <button
-                onClick={confirmarCrop}
-                disabled={uploading}
-                className="flex-1 py-3 rounded-xl bg-violet-600 hover:bg-violet-500 disabled:opacity-50 text-white font-bold text-sm"
-              >
-                {uploading ? 'Salvando…' : 'Usar esta foto ✓'}
-              </button>
-            </div>
-          </div>
-        )}
-
-        {/* Nome */}
-        {!crop && (
-          <div className="space-y-3">
-            <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wide">
-              Como quer ser chamado?
-            </label>
-            <input
-              value={name}
-              onChange={e => setName(e.target.value)}
-              placeholder="Seu nome"
-              className="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-3 text-white placeholder-gray-600 outline-none focus:border-violet-500 text-base"
+          <div
+            className="mx-auto rounded-full border-4 border-brand overflow-hidden select-none"
+            style={{ width: CROP_SIZE, height: CROP_SIZE, position: 'relative', cursor: crop.dragging ? 'grabbing' : 'grab' }}
+            onPointerDown={onPointerDown}
+            onPointerMove={onPointerMove}
+            onPointerUp={onPointerUp}
+            onPointerCancel={onPointerUp}
+          >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={crop.src}
+              alt="crop"
+              draggable={false}
+              style={{
+                position: 'absolute',
+                width:    crop.naturalW * crop.scale,
+                height:   crop.naturalH * crop.scale,
+                maxWidth: 'none',   // cancela max-width: 100% do Tailwind
+                left:     crop.x,
+                top:      crop.y,
+                userSelect: 'none',
+                pointerEvents: 'none',
+              }}
             />
+          </div>
+
+          <div className="space-y-1">
+            <p className="text-xs text-gray-400 text-center">Zoom</p>
+            <input
+              type="range"
+              min={minScale}
+              max={Math.min(minScale * 4, 3)}
+              step={0.005}
+              value={crop.scale}
+              onChange={onZoom}
+              className="w-full accent-brand"
+            />
+          </div>
+
+          <div className="flex gap-3">
             <button
-              onClick={salvarNome}
-              disabled={saving || !name.trim()}
-              className="w-full py-3 rounded-xl bg-violet-600 hover:bg-violet-500 disabled:opacity-50 text-white font-bold transition-colors"
+              onClick={() => setCrop(null)}
+              className="flex-1 py-3 rounded-xl bg-gray-100 text-gray-600 font-semibold text-sm hover:bg-gray-200"
             >
-              {saving ? 'Salvando…' : 'Salvar nome'}
+              Cancelar
+            </button>
+            <button
+              onClick={confirmarCrop}
+              disabled={uploading}
+              className="flex-1 py-3 rounded-xl bg-brand hover:bg-brand-dark disabled:opacity-50 text-white font-bold text-sm"
+            >
+              {uploading ? 'Salvando…' : 'Usar esta foto ✓'}
             </button>
           </div>
-        )}
+        </div>
+      )}
 
-        {msg && (
-          <p className={`text-sm text-center ${msg.includes('!') ? 'text-green-400' : 'text-red-400'}`}>
-            {msg}
-          </p>
-        )}
+      {/* Nome */}
+      {!crop && (
+        <div className="space-y-3">
+          <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide">
+            Como quer ser chamado?
+          </label>
+          <input
+            value={name}
+            onChange={e => setName(e.target.value)}
+            placeholder="Seu nome"
+            className="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 outline-none focus:border-brand text-base"
+          />
+          <button
+            onClick={salvarNome}
+            disabled={saving || !name.trim()}
+            className="w-full py-3 rounded-xl bg-brand hover:bg-brand-dark disabled:opacity-50 text-white font-bold transition-colors"
+          >
+            {saving ? 'Salvando…' : 'Salvar nome'}
+          </button>
+        </div>
+      )}
 
-        <canvas ref={cropCanvas} className="hidden" />
-      </div>
+      {msg && (
+        <p className={`text-sm text-center ${msg.includes('!') ? 'text-green-600' : 'text-red-500'}`}>
+          {msg}
+        </p>
+      )}
+
+      <canvas ref={cropCanvas} className="hidden" />
     </div>
   )
 }

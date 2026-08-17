@@ -12,7 +12,7 @@ type Props = { searchParams: Promise<{ page?: string }> }
 
 export default async function MeusEventosPage({ searchParams }: Props) {
   const session = await getSession()
-  if (!session) redirect('/login')
+  if (!session) redirect('/login?next=/meus-convites')
 
   const { page: pageParam } = await searchParams
   const page = Math.max(1, parseInt(pageParam ?? '1', 10) || 1)

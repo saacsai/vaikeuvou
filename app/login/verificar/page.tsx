@@ -3,6 +3,8 @@
 import { useState, useEffect } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Suspense } from 'react'
+import Image from 'next/image'
+import AppFooter from '@/components/AppFooter'
 
 function VerificarForm() {
   const router  = useRouter()
@@ -53,56 +55,62 @@ function VerificarForm() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-950 text-white flex flex-col items-center justify-center px-4">
-      <div className="w-full max-w-sm space-y-6">
-        <div className="text-center">
-          <p className="text-violet-400 font-bold text-sm uppercase tracking-widest mb-2">vaikeuvou.app</p>
-          <h1 className="text-2xl font-extrabold">Código enviado!</h1>
-          <p className="text-gray-400 text-sm mt-1">
-            Enviamos um código para<br />
-            <span className="text-white font-semibold">{phone}</span>
-          </p>
-        </div>
-
-        <div className="space-y-4">
-          <div>
-            <label className="block text-xs font-semibold text-gray-400 mb-1.5 uppercase tracking-wide">
-              Código de 6 dígitos
-            </label>
-            <input
-              type="number"
-              value={code}
-              onChange={e => setCode(e.target.value.slice(0, 6))}
-              onKeyDown={e => e.key === 'Enter' && verificar()}
-              placeholder="000000"
-              autoFocus
-              className="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-3 text-white placeholder-gray-600 outline-none focus:border-violet-500 text-2xl font-mono tracking-widest text-center"
-            />
+    <div className="min-h-screen bg-white text-gray-900 flex flex-col">
+      <div className="flex-1 flex flex-col items-center justify-center px-4 py-8">
+        <div className="w-full max-w-sm space-y-6">
+          <div className="text-center">
+            <a href="/" className="inline-block mb-5">
+              <Image src="/logo.png" alt="vaikeuvou" width={480} height={108} className="h-[43px] w-auto mx-auto" />
+            </a>
+            <h1 className="text-2xl font-extrabold text-gray-900">Código enviado!</h1>
+            <p className="text-gray-400 text-sm mt-1">
+              Enviamos um código para<br />
+              <span className="text-gray-900 font-semibold">{phone}</span>
+            </p>
           </div>
 
-          {erro && <p className="text-red-400 text-sm">{erro}</p>}
+          <div className="space-y-4">
+            <div>
+              <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">
+                Código de 6 dígitos
+              </label>
+              <input
+                type="number"
+                value={code}
+                onChange={e => setCode(e.target.value.slice(0, 6))}
+                onKeyDown={e => e.key === 'Enter' && verificar()}
+                placeholder="000000"
+                autoFocus
+                className="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 outline-none focus:border-brand text-2xl font-mono tracking-widest text-center"
+              />
+            </div>
 
-          <button
-            onClick={verificar}
-            disabled={saving}
-            className="w-full py-4 rounded-2xl bg-violet-600 hover:bg-violet-500 disabled:opacity-50 text-white font-extrabold text-lg transition-colors"
-          >
-            {saving ? 'Verificando…' : 'Entrar ✓'}
-          </button>
+            {erro && <p className="text-red-500 text-sm">{erro}</p>}
 
-          <button
-            onClick={reenviar}
-            disabled={reenvio}
-            className="w-full text-gray-500 text-sm py-2 hover:text-gray-400 disabled:opacity-50"
-          >
-            {reenvio ? 'Reenviando…' : 'Reenviar código'}
-          </button>
-        </div>
+            <button
+              onClick={verificar}
+              disabled={saving}
+              className="w-full py-4 rounded-xl bg-brand hover:bg-brand-dark disabled:opacity-50 text-white font-bold text-lg transition-colors"
+            >
+              {saving ? 'Verificando…' : 'Entrar ✓'}
+            </button>
 
-        <div className="text-center">
-          <a href="/login" className="text-gray-500 text-sm hover:text-gray-400">← Trocar número</a>
+            <button
+              onClick={reenviar}
+              disabled={reenvio}
+              className="w-full text-gray-400 text-sm py-2 hover:text-gray-600 disabled:opacity-50"
+            >
+              {reenvio ? 'Reenviando…' : 'Reenviar código'}
+            </button>
+          </div>
+
+          <div className="text-center">
+            <a href="/login" className="text-gray-400 text-sm hover:text-gray-600">← Trocar número</a>
+          </div>
         </div>
       </div>
+
+      <AppFooter />
     </div>
   )
 }
