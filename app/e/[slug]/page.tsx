@@ -13,7 +13,7 @@ export async function generateMetadata({ params, searchParams }: Props): Promise
   if (!data) return { title: 'vaikeuvou.app' }
 
   const base    = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://vaikeuvou.app'
-  const dateStr = new Date(data.event_date).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' })
+  const dateStr = fmtDate(data.event_date)
   const ogUrl   = `${base}/api/og?title=${encodeURIComponent(data.title)}&date=${encodeURIComponent(dateStr)}${data.location ? `&location=${encodeURIComponent(data.location)}` : ''}`
 
   return {
