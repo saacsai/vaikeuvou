@@ -17,6 +17,15 @@ const PRIVACIDADE = [
   { value: 999, label: 'Aberto',           desc: 'Viralização ilimitada' },
 ]
 
+function EditIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+      <path d="M12 20h9" />
+      <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z" />
+    </svg>
+  )
+}
+
 type Props = {
   evento: Event
   rsvps: Rsvp[]
@@ -203,7 +212,8 @@ export default function DashboardClient({ evento, rsvps, isNovo, userName, userA
               onClick={() => setEditando(true)}
               className="flex items-center gap-2 px-5 py-3 rounded-xl border border-gray-200 hover:border-brand hover:bg-brand/5 text-gray-700 font-semibold text-sm uppercase tracking-wide transition-colors"
             >
-              Editar convite ✏️
+              Editar convite
+              <EditIcon className="w-4 h-4" />
             </button>
           </div>
         ) : (
