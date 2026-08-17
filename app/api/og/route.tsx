@@ -23,7 +23,7 @@ export async function GET(req: NextRequest) {
       >
         {/* Top: logo */}
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={logoUrl} width={350} height={79} alt="vaikeuvou" />
+        <img src={logoUrl} width={360} height={81} alt="vaikeuvou" />
 
         {/* Middle: título */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
