@@ -15,7 +15,7 @@ export async function GET(req: NextRequest) {
       <div
         style={{
           width: '1200px', height: '630px',
-          background: 'linear-gradient(135deg, #fff6ed 0%, #f4b077 55%, #eb9a54 100%)',
+          background: 'linear-gradient(135deg, #fffcf8 0%, #fbdcbc 55%, #f8cba1 100%)',
           display: 'flex', flexDirection: 'column',
           justifyContent: 'space-between',
           fontFamily: 'sans-serif', padding: '60px',
@@ -23,7 +23,7 @@ export async function GET(req: NextRequest) {
       >
         {/* Top: logo */}
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={logoUrl} width={340} height={77} alt="vaikeuvou" />
+        <img src={logoUrl} width={350} height={79} alt="vaikeuvou" />
 
         {/* Middle: título */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
