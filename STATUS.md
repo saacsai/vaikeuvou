@@ -2,6 +2,75 @@
 
 Última atualização: 2026-08-17
 
+## Sessão 2026-08-17 (parte 2) — motor de créditos: vídeo e foto cobram também na criação
+
+Correção de regra de negócio sobre a 2ª leva do motor de créditos (vídeo,
+upload de foto de cabeçalho, "Ver quem vai"): a versão anterior cobrava só
+na troca, com a primeira vez (na criação do convite) grátis. Luciano
+corrigiu explicitamente: **não existe "primeira grátis"** — vídeo e foto
+própria custam 1 crédito **toda vez que são definidos**, inclusive a
+primeira, já em `/criar`. Só a edição de um valor existente é chamada de
+"troca" (mesmo preço, 1 crédito, sem desconto).
+
+### Feito
+- `app/api/eventos/imagem-cabecalho/route.ts`: removida a checagem
+  `isFirstUpload` — sempre debita 1 crédito antes do upload, devolve o
+  crédito se o Storage falhar.
+- `components/HeaderImageCropUpload.tsx`: reescrito como máquina de estados
+  `idle → confirmTroca → crop` — o aviso de custo ("vai debitar 1 crédito")
+  aparece **antes** de abrir o seletor de arquivo, não depois de já ter
+  recortado a foto (feedback explícito do Luciano: "imagino que eu faço as
+  coisas pensando que é gratuito e só depois avisa"). Removida a variante
+  verde "grátis"; agora é sempre o quadradinho âmbar com cadeado.
+- `components/BgSelector.tsx`: quadradinho "✨ Imagem por IA" ganhou nota
+  "Em breve · 3 créditos"; removido o prop `currentValue` (não fazia mais
+  sentido sem a distinção primeira-grátis).
+- `app/criar/CriarClient.tsx`:
+  - Campo de vídeo agora nasce **travado** (botão "🔒 Adicionar vídeo — 1
+    crédito"); só vira `<input>` normal depois que a pessoa reconhece o
+    aviso.
+  - Upload de foto de cabeçalho: como o convite ainda não existe no
+    momento do recorte, o blob fica pendente em memória
+    (`pendingHeaderImage`) — o upload de verdade (e o débito) só acontece
+    **depois** que o convite é criado, reaproveitando o `edit_token` da
+    resposta.
+  - Ao clicar em "Criar convite", se algum item pago foi preenchido
+    (vídeo e/ou foto), aparece **um único `confirm()` com o total**
+    ("vai debitar 2 créditos... vídeo + foto. Confirma?") antes de
+    prosseguir — em vez de vários avisos separados.
+  - Bug pré-existente corrigido no caminho: `POST /api/eventos` (criação)
+    descartava silenciosamente `video_url`/`external_url`/
+    `external_url_label` — só `PATCH /api/eventos/editar` (edição)
+    persistia esses campos. Corrigido; validado criando evento real com
+    vídeo+link externo e conferindo persistência.
+- `app/dashboard/[edit_token]/DashboardClient.tsx`: `window.confirm()`
+  adicionado antes de debitar (vídeo e "Ver quem vai"), simplificado o
+  callback de upload de imagem (sempre debita, sem branch de "grátis").
+
+### Como foi validado
+Sessão de teste temporária (token direto na tabela `sessions`, conta real
+do Luciano, 8 créditos) rodando contra o dev server local: criei um
+convite via API simulando exatamente a sequência do `/criar` (criar
+evento → debitar vídeo → PATCH salvando `video_url` → upload de imagem
+1200×500 debitando 1 crédito) — confirmado no banco que `video_url` e
+`bg_image_url` ficaram persistidos e exatamente 2 créditos foram
+debitados (8→6), com as duas linhas em `credit_transactions`. Testado
+também o caminho de saldo insuficiente com uma segunda conta (0
+créditos): os dois endpoints retornam 402 sem debitar. Saldo e dados de
+teste revertidos ao final (créditos devolvidos, evento e arquivo no
+Storage apagados, sessões de teste removidas). `npm run build` limpo.
+Commit `686b5c6`, push feito, deploy automático via Vercel.
+
+### Pendências que restam
+1. Motor de créditos: falta só a regra "2ª mudança de data (2 créditos)",
+   que não foi pedida nesta leva — não implementada.
+2. Feature de imagem gerada por IA (3 créditos) ainda não existe — só o
+   quadradinho "em breve" está no lugar.
+3. 10 imagens de header ainda placeholder (Picsum) — Sandro entrega as
+   definitivas.
+
+---
+
 ## Sessão 2026-08-17 — design system de botões + menu de bolinhas + OG image
 
 ### Padronização de botões (padrão oficial = o botão BORA)
