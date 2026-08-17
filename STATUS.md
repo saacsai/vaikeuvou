@@ -2,6 +2,22 @@
 
 Última atualização: 2026-08-17
 
+## Sessão 2026-08-17 (parte 4) — acabamentos finais: raio da foto hero e favicon
+
+Dois ajustes rápidos pra fechar o dia. **Raio da foto do "Como funciona?"**
+corrigido de `rounded-2xl` (16px) pra `rounded-lg` (8px) — padrão usado em
+todo o resto do app (card do convite, vídeo embed, preview). **Favicon**
+trocado: era o ícone padrão do `create-next-app`/Vercel (triângulo preto
+num círculo), agora é o ícone quadrado laranja da marca, recortado do
+`logo-vertical.png` (bounding box 133×133 do ícone dentro do arquivo,
+com pequena margem) e gerado nos três formatos que o Next.js App Router
+reconhece: `app/favicon.ico` (16/32/48), `app/icon.png` (512, navegadores
+modernos) e `app/apple-icon.png` (180, tela inicial iOS). Validado via
+build (rotas `/icon.png` e `/apple-icon.png` aparecem geradas) e via
+`curl` conferindo as tags `<link rel="icon">` no `<head>` renderizado.
+
+---
+
 ## Sessão 2026-08-17 (parte 3) — Como funciona?, LGPD, Termos e Privacidade
 
 ### Página "Como funciona?" (antes stub em branco)
