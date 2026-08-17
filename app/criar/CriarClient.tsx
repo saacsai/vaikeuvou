@@ -47,8 +47,24 @@ export default function CriarClient({ userName, userAvatar, userBio, userInstagr
   const [profileBio,        setProfileBio]        = useState('')
   const [profileInstagram,  setProfileInstagram]  = useState('')
 
+  // Foto própria de cabeçalho: o convite ainda não existe, então o upload de
+  // verdade só acontece depois de criar (é sempre grátis — é sempre a
+  // primeira foto de um convite novo). Até lá, só guarda o recorte pronto
+  // e mostra o preview localmente.
+  const [pendingHeaderImage, setPendingHeaderImage] = useState<Blob | null>(null)
+
   function set(k: keyof Form, v: string | number) {
     setForm(p => ({ ...p, [k]: v }))
+  }
+
+  function onBgChange(v: string) {
+    setPendingHeaderImage(null)
+    set('bg_image_url', v)
+  }
+
+  function onHeaderImageCropped(blob: Blob, previewUrl: string) {
+    setPendingHeaderImage(blob)
+    set('bg_image_url', previewUrl)
   }
 
   async function criar() {
@@ -75,14 +91,28 @@ export default function CriarClient({ userName, userAvatar, userBio, userInstagr
 
     const event_date = `${form.event_date}T${form.event_time}:00-03:00`
 
+    // Se tem foto própria pendente, o bg_image_url ainda é uma blob: URL
+    // local — não faz sentido gravar isso no banco, o convite nasce sem
+    // imagem (Auto) e o upload de verdade acontece logo em seguida.
     const res = await fetch('/api/eventos', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ ...form, event_date }),
+      body: JSON.stringify({ ...form, event_date, bg_image_url: pendingHeaderImage ? '' : form.bg_image_url }),
     })
     const json = await res.json()
 
     if (!res.ok) { setErro(json.error ?? 'Erro ao criar convite.'); setSaving(false); return }
+
+    if (pendingHeaderImage) {
+      const imgForm = new FormData()
+      imgForm.append('edit_token', json.edit_token)
+      imgForm.append('imagem', pendingHeaderImage, 'header.jpg')
+      // Convite recém-criado, sem foto ainda — essa é sempre a primeira,
+      // grátis. Se falhar por algum motivo, o convite já foi criado do
+      // mesmo jeito, só sem a foto (dá pra subir depois no painel).
+      await fetch('/api/eventos/imagem-cabecalho', { method: 'POST', body: imgForm })
+    }
+
     router.push(`/dashboard/${json.edit_token}?novo=1`)
   }
 
@@ -266,7 +296,7 @@ export default function CriarClient({ userName, userAvatar, userBio, userInstagr
 
             {/* BG selector — mobile (some antes do botão, no desktop fica junto ao preview) */}
             <div className="lg:hidden">
-              <BgSelector value={form.bg_image_url} onChange={v => set('bg_image_url', v)} title={form.title} />
+              <BgSelector value={form.bg_image_url} onChange={onBgChange} title={form.title} onCropped={onHeaderImageCropped} />
             </div>
 
             {/* Vídeo */}
@@ -300,7 +330,7 @@ export default function CriarClient({ userName, userAvatar, userBio, userInstagr
             <p className="text-xs text-gray-400 uppercase tracking-widest font-semibold mb-3 text-center">Preview</p>
             <div className="sticky top-6 space-y-3">
               <EventPreviewCard form={form} userName={previewName} userAvatar={avatarUrl} userBio={previewBio} userInstagram={previewInstagram} />
-              <BgSelector value={form.bg_image_url} onChange={v => set('bg_image_url', v)} title={form.title} />
+              <BgSelector value={form.bg_image_url} onChange={onBgChange} title={form.title} onCropped={onHeaderImageCropped} />
             </div>
           </div>
 

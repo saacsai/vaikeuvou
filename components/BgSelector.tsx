@@ -6,14 +6,20 @@ type Props = {
   value: string
   onChange: (v: string) => void
   title: string
-  /** Só definido no painel (editando um convite já existente) — habilita o upload real de imagem própria (1 crédito/troca). No /criar fica desabilitado, pois ainda não existe convite pra vincular. */
+  /** Só definido no painel — habilita upload imediato (sobe e debita na hora). */
   editToken?: string
+  /** Valor salvo do convite (não o do form em edição) — se já contém uma foto
+   * própria, trocar custa 1 crédito; senão a próxima foto é grátis. No /criar
+   * sempre vazio, então a primeira foto de um convite novo é sempre grátis. */
+  currentValue?: string
   credits?: number
-  /** Chamado quando um upload pago é confirmado — separado do onChange dos presets grátis porque, no painel, precisa também sincronizar o estado "initial" do form (o upload já salva sozinho, não fica pendente de "Salvar alterações"). */
-  onUploaded?: (v: string) => void
+  onUploaded?: (v: string, charged: boolean) => void
+  /** Presente no /criar — convite ainda não existe, upload fica pendente até
+   * a criação ser confirmada (sempre grátis nesse caso, é a primeira foto). */
+  onCropped?: (blob: Blob, previewUrl: string) => void
 }
 
-export default function BgSelector({ value, onChange, title, editToken, credits, onUploaded }: Props) {
+export default function BgSelector({ value, onChange, title, editToken, currentValue, credits, onUploaded, onCropped }: Props) {
   const auto = titleToHeader(title.trim() || 'vaikeuvou')
   return (
     <div className="rounded-2xl bg-white border border-gray-100 p-4 space-y-3">
@@ -49,28 +55,16 @@ export default function BgSelector({ value, onChange, title, editToken, credits,
           <span className="text-[7px] font-bold text-gray-400 uppercase">Em breve</span>
         </div>
 
-        {editToken ? (
-          <HeaderImageCropUpload editToken={editToken} credits={credits ?? 0} onUploaded={onUploaded ?? onChange} />
-        ) : (
-          <div
-            title="Enviar sua foto — disponível ao editar o convite"
-            className="aspect-square rounded-lg bg-gray-50 border-2 border-dashed border-gray-200 flex flex-col items-center justify-center gap-1 cursor-not-allowed"
-          >
-            <CameraIcon className="w-5 h-5 text-gray-300" />
-            <span className="text-[8px] font-bold text-gray-500 uppercase leading-tight text-center px-1">Enviar foto</span>
-            <span className="text-[7px] font-bold text-gray-400 uppercase">1 crédito</span>
-          </div>
+        {(editToken || onCropped) && (
+          <HeaderImageCropUpload
+            editToken={editToken}
+            currentValue={currentValue ?? ''}
+            credits={credits ?? 0}
+            onUploaded={onUploaded ?? onChange}
+            onCropped={onCropped}
+          />
         )}
       </div>
     </div>
-  )
-}
-
-function CameraIcon({ className }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
-      <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
-      <circle cx="12" cy="13" r="4" />
-    </svg>
   )
 }
