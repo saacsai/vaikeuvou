@@ -1,8 +1,34 @@
 # vaikeuvou.app — Status
 
-Última atualização: 2026-08-16 (parte 3)
+Última atualização: 2026-08-16 (parte 4)
 
-## Pós-login inteligente (mesma parte 3, adicionado depois)
+## Sessão 2026-08-16 (parte 4) — /login, /login/verificar e /perfil pro tema claro
+
+**Última área do app ainda no visual escuro/roxo original — convertida.**
+Todas as páginas agora seguem o mesmo padrão visual (fundo branco, inputs
+com borda cinza + foco laranja/`brand`, botões laranja, `AppFooter`).
+
+- `/login` e `/login/verificar`: logo clicável (volta pra home) + rodapé
+  padrão, mesmo layout centralizado de antes, só trocando `violet-*` por
+  `brand`/`brand-dark`.
+- `/perfil`: passou a usar `InfoPageShell` (o mesmo header com breadcrumb
+  + `ProfilePopover` + rodapé usado em `/historia`, `/termos` etc.) —
+  `PerfilClient.tsx` virou só o conteúdo (avatar/crop/nome), sem duplicar
+  wrapper de página. Fluxo de crop de avatar (canvas, zoom, drag) não foi
+  tocado, só as cores.
+- Redirects pro `/login` em `/meus-convites` e `/perfil` agora incluem
+  `?next=` também, consistentes com o pós-login inteligente implementado
+  na parte 3.
+- Validado: build limpo, `curl` com sessão real confirmando ausência de
+  qualquer classe `violet-*`/`bg-gray-950`/`bg-gray-900` remanescente em
+  `app/login` e `app/perfil`.
+
+**Com isso, a padronização visual completa do app está concluída** — não
+resta nenhuma página no tema antigo.
+
+---
+
+## Pós-login inteligente (parte 3, adicionado depois)
 
 Investigando o fluxo "cheguei na home sem convite, cliquei em Criar
 convite", achamos um atrito: `/criar` exigia login, mas depois do OTP o
