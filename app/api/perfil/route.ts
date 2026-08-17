@@ -7,22 +7,33 @@ export async function POST(req: NextRequest) {
   if (!session) return NextResponse.json({ error: 'Não autenticado.' }, { status: 401 })
 
   const { name, bio, vibe, instagram } = await req.json()
-  if (!name?.trim()) return NextResponse.json({ error: 'Nome obrigatório.' }, { status: 400 })
 
-  const cleanInstagram = instagram
-    ?.trim()
-    .replace(/^https?:\/\/(www\.)?instagram\.com\//i, '')
-    .replace(/^@/, '')
-    .replace(/\/$/, '') || null
+  // Update parcial: só grava os campos enviados. `name` é o único que,
+  // se enviado, não pode ser vazio — os demais são opcionais mesmo vindo
+  // vazios (ex: campos condicionais do /criar que só mandam o que falta).
+  const updates: Record<string, string | null> = {}
+  if (name !== undefined) {
+    if (!name?.trim()) return NextResponse.json({ error: 'Nome obrigatório.' }, { status: 400 })
+    updates.name = name.trim()
+  }
+  if (bio !== undefined) updates.bio = bio?.trim() || null
+  if (vibe !== undefined) updates.vibe = vibe?.trim() || null
+
+  const cleanInstagram: string | null = instagram !== undefined
+    ? (instagram?.trim()
+        .replace(/^https?:\/\/(www\.)?instagram\.com\//i, '')
+        .replace(/^@/, '')
+        .replace(/\/$/, '') || null)
+    : null
+  if (instagram !== undefined) updates.instagram = cleanInstagram
+
+  if (Object.keys(updates).length === 0) {
+    return NextResponse.json({ error: 'Nada para atualizar.' }, { status: 400 })
+  }
 
   await getSupabaseAdmin()
     .from('users')
-    .update({
-      name: name.trim(),
-      bio: bio?.trim() || null,
-      vibe: vibe?.trim() || null,
-      instagram: cleanInstagram,
-    })
+    .update(updates)
     .eq('id', session.user_id)
 
   return NextResponse.json({ ok: true, instagram: cleanInstagram })

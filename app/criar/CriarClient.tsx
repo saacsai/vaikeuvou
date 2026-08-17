@@ -9,6 +9,7 @@ import { ProfilePopover } from '@/components/AppHeaderNav'
 import AppFooter from '@/components/AppFooter'
 import EventPreviewCard from '@/components/EventPreviewCard'
 import BgSelector from '@/components/BgSelector'
+import AvatarCropUpload from '@/components/AvatarCropUpload'
 import type { EventFormFields } from '@/lib/eventForm'
 
 const PRIVACIDADE = [
@@ -27,7 +28,6 @@ type Props = {
 }
 
 export default function CriarClient({ userName, userAvatar, userBio, userInstagram }: Props) {
-  const perfilIncompleto = !userAvatar || !userBio || !userInstagram
   const router = useRouter()
   const [form, setForm] = useState<Form>({
     title: '', event_date: '', event_time: '',
@@ -37,6 +37,14 @@ export default function CriarClient({ userName, userAvatar, userBio, userInstagr
   })
   const [saving, setSaving] = useState(false)
   const [erro,   setErro]   = useState('')
+
+  // Assinatura do convite — só pergunta o que ainda não está no perfil,
+  // pra não obrigar a pessoa a sair daqui e ir preencher /perfil antes
+  // de criar o convite.
+  const [avatarUrl,         setAvatarUrl]         = useState(userAvatar)
+  const [profileName,       setProfileName]       = useState('')
+  const [profileBio,        setProfileBio]        = useState('')
+  const [profileInstagram,  setProfileInstagram]  = useState('')
 
   function set(k: keyof Form, v: string | number) {
     setForm(p => ({ ...p, [k]: v }))
@@ -50,6 +58,20 @@ export default function CriarClient({ userName, userAvatar, userBio, userInstagr
     setSaving(true)
     setErro('')
 
+    // Salva no perfil só os campos que a pessoa preencheu aqui (os que
+    // já existiam não são pedidos de novo, então nunca são reenviados).
+    const profileUpdates: Record<string, string> = {}
+    if (!userName && profileName.trim()) profileUpdates.name = profileName.trim()
+    if (!userBio && profileBio.trim()) profileUpdates.bio = profileBio.trim()
+    if (!userInstagram && profileInstagram.trim()) profileUpdates.instagram = profileInstagram.trim()
+    if (Object.keys(profileUpdates).length > 0) {
+      await fetch('/api/perfil', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(profileUpdates),
+      })
+    }
+
     const event_date = `${form.event_date}T${form.event_time}:00-03:00`
 
     const res = await fetch('/api/eventos', {
@@ -62,6 +84,11 @@ export default function CriarClient({ userName, userAvatar, userBio, userInstagr
     if (!res.ok) { setErro(json.error ?? 'Erro ao criar convite.'); setSaving(false); return }
     router.push(`/dashboard/${json.edit_token}?novo=1`)
   }
+
+  const previewName      = userName ?? (profileName || null)
+  const previewBio       = userBio ?? (profileBio || null)
+  const previewInstagram = userInstagram ?? (profileInstagram || null)
+  const initials          = (previewName ?? 'Você').slice(0, 2).toUpperCase()
 
   return (
     <div className="min-h-screen bg-white text-gray-900 flex flex-col">
@@ -89,24 +116,9 @@ export default function CriarClient({ userName, userAvatar, userBio, userInstagr
           </div>
         </div>
 
-        {perfilIncompleto && (
-          <div className="bg-brand/5 border border-brand/20 rounded-xl p-4 mb-8 flex items-start justify-between gap-4 flex-wrap">
-            <div>
-              <p className="text-sm font-bold text-brand">Capriche na sua assinatura!</p>
-              <p className="text-xs text-gray-600 mt-0.5">
-                Foto, bio e @ aparecem no seu convite — sem foto, por exemplo,
-                fica sem graça assinar só com as iniciais.
-              </p>
-            </div>
-            <a href="/perfil" className="text-xs font-bold text-brand hover:text-brand-dark whitespace-nowrap">
-              Completar perfil →
-            </a>
-          </div>
-        )}
-
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
 
-          {/* Formulário */}
+          {/* Formulário — mesma ordem do card real */}
           <div className="space-y-5">
 
             <div>
@@ -141,6 +153,43 @@ export default function CriarClient({ userName, userAvatar, userBio, userInstagr
               />
             </div>
 
+            {/* Link externo */}
+            <div>
+              <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Link externo</label>
+              <input
+                value={form.external_url}
+                onChange={e => set('external_url', e.target.value)}
+                placeholder="https://...(ingresso, mais informações, etc...)"
+                type="url"
+                className="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 outline-none focus:border-brand text-sm"
+              />
+            </div>
+
+            {form.external_url && (
+              <div>
+                <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Texto do botão</label>
+                <input
+                  value={form.external_url_label}
+                  onChange={e => set('external_url_label', e.target.value)}
+                  placeholder="Ex: Comprar ingresso 🎟️"
+                  className="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 outline-none focus:border-brand text-sm"
+                />
+              </div>
+            )}
+
+            {/* Assinatura — só pergunta o que falta no perfil */}
+            {!avatarUrl && (
+              <div>
+                <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Sua foto</label>
+                <AvatarCropUpload
+                  avatar={avatarUrl}
+                  onUploaded={setAvatarUrl}
+                  fallbackInitials={initials}
+                />
+                <p className="text-[10px] text-gray-400 mt-1 text-center">Aparece na assinatura do seu convite — sem ela fica sem graça.</p>
+              </div>
+            )}
+
             <div>
               <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Comentários</label>
               <textarea
@@ -172,34 +221,52 @@ export default function CriarClient({ userName, userAvatar, userBio, userInstagr
               </div>
             </div>
 
+            {!userName && (
+              <div>
+                <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Como quer ser chamado?</label>
+                <input
+                  value={profileName}
+                  onChange={e => setProfileName(e.target.value)}
+                  placeholder="Seu nome"
+                  className="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 outline-none focus:border-brand text-base"
+                />
+              </div>
+            )}
+
+            {!userBio && (
+              <div>
+                <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Bio</label>
+                <textarea
+                  value={profileBio}
+                  onChange={e => setProfileBio(e.target.value.slice(0, 140))}
+                  placeholder="Você pode usar a mesma do Instagram"
+                  rows={2}
+                  className="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 outline-none focus:border-brand text-sm resize-none"
+                />
+                <p className="text-[10px] text-gray-400 mt-1">Aparece na assinatura do seu convite.</p>
+              </div>
+            )}
+
+            {!userInstagram && (
+              <div>
+                <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Instagram</label>
+                <div className="flex items-center bg-white border border-gray-300 rounded-xl px-4 focus-within:border-brand">
+                  <span className="text-gray-400 text-sm">@</span>
+                  <input
+                    value={profileInstagram}
+                    onChange={e => setProfileInstagram(e.target.value)}
+                    placeholder="seu.instagram"
+                    className="w-full bg-transparent py-3 pl-1 text-gray-900 placeholder-gray-400 outline-none text-sm"
+                  />
+                </div>
+                <p className="text-[10px] text-gray-400 mt-1">Também aparece na assinatura do seu convite.</p>
+              </div>
+            )}
+
             {/* BG selector — mobile (some antes do botão, no desktop fica junto ao preview) */}
             <div className="lg:hidden">
               <BgSelector value={form.bg_image_url} onChange={v => set('bg_image_url', v)} title={form.title} />
             </div>
-
-            {/* Link externo */}
-            <div>
-              <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Link externo</label>
-              <input
-                value={form.external_url}
-                onChange={e => set('external_url', e.target.value)}
-                placeholder="https://...(ingresso, mais informações, etc...)"
-                type="url"
-                className="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 outline-none focus:border-brand text-sm"
-              />
-            </div>
-
-            {form.external_url && (
-              <div>
-                <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Texto do botão</label>
-                <input
-                  value={form.external_url_label}
-                  onChange={e => set('external_url_label', e.target.value)}
-                  placeholder="Ex: Comprar ingresso 🎟️"
-                  className="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 outline-none focus:border-brand text-sm"
-                />
-              </div>
-            )}
 
             {/* Vídeo */}
             <div>
@@ -231,7 +298,7 @@ export default function CriarClient({ userName, userAvatar, userBio, userInstagr
           <div className="hidden lg:block">
             <p className="text-xs text-gray-400 uppercase tracking-widest font-semibold mb-3 text-center">Preview</p>
             <div className="sticky top-6 space-y-3">
-              <EventPreviewCard form={form} userName={userName} userAvatar={userAvatar} userBio={userBio} userInstagram={userInstagram} />
+              <EventPreviewCard form={form} userName={previewName} userAvatar={avatarUrl} userBio={previewBio} userInstagram={previewInstagram} />
               <BgSelector value={form.bg_image_url} onChange={v => set('bg_image_url', v)} title={form.title} />
             </div>
           </div>
