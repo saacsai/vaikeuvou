@@ -42,24 +42,35 @@ export default function BgSelector({ value, onChange, title, editToken, credits,
 
         <div
           title="Imagem gerada por IA — em breve"
-          className="aspect-square rounded-lg bg-gray-50 border border-dashed border-gray-200 flex flex-col items-center justify-center gap-0.5 cursor-not-allowed"
+          className="aspect-square rounded-lg bg-gray-50 border-2 border-dashed border-gray-200 flex flex-col items-center justify-center gap-1 cursor-not-allowed"
         >
-          <span className="text-sm text-gray-400 font-bold">✨</span>
-          <span className="text-[7px] text-gray-400 font-bold uppercase">Em breve</span>
+          <span className="text-base text-gray-400">✨</span>
+          <span className="text-[8px] font-bold text-gray-500 uppercase leading-tight text-center px-1">Imagem por IA</span>
+          <span className="text-[7px] font-bold text-gray-400 uppercase">Em breve</span>
         </div>
 
         {editToken ? (
           <HeaderImageCropUpload editToken={editToken} credits={credits ?? 0} onUploaded={onUploaded ?? onChange} />
         ) : (
           <div
-            title="Upload de imagem própria — disponível ao editar o convite"
-            className="aspect-square rounded-lg bg-gray-50 border border-dashed border-gray-200 flex flex-col items-center justify-center gap-0.5 cursor-not-allowed"
+            title="Enviar sua foto — disponível ao editar o convite"
+            className="aspect-square rounded-lg bg-gray-50 border-2 border-dashed border-gray-200 flex flex-col items-center justify-center gap-1 cursor-not-allowed"
           >
-            <span className="text-sm text-gray-400 font-bold">↑</span>
-            <span className="text-[7px] text-gray-400 font-bold uppercase">1 crédito</span>
+            <CameraIcon className="w-5 h-5 text-gray-300" />
+            <span className="text-[8px] font-bold text-gray-500 uppercase leading-tight text-center px-1">Enviar foto</span>
+            <span className="text-[7px] font-bold text-gray-400 uppercase">1 crédito</span>
           </div>
         )}
       </div>
     </div>
+  )
+}
+
+function CameraIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+      <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
+      <circle cx="12" cy="13" r="4" />
+    </svg>
   )
 }

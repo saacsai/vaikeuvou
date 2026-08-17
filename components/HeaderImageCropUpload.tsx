@@ -142,11 +142,12 @@ export default function HeaderImageCropUpload({ editToken, credits, onUploaded }
       <button
         type="button"
         onClick={() => fileRef.current?.click()}
-        title="Upload de imagem própria — 1 crédito"
-        className="aspect-square rounded-lg bg-gray-50 hover:bg-gray-100 border border-dashed border-gray-200 hover:border-brand flex flex-col items-center justify-center gap-0.5 transition-colors"
+        title="Enviar sua própria foto — 1 crédito"
+        className="aspect-square rounded-lg bg-gray-50 hover:bg-brand/5 border-2 border-dashed border-gray-300 hover:border-brand flex flex-col items-center justify-center gap-1 transition-colors"
       >
-        <span className="text-sm text-gray-400 font-bold">↑</span>
-        <span className="text-[7px] text-gray-400 font-bold uppercase">1 crédito</span>
+        <CameraIcon className="w-5 h-5 text-gray-400" />
+        <span className="text-[8px] font-bold text-gray-600 uppercase leading-tight text-center px-1">Enviar foto</span>
+        <span className="text-[7px] font-bold text-brand uppercase">1 crédito</span>
         <input ref={fileRef} type="file" accept="image/*" onChange={onFileChange} className="hidden" />
       </button>
     )
@@ -220,5 +221,14 @@ export default function HeaderImageCropUpload({ editToken, credits, onUploaded }
 
       <canvas ref={cropCanvas} className="hidden" />
     </div>
+  )
+}
+
+function CameraIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+      <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
+      <circle cx="12" cy="13" r="4" />
+    </svg>
   )
 }
