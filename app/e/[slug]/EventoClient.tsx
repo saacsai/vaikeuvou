@@ -208,11 +208,11 @@ export default function EventoClient({ evento, rsvps, parentRsvpId, criador }: P
                   'Confirmando…'
                 ) : (
                   <>
-                    Confirmar
                     <span className="flex items-center gap-[5px]">
                       <Image src="/letra_bora.png" alt="BORA" width={130} height={53} className="h-6 w-auto" />
                       <Image src="/icone_bora.png" alt="" width={57} height={61} className="h-7 w-auto" />
                     </span>
+                    Confirmar
                   </>
                 )}
               </button>
