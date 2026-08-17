@@ -34,6 +34,8 @@ export default async function DashboardPage({ params, searchParams }: Props) {
       userAvatar={session?.users.avatar_url ?? null}
       userBio={session?.users.bio ?? null}
       userInstagram={session?.users.instagram ?? null}
+      userCredits={session?.users.credits ?? 0}
+      isOwner={!!session && session.user_id === evento.user_id}
     />
   )
 }

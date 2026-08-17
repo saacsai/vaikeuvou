@@ -28,6 +28,8 @@ export type Event = {
   creator_phone: string
   edit_token: string
   created_at: string
+  user_id: string | null
+  guest_list_unlocked_at: string | null
 }
 
 export type Rsvp = {

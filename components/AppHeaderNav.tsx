@@ -61,9 +61,10 @@ function MessageIcon({ className }: { className?: string }) {
 type ProfileProps = {
   userName: string | null
   userAvatar: string | null
+  userCredits?: number
 }
 
-export function ProfilePopover({ userName, userAvatar }: ProfileProps) {
+export function ProfilePopover({ userName, userAvatar, userCredits = 0 }: ProfileProps) {
   const router = useRouter()
   const nome = userName ?? 'Você'
   const iniciais = nome.slice(0, 2).toUpperCase()
@@ -113,15 +114,14 @@ export function ProfilePopover({ userName, userAvatar }: ProfileProps) {
                 <TicketIcon className="w-4 h-4 text-brand" />
                 Créditos disponíveis
               </span>
-              <span className="text-sm font-bold text-brand">Em breve</span>
+              <span className="text-sm font-bold text-brand">{userCredits}</span>
             </div>
-            <button
-              type="button"
-              disabled
-              className="w-full flex items-center justify-center gap-1.5 py-2 rounded-lg bg-white border border-gray-200 text-xs font-semibold uppercase tracking-wide text-gray-400 cursor-not-allowed"
+            <a
+              href="/creditos"
+              className="w-full flex items-center justify-center gap-1.5 py-2 rounded-lg bg-white border border-gray-200 hover:border-brand text-xs font-semibold uppercase tracking-wide text-gray-700 transition-colors"
             >
-              Comprar créditos <span className="normal-case font-normal">(em breve)</span>
-            </button>
+              Comprar créditos
+            </a>
           </div>
           <a href="/como-funciona" className="block text-center text-xs text-gray-400 hover:text-gray-600">
             Como funciona?

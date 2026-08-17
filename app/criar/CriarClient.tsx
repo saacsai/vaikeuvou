@@ -25,9 +25,10 @@ type Props = {
   userAvatar: string | null
   userBio: string | null
   userInstagram: string | null
+  userCredits: number
 }
 
-export default function CriarClient({ userName, userAvatar, userBio, userInstagram }: Props) {
+export default function CriarClient({ userName, userAvatar, userBio, userInstagram, userCredits }: Props) {
   const router = useRouter()
   const [form, setForm] = useState<Form>({
     title: '', event_date: '', event_time: '',
@@ -100,7 +101,7 @@ export default function CriarClient({ userName, userAvatar, userBio, userInstagr
               <Image src="/logo.png" alt="vaikeuvou" width={480} height={108} className="h-[43px] md:h-[47px] w-auto" />
             </a>
             <div className="flex items-center gap-1 md:hidden">
-              <ProfilePopover userName={userName} userAvatar={userAvatar} />
+              <ProfilePopover userName={userName} userAvatar={userAvatar} userCredits={userCredits} />
             </div>
           </div>
 
@@ -112,7 +113,7 @@ export default function CriarClient({ userName, userAvatar, userBio, userInstagr
           </div>
 
           <div className="hidden md:flex items-center gap-1 flex-shrink-0">
-            <ProfilePopover userName={userName} userAvatar={userAvatar} />
+            <ProfilePopover userName={userName} userAvatar={userAvatar} userCredits={userCredits} />
           </div>
         </div>
 

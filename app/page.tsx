@@ -11,7 +11,7 @@ export default async function Home() {
     <div className="min-h-screen bg-white text-gray-900 flex flex-col">
       {session && (
         <div className="flex items-center justify-end gap-1 px-5 pt-4">
-          <ProfilePopover userName={session.users.name} userAvatar={session.users.avatar_url} />
+          <ProfilePopover userName={session.users.name} userAvatar={session.users.avatar_url} userCredits={session.users.credits} />
         </div>
       )}
 

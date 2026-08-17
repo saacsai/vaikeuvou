@@ -6,10 +6,11 @@ type Props = {
   title: string
   userName: string | null
   userAvatar: string | null
+  userCredits?: number
   children?: React.ReactNode
 }
 
-export default function InfoPageShell({ title, userName, userAvatar, children }: Props) {
+export default function InfoPageShell({ title, userName, userAvatar, userCredits, children }: Props) {
   return (
     <div className="min-h-screen bg-white text-gray-900 flex flex-col">
       <div className="max-w-5xl mx-auto w-full px-4 py-8 flex-1">
@@ -20,7 +21,7 @@ export default function InfoPageShell({ title, userName, userAvatar, children }:
               <Image src="/logo.png" alt="vaikeuvou" width={480} height={108} className="h-[43px] md:h-[47px] w-auto" />
             </a>
             <div className="flex items-center gap-1 md:hidden">
-              <ProfilePopover userName={userName} userAvatar={userAvatar} />
+              <ProfilePopover userName={userName} userAvatar={userAvatar} userCredits={userCredits} />
             </div>
           </div>
 
@@ -30,7 +31,7 @@ export default function InfoPageShell({ title, userName, userAvatar, children }:
           </div>
 
           <div className="hidden md:flex items-center gap-1 flex-shrink-0">
-            <ProfilePopover userName={userName} userAvatar={userAvatar} />
+            <ProfilePopover userName={userName} userAvatar={userAvatar} userCredits={userCredits} />
           </div>
         </div>
 

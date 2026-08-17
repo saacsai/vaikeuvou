@@ -34,7 +34,11 @@ type Props = {
   userAvatar: string | null
   userBio: string | null
   userInstagram: string | null
+  userCredits: number
+  isOwner: boolean
 }
+
+const UNLOCK_COST = 3
 
 function parseEventDate(iso: string): { date: string; time: string } {
   const d = new Date(iso)
@@ -73,13 +77,30 @@ function toForm(evento: Event): EventFormFields {
   }
 }
 
-export default function DashboardClient({ evento, rsvps, isNovo, userName, userAvatar, userBio, userInstagram }: Props) {
-  const [initial,  setInitial]  = useState<EventFormFields>(() => toForm(evento))
-  const [form,     setForm]     = useState<EventFormFields>(() => toForm(evento))
-  const [copiado,  setCopiado]  = useState(false)
-  const [saving,   setSaving]   = useState(false)
-  const [msg,      setMsg]      = useState('')
-  const [editando, setEditando] = useState(false)
+export default function DashboardClient({ evento, rsvps, isNovo, userName, userAvatar, userBio, userInstagram, userCredits, isOwner }: Props) {
+  const [initial,   setInitial]   = useState<EventFormFields>(() => toForm(evento))
+  const [form,      setForm]      = useState<EventFormFields>(() => toForm(evento))
+  const [copiado,   setCopiado]   = useState(false)
+  const [saving,    setSaving]    = useState(false)
+  const [msg,       setMsg]       = useState('')
+  const [editando,  setEditando]  = useState(false)
+  const [unlocked,  setUnlocked]  = useState(!!evento.guest_list_unlocked_at)
+  const [unlocking, setUnlocking] = useState(false)
+  const [unlockErro, setUnlockErro] = useState('')
+
+  async function desbloquear() {
+    setUnlocking(true)
+    setUnlockErro('')
+    const res = await fetch('/api/creditos/desbloquear', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ edit_token: evento.edit_token }),
+    })
+    const json = await res.json()
+    if (!res.ok) { setUnlockErro(json.error ?? 'Erro ao desbloquear.'); setUnlocking(false); return }
+    setUnlocked(true)
+    setUnlocking(false)
+  }
 
   const dirty = JSON.stringify(form) !== JSON.stringify(initial)
 
@@ -136,7 +157,7 @@ export default function DashboardClient({ evento, rsvps, isNovo, userName, userA
               <Image src="/logo.png" alt="vaikeuvou" width={480} height={108} className="h-[43px] md:h-[47px] w-auto" />
             </a>
             <div className="flex items-center gap-1 md:hidden">
-              <ProfilePopover userName={userName} userAvatar={userAvatar} />
+              <ProfilePopover userName={userName} userAvatar={userAvatar} userCredits={userCredits} />
             </div>
           </div>
 
@@ -148,7 +169,7 @@ export default function DashboardClient({ evento, rsvps, isNovo, userName, userA
           </div>
 
           <div className="hidden md:flex items-center gap-1 flex-shrink-0">
-            <ProfilePopover userName={userName} userAvatar={userAvatar} />
+            <ProfilePopover userName={userName} userAvatar={userAvatar} userCredits={userCredits} />
           </div>
         </div>
 
@@ -165,9 +186,19 @@ export default function DashboardClient({ evento, rsvps, isNovo, userName, userA
               <p className="text-2xl font-extrabold text-brand">{rsvps.length}</p>
               <p className="text-gray-500 text-xs mt-1">Total</p>
               {rsvps.length > 0 && (
-                <a href={`/dashboard/${evento.edit_token}/convidados`} className="text-[10px] font-semibold text-brand mt-1">
-                  Ver quem vai
-                </a>
+                unlocked ? (
+                  <a href={`/dashboard/${evento.edit_token}/convidados`} className="text-[10px] font-semibold text-brand mt-1">
+                    Ver quem vai
+                  </a>
+                ) : isOwner ? (
+                  <button
+                    onClick={desbloquear}
+                    disabled={unlocking}
+                    className="text-[10px] font-semibold text-brand mt-1 disabled:opacity-50"
+                  >
+                    🔒 {unlocking ? 'Desbloqueando…' : `Desbloquear (${UNLOCK_COST} créditos)`}
+                  </button>
+                ) : null
               )}
             </div>
             {[
@@ -204,6 +235,17 @@ export default function DashboardClient({ evento, rsvps, isNovo, userName, userA
             </a>
           </div>
         </div>
+
+        {unlockErro && (
+          <div className="bg-red-50 border border-red-200 rounded-xl p-4 mb-6 flex items-center justify-between gap-3 flex-wrap">
+            <p className="text-red-600 text-sm">{unlockErro}</p>
+            {unlockErro.includes('insuficientes') && (
+              <a href="/creditos" className="text-xs font-bold text-brand hover:text-brand-dark whitespace-nowrap">
+                Comprar créditos →
+              </a>
+            )}
+          </div>
+        )}
 
         {/* Edição completa — mesma estrutura do /criar */}
         {!editando ? (
@@ -365,33 +407,48 @@ export default function DashboardClient({ evento, rsvps, isNovo, userName, userA
 
         {/* Confirmados */}
         {rsvps.length > 0 && (
-          <div className="bg-white border border-gray-100 rounded-xl p-4 shadow-sm">
-            <p className="text-xs font-bold text-gray-400 uppercase tracking-wide mb-3">Confirmados</p>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
-              {rsvps.map(r => (
-                <div key={r.id} className="flex items-center justify-between py-2 px-3 rounded-lg bg-gray-50">
-                  <div className="flex items-center gap-3 min-w-0">
-                    <div className="w-8 h-8 rounded-full bg-brand flex items-center justify-center text-xs font-bold text-white flex-shrink-0">
-                      {r.user_name[0].toUpperCase()}
+          unlocked ? (
+            <div className="bg-white border border-gray-100 rounded-xl p-4 shadow-sm">
+              <p className="text-xs font-bold text-gray-400 uppercase tracking-wide mb-3">Confirmados</p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+                {rsvps.map(r => (
+                  <div key={r.id} className="flex items-center justify-between py-2 px-3 rounded-lg bg-gray-50">
+                    <div className="flex items-center gap-3 min-w-0">
+                      <div className="w-8 h-8 rounded-full bg-brand flex items-center justify-center text-xs font-bold text-white flex-shrink-0">
+                        {r.user_name[0].toUpperCase()}
+                      </div>
+                      <div className="min-w-0">
+                        <p className="text-sm font-semibold text-gray-900 truncate">{r.user_name}</p>
+                        <p className="text-xs text-gray-400">
+                          {new Date(r.created_at).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })}
+                        </p>
+                      </div>
                     </div>
-                    <div className="min-w-0">
-                      <p className="text-sm font-semibold text-gray-900 truncate">{r.user_name}</p>
-                      <p className="text-xs text-gray-400">
-                        {new Date(r.created_at).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })}
-                      </p>
-                    </div>
+                    <span className={`text-xs font-bold px-2 py-0.5 rounded-full flex-shrink-0 ${
+                      r.depth_level === 1 ? 'bg-blue-50 text-blue-600' :
+                      r.depth_level === 2 ? 'bg-pink-50 text-pink-600' :
+                      'bg-orange-50 text-orange-600'
+                    }`}>
+                      Nível {r.depth_level}
+                    </span>
                   </div>
-                  <span className={`text-xs font-bold px-2 py-0.5 rounded-full flex-shrink-0 ${
-                    r.depth_level === 1 ? 'bg-blue-50 text-blue-600' :
-                    r.depth_level === 2 ? 'bg-pink-50 text-pink-600' :
-                    'bg-orange-50 text-orange-600'
-                  }`}>
-                    Nível {r.depth_level}
-                  </span>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
-          </div>
+          ) : isOwner ? (
+            <div className="bg-white border border-gray-100 rounded-xl p-8 shadow-sm text-center">
+              <p className="text-3xl mb-2">🔒</p>
+              <p className="text-gray-700 text-sm font-semibold">{rsvps.length} confirmados</p>
+              <p className="text-gray-400 text-xs mt-1 mb-4">Desbloqueie os nomes por {UNLOCK_COST} créditos — vale pra sempre nesse convite.</p>
+              <button
+                onClick={desbloquear}
+                disabled={unlocking}
+                className="px-6 py-2.5 rounded-lg bg-brand hover:bg-brand-dark disabled:opacity-50 text-white font-bold text-sm uppercase tracking-wide transition-colors"
+              >
+                {unlocking ? 'Desbloqueando…' : `Desbloquear (${UNLOCK_COST} créditos)`}
+              </button>
+            </div>
+          ) : null
         )}
 
       </div>
