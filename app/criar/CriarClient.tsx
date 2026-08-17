@@ -22,9 +22,12 @@ type Form = EventFormFields
 type Props = {
   userName: string | null
   userAvatar: string | null
+  userBio: string | null
+  userInstagram: string | null
 }
 
-export default function CriarClient({ userName, userAvatar }: Props) {
+export default function CriarClient({ userName, userAvatar, userBio, userInstagram }: Props) {
+  const perfilIncompleto = !userAvatar || !userBio || !userInstagram
   const router = useRouter()
   const [form, setForm] = useState<Form>({
     title: '', event_date: '', event_time: '',
@@ -85,6 +88,21 @@ export default function CriarClient({ userName, userAvatar }: Props) {
             <ProfilePopover userName={userName} userAvatar={userAvatar} />
           </div>
         </div>
+
+        {perfilIncompleto && (
+          <div className="bg-brand/5 border border-brand/20 rounded-xl p-4 mb-8 flex items-start justify-between gap-4 flex-wrap">
+            <div>
+              <p className="text-sm font-bold text-brand">Capriche na sua assinatura!</p>
+              <p className="text-xs text-gray-600 mt-0.5">
+                Foto, bio e @ aparecem no seu convite — sem foto, por exemplo,
+                fica sem graça assinar só com as iniciais.
+              </p>
+            </div>
+            <a href="/perfil" className="text-xs font-bold text-brand hover:text-brand-dark whitespace-nowrap">
+              Completar perfil →
+            </a>
+          </div>
+        )}
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
 
@@ -213,7 +231,7 @@ export default function CriarClient({ userName, userAvatar }: Props) {
           <div className="hidden lg:block">
             <p className="text-xs text-gray-400 uppercase tracking-widest font-semibold mb-3 text-center">Preview</p>
             <div className="sticky top-6 space-y-3">
-              <EventPreviewCard form={form} userName={userName} userAvatar={userAvatar} />
+              <EventPreviewCard form={form} userName={userName} userAvatar={userAvatar} userBio={userBio} userInstagram={userInstagram} />
               <BgSelector value={form.bg_image_url} onChange={v => set('bg_image_url', v)} title={form.title} />
             </div>
           </div>

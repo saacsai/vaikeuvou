@@ -32,6 +32,8 @@ export default async function DashboardPage({ params, searchParams }: Props) {
       isNovo={novo === '1'}
       userName={session?.users.name ?? null}
       userAvatar={session?.users.avatar_url ?? null}
+      userBio={session?.users.bio ?? null}
+      userInstagram={session?.users.instagram ?? null}
     />
   )
 }

@@ -54,7 +54,7 @@ export default async function EventoPage({ params, searchParams }: Props) {
   if (evento.user_id) {
     const { data: user } = await sbAdmin
       .from('users')
-      .select('name, avatar_url')
+      .select('name, avatar_url, bio, instagram')
       .eq('id', evento.user_id)
       .single()
     criador = user

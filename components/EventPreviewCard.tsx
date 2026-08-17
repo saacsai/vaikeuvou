@@ -6,9 +6,11 @@ type Props = {
   form: EventFormFields
   userName: string | null
   userAvatar: string | null
+  userBio?: string | null
+  userInstagram?: string | null
 }
 
-export default function EventPreviewCard({ form, userName, userAvatar }: Props) {
+export default function EventPreviewCard({ form, userName, userAvatar, userBio, userInstagram }: Props) {
   const hasTitle  = form.title.trim().length > 0
   const header    = form.bg_image_url
     ? { src: form.bg_image_url, bg: '#f5f5f4' }
@@ -46,7 +48,13 @@ export default function EventPreviewCard({ form, userName, userAvatar }: Props) 
               {iniciais}
             </div>
           )}
-          <p className="text-xs text-gray-400">organizado por <span className="font-semibold text-gray-600">{nome}</span></p>
+          <div className="min-w-0">
+            <p className="text-xs text-gray-400 truncate">
+              organizado por <span className="font-semibold text-gray-600">{nome}</span>
+              {userInstagram && <span className="text-gray-400"> · @{userInstagram}</span>}
+            </p>
+            {userBio && <p className="text-[10px] text-gray-400 truncate">{userBio}</p>}
+          </div>
         </div>
 
         <p className="text-gray-900 font-semibold text-sm mb-2">Vamo aí?</p>

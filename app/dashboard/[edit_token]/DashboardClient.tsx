@@ -23,6 +23,8 @@ type Props = {
   isNovo: boolean
   userName: string | null
   userAvatar: string | null
+  userBio: string | null
+  userInstagram: string | null
 }
 
 function parseEventDate(iso: string): { date: string; time: string } {
@@ -62,7 +64,7 @@ function toForm(evento: Event): EventFormFields {
   }
 }
 
-export default function DashboardClient({ evento, rsvps, isNovo, userName, userAvatar }: Props) {
+export default function DashboardClient({ evento, rsvps, isNovo, userName, userAvatar, userBio, userInstagram }: Props) {
   const [initial,  setInitial]  = useState<EventFormFields>(() => toForm(evento))
   const [form,     setForm]     = useState<EventFormFields>(() => toForm(evento))
   const [copiado,  setCopiado]  = useState(false)
@@ -336,7 +338,7 @@ export default function DashboardClient({ evento, rsvps, isNovo, userName, userA
           <div className="hidden lg:block">
             <p className="text-xs text-gray-400 uppercase tracking-widest font-semibold mb-3 text-center">Preview</p>
             <div className="sticky top-6 space-y-3">
-              <EventPreviewCard form={form} userName={userName} userAvatar={userAvatar} />
+              <EventPreviewCard form={form} userName={userName} userAvatar={userAvatar} userBio={userBio} userInstagram={userInstagram} />
               <BgSelector value={form.bg_image_url} onChange={v => set('bg_image_url', v)} title={form.title} />
             </div>
           </div>

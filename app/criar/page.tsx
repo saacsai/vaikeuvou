@@ -10,6 +10,8 @@ export default async function CriarPage() {
     <CriarClient
       userName={session.users.name}
       userAvatar={session.users.avatar_url}
+      userBio={session.users.bio}
+      userInstagram={session.users.instagram}
     />
   )
 }

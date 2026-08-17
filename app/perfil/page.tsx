@@ -10,7 +10,7 @@ export default async function PerfilPage() {
 
   const { data: user } = await getSupabaseAdmin()
     .from('users')
-    .select('id, phone, name, avatar_url')
+    .select('id, phone, name, avatar_url, bio, vibe, instagram')
     .eq('id', session.user_id)
     .single()
 
@@ -23,6 +23,9 @@ export default async function PerfilPage() {
         phone={user.phone}
         name={user.name}
         avatarUrl={user.avatar_url}
+        bio={user.bio}
+        vibe={user.vibe}
+        instagram={user.instagram}
       />
     </InfoPageShell>
   )

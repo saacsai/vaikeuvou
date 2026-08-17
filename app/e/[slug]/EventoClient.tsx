@@ -6,7 +6,7 @@ import type { Event, Rsvp } from '@/lib/supabase'
 import { fmtDate } from '@/lib/slug'
 import { titleToHeader } from '@/lib/headers'
 
-type Criador = { name: string | null; avatar_url: string | null }
+type Criador = { name: string | null; avatar_url: string | null; bio: string | null; instagram: string | null }
 
 type Props = {
   evento: Event
@@ -39,9 +39,11 @@ export default function EventoClient({ evento, rsvps, parentRsvpId, criador }: P
     ? { src: evento.bg_image_url, bg: '#f5f5f4' }
     : titleToHeader(evento.title)
 
-  const criadorNome     = criador?.name ?? 'Anfitrião'
-  const criadorAvatar   = criador?.avatar_url
-  const criadorIniciais = criadorNome.slice(0, 2).toUpperCase()
+  const criadorNome      = criador?.name ?? 'Anfitrião'
+  const criadorAvatar    = criador?.avatar_url
+  const criadorBio       = criador?.bio
+  const criadorInstagram = criador?.instagram
+  const criadorIniciais  = criadorNome.slice(0, 2).toUpperCase()
 
   const embedUrl    = evento.video_url ? getVideoEmbed(evento.video_url) : null
   const linkLabel   = evento.external_url_label ?? 'Saiba mais'
@@ -150,11 +152,16 @@ export default function EventoClient({ evento, rsvps, parentRsvpId, criador }: P
                 {criadorIniciais}
               </div>
             )}
-            <div>
-              {evento.description ? (
-                <p className="text-sm text-gray-700 italic">&ldquo;{evento.description}&rdquo;</p>
-              ) : (
-                <p className="text-sm text-gray-400">Organizado por {criadorNome}</p>
+            <div className="min-w-0">
+              <p className="text-sm text-gray-900 font-semibold">
+                {criadorNome}
+                {criadorInstagram && (
+                  <span className="text-gray-400 font-normal"> · @{criadorInstagram}</span>
+                )}
+              </p>
+              {criadorBio && <p className="text-xs text-gray-400 mt-0.5">{criadorBio}</p>}
+              {evento.description && (
+                <p className="text-sm text-gray-700 italic mt-1">&ldquo;{evento.description}&rdquo;</p>
               )}
             </div>
           </div>
