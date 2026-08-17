@@ -1,13 +1,19 @@
 import Image from 'next/image'
 import { HEADER_PRESETS, titleToHeader } from '@/lib/headers'
+import HeaderImageCropUpload from '@/components/HeaderImageCropUpload'
 
 type Props = {
   value: string
   onChange: (v: string) => void
   title: string
+  /** Só definido no painel (editando um convite já existente) — habilita o upload real de imagem própria (1 crédito/troca). No /criar fica desabilitado, pois ainda não existe convite pra vincular. */
+  editToken?: string
+  credits?: number
+  /** Chamado quando um upload pago é confirmado — separado do onChange dos presets grátis porque, no painel, precisa também sincronizar o estado "initial" do form (o upload já salva sozinho, não fica pendente de "Salvar alterações"). */
+  onUploaded?: (v: string) => void
 }
 
-export default function BgSelector({ value, onChange, title }: Props) {
+export default function BgSelector({ value, onChange, title, editToken, credits, onUploaded }: Props) {
   const auto = titleToHeader(title.trim() || 'vaikeuvou')
   return (
     <div className="rounded-2xl bg-white border border-gray-100 p-4 space-y-3">
@@ -33,13 +39,26 @@ export default function BgSelector({ value, onChange, title }: Props) {
             <Image src={p.src} alt={p.label} fill unoptimized className="object-cover" />
           </button>
         ))}
+
         <div
-          title="Upload de imagem própria — plano PRO"
+          title="Imagem gerada por IA — em breve"
           className="aspect-square rounded-lg bg-gray-50 border border-dashed border-gray-200 flex flex-col items-center justify-center gap-0.5 cursor-not-allowed"
         >
-          <span className="text-sm text-gray-400 font-bold">↑</span>
-          <span className="text-[7px] text-gray-400 font-bold uppercase">PRO</span>
+          <span className="text-sm text-gray-400 font-bold">✨</span>
+          <span className="text-[7px] text-gray-400 font-bold uppercase">Em breve</span>
         </div>
+
+        {editToken ? (
+          <HeaderImageCropUpload editToken={editToken} credits={credits ?? 0} onUploaded={onUploaded ?? onChange} />
+        ) : (
+          <div
+            title="Upload de imagem própria — disponível ao editar o convite"
+            className="aspect-square rounded-lg bg-gray-50 border border-dashed border-gray-200 flex flex-col items-center justify-center gap-0.5 cursor-not-allowed"
+          >
+            <span className="text-sm text-gray-400 font-bold">↑</span>
+            <span className="text-[7px] text-gray-400 font-bold uppercase">1 crédito</span>
+          </div>
+        )}
       </div>
     </div>
   )

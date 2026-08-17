@@ -87,6 +87,32 @@ export default function DashboardClient({ evento, rsvps, isNovo, userName, userA
   const [unlocked,  setUnlocked]  = useState(!!evento.guest_list_unlocked_at)
   const [unlocking, setUnlocking] = useState(false)
   const [unlockErro, setUnlockErro] = useState('')
+  const [creditsLeft, setCreditsLeft] = useState(userCredits)
+
+  const [videoUnlocked,  setVideoUnlocked]  = useState(false)
+  const [videoUnlocking, setVideoUnlocking] = useState(false)
+  const [videoErro,      setVideoErro]      = useState('')
+
+  async function desbloquearVideo() {
+    setVideoUnlocking(true)
+    setVideoErro('')
+    const res = await fetch('/api/creditos/desbloquear-video', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ edit_token: evento.edit_token }),
+    })
+    const json = await res.json()
+    if (!res.ok) { setVideoErro(json.error ?? 'Erro ao desbloquear.'); setVideoUnlocking(false); return }
+    setVideoUnlocked(true)
+    setCreditsLeft(c => c - 1)
+    setVideoUnlocking(false)
+  }
+
+  function onHeaderImageUploaded(url: string) {
+    setForm(p => ({ ...p, bg_image_url: url }))
+    setInitial(p => ({ ...p, bg_image_url: url }))
+    setCreditsLeft(c => c - 1)
+  }
 
   async function desbloquear() {
     setUnlocking(true)
@@ -98,6 +124,7 @@ export default function DashboardClient({ evento, rsvps, isNovo, userName, userA
     })
     const json = await res.json()
     if (!res.ok) { setUnlockErro(json.error ?? 'Erro ao desbloquear.'); setUnlocking(false); return }
+    setCreditsLeft(c => c - UNLOCK_COST)
     setUnlocked(true)
     setUnlocking(false)
   }
@@ -157,7 +184,7 @@ export default function DashboardClient({ evento, rsvps, isNovo, userName, userA
               <Image src="/logo.png" alt="vaikeuvou" width={480} height={108} className="h-[43px] md:h-[47px] w-auto" />
             </a>
             <div className="flex items-center gap-1 md:hidden">
-              <ProfilePopover userName={userName} userAvatar={userAvatar} userCredits={userCredits} />
+              <ProfilePopover userName={userName} userAvatar={userAvatar} userCredits={creditsLeft} />
             </div>
           </div>
 
@@ -169,7 +196,7 @@ export default function DashboardClient({ evento, rsvps, isNovo, userName, userA
           </div>
 
           <div className="hidden md:flex items-center gap-1 flex-shrink-0">
-            <ProfilePopover userName={userName} userAvatar={userAvatar} userCredits={userCredits} />
+            <ProfilePopover userName={userName} userAvatar={userAvatar} userCredits={creditsLeft} />
           </div>
         </div>
 
@@ -362,18 +389,47 @@ export default function DashboardClient({ evento, rsvps, isNovo, userName, userA
             </div>
 
             <div className="lg:hidden">
-              <BgSelector value={form.bg_image_url} onChange={v => set('bg_image_url', v)} title={form.title} />
+              <BgSelector
+                value={form.bg_image_url}
+                onChange={v => set('bg_image_url', v)}
+                title={form.title}
+                editToken={evento.edit_token}
+                credits={creditsLeft}
+                onUploaded={onHeaderImageUploaded}
+              />
             </div>
 
             <div>
               <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Vídeo do convite</label>
-              <input
-                value={form.video_url}
-                onChange={e => set('video_url', e.target.value)}
-                placeholder="YouTube ou Vimeo"
-                type="url"
-                className="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 outline-none focus:border-brand text-sm"
-              />
+              {evento.video_url && !videoUnlocked ? (
+                <div className="bg-gray-50 border border-gray-200 rounded-xl p-3 space-y-2">
+                  <p className="text-sm text-gray-500 truncate">{evento.video_url}</p>
+                  <button
+                    type="button"
+                    onClick={desbloquearVideo}
+                    disabled={videoUnlocking}
+                    className="px-3 py-1.5 rounded-lg bg-white border border-gray-200 hover:border-brand disabled:opacity-50 text-xs font-semibold uppercase tracking-wide text-gray-700 transition-colors"
+                  >
+                    🔒 {videoUnlocking ? 'Desbloqueando…' : 'Trocar (1 crédito)'}
+                  </button>
+                  {videoErro && (
+                    <p className="text-xs text-red-500">
+                      {videoErro}
+                      {videoErro.includes('insuficientes') && (
+                        <> — <a href="/creditos" className="text-brand font-bold hover:underline">Comprar créditos</a></>
+                      )}
+                    </p>
+                  )}
+                </div>
+              ) : (
+                <input
+                  value={form.video_url}
+                  onChange={e => set('video_url', e.target.value)}
+                  placeholder="YouTube ou Vimeo"
+                  type="url"
+                  className="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 outline-none focus:border-brand text-sm"
+                />
+              )}
               <p className="text-[10px] text-gray-400 mt-1">Aparece abaixo do botão BORA na página do convite</p>
             </div>
 
@@ -398,7 +454,14 @@ export default function DashboardClient({ evento, rsvps, isNovo, userName, userA
             <p className="text-xs text-gray-400 uppercase tracking-widest font-semibold mb-3 text-center">Preview</p>
             <div className="sticky top-6 space-y-3">
               <EventPreviewCard form={form} userName={userName} userAvatar={userAvatar} userBio={userBio} userInstagram={userInstagram} />
-              <BgSelector value={form.bg_image_url} onChange={v => set('bg_image_url', v)} title={form.title} />
+              <BgSelector
+                value={form.bg_image_url}
+                onChange={v => set('bg_image_url', v)}
+                title={form.title}
+                editToken={evento.edit_token}
+                credits={creditsLeft}
+                onUploaded={onHeaderImageUploaded}
+              />
             </div>
           </div>
 
