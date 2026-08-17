@@ -1,6 +1,78 @@
 # vaikeuvou.app — Status
 
-Última atualização: 2026-08-16 (parte 6)
+Última atualização: 2026-08-17
+
+## Sessão 2026-08-17 — design system de botões + menu de bolinhas + OG image
+
+### Padronização de botões (padrão oficial = o botão BORA)
+Todos os botões de ação do app (login, meus convites, painel, perfil,
+confirmação do convite) passaram a seguir o formato do BORA: **caixa
+alta + ícone à direita**, mantendo a cor/hierarquia de cada um (laranja
+= ação principal, branco/borda = secundária, cinza = neutra). WhatsApp
+verde ficou intocado (reconhecimento de marca, não inconsistência).
+Emojis que estavam à esquerda do texto ("✏️ Editar convite", "✏️
+alterar") foram trocados por SVGs monocromáticos posicionados à direita,
+herdando a cor do texto via `currentColor` (branco em botão laranja,
+cinza em botão neutro). Seletores tipo radio (privacidade em /criar e
+/dashboard) e setas de paginação ficaram fora do escopo — não são
+"botões de ação" no mesmo sentido do BORA.
+
+### Menu de bolinhas reorganizado (`components/AppHeaderNav.tsx`)
+O popover de perfil, que antes só tinha avatar/nome + "Créditos: Em
+breve" + Editar perfil + Sair, ganhou estrutura completa em blocos
+separados por divisor:
+- **Navegação**: Meus convites, Criar convite
+- **Créditos**: card destacado (fundo laranja diluído) com saldo + botão
+  "Comprar créditos" desabilitado ("em breve" — motor de créditos ainda
+  não existe) + link "Como funciona?" logo abaixo (explica o modelo,
+  por isso fica junto dos créditos, não no bloco de suporte)
+- **Perfil**: Editar perfil (como já estava)
+- **Suporte**: Fale conosco
+- **Sair** (separado por linha, como antes)
+
+Isso resolve uma pendência antiga: "Como funciona?" e "Fale conosco"
+existiam como páginas em branco desde a sessão de padronização visual,
+mas sem link nenhum — agora estão acessíveis.
+
+### OG image redesenhada (`app/api/og/route.tsx`) — última tela escura do app
+Era o último lugar do app ainda no visual escuro/gradiente-por-hash
+antigo. Mesma estrutura (logo em cima, título+data+local no meio, CTA
+embaixo), pele nova:
+- Fundo: gradiente laranja mais forte que o pastel dos cards (branco →
+  laranja médio, 135deg), no lugar do gradiente escuro por hash do
+  título.
+- Logo horizontal real (`/logo.png`) no lugar do texto "vaikeuvou.app".
+- Data agora mostra data completa + horário (reaproveita `fmtDate`, o
+  mesmo formatador do resto do site) — antes só tinha dia/mês abreviado.
+- CTA "E aí? Vamos? 🚀" virou **"Vamo aí?" dentro de um botão laranja
+  sólido, caixa baixa, sem ícone** — decisão consciente de não seguir o
+  padrão caixa-alta+ícone dos outros botões, porque "Vamo aí?" é a mesma
+  frase solta (não-botão) que aparece no card real; aqui vira botão só
+  porque a imagem estática não tem como ter um BORA clicável de verdade.
+- Removido `lib/gradient.ts` (código morto — a rota tinha sua própria
+  cópia inline da mesma lógica de hash, nada mais importava o arquivo).
+
+**Com isso, não sobra nenhuma tela ou asset do app no visual escuro
+antigo — a padronização visual está 100% completa**, incluindo o preview
+do link no WhatsApp.
+
+### Como foi validado
+Botões: build limpo + checado via sessão real em /login, /meus-convites,
+/dashboard e /perfil (curl com cookie de sessão). Menu: popover forçado
+aberto temporariamente (`HeaderPopover` `useState(true)`) pra
+screenshot mobile fullscreen e painel desktop, revertido antes do
+commit. OG image: gerada de verdade via curl com dados de um evento
+real, e confirmado que a rota do evento monta a URL do OG com data+
+horário completos.
+
+### Pendências que restam
+1. Motor de créditos real (saldo, Stripe, débito por ação) — quando
+   existir, precisa gatear "Ver quem vai" e a lista "Confirmados" do
+   painel, e ativar o botão "Comprar créditos" do menu
+2. 10 imagens de header ainda placeholder (Picsum) — Sandro entrega as
+   definitivas
+
+---
 
 ## Sessão 2026-08-16 (parte 6) — ajuste fino: assinatura no rodapé, botão BORA
 
