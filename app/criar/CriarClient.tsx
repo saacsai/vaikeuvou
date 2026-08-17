@@ -352,7 +352,7 @@ export default function CriarClient({ userName, userAvatar, userBio, userInstagr
               {videoStage === 'confirm' && (
                 <CreditLockPanel
                   title="Adicionar vídeo custa 1 crédito"
-                  message="Vai debitar 1 crédito do seu saldo quando você criar o convite."
+                  message={`Vai debitar 1 crédito do seu saldo (${userCredits} disponíveis) quando você criar o convite.`}
                   credits={userCredits}
                   onCancel={() => setVideoStage('idle')}
                   onContinue={() => setVideoStage('unlocked')}

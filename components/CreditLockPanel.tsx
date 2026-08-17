@@ -25,13 +25,11 @@ export default function CreditLockPanel({
       <p className="text-sm font-semibold text-gray-800">{title}</p>
       <p className="text-xs text-gray-500">{message}</p>
       {insuficiente && (
-        <p className="text-xs text-red-500 font-semibold">
-          Saldo insuficiente. <a href="/creditos" className="underline">Comprar créditos</a>
-        </p>
+        <p className="text-xs text-red-500 font-semibold">Saldo insuficiente.</p>
       )}
       {erro && <p className="text-xs text-red-500 font-semibold">{erro}</p>}
       <p className="text-[10px] text-gray-400">
-        Dúvidas? Acesse <a href="/como-funciona" className="underline hover:text-gray-600">Como funciona?</a>
+        Dúvidas? Acesse <a href="/como-funciona" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Como funciona?</a>
       </p>
       <div className="flex gap-2">
         <button
@@ -41,14 +39,23 @@ export default function CreditLockPanel({
         >
           Cancelar
         </button>
-        <button
-          type="button"
-          onClick={onContinue}
-          disabled={insuficiente || continuing}
-          className="flex-1 py-2 rounded-lg bg-brand hover:bg-brand-dark disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold text-xs uppercase tracking-wide"
-        >
-          {continuing ? 'Aguarde…' : continueLabel}
-        </button>
+        {insuficiente ? (
+          <a
+            href="/creditos"
+            className="flex-1 py-2 rounded-lg bg-brand hover:bg-brand-dark text-white font-bold text-xs uppercase tracking-wide text-center"
+          >
+            Comprar créditos
+          </a>
+        ) : (
+          <button
+            type="button"
+            onClick={onContinue}
+            disabled={continuing}
+            className="flex-1 py-2 rounded-lg bg-brand hover:bg-brand-dark disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold text-xs uppercase tracking-wide"
+          >
+            {continuing ? 'Aguarde…' : continueLabel}
+          </button>
+        )}
       </div>
     </div>
   )

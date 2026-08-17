@@ -196,7 +196,7 @@ export default function HeaderImageCropUpload({ editToken, credits, onUploaded, 
         message={
           editToken
             ? `Vai debitar 1 crédito do seu saldo (${credits} disponíveis) assim que você escolher a foto.`
-            : 'Vai debitar 1 crédito do seu saldo quando você criar o convite.'
+            : `Vai debitar 1 crédito do seu saldo (${credits} disponíveis) quando você criar o convite.`
         }
         credits={credits}
         onCancel={() => setStage('idle')}
