@@ -5,7 +5,7 @@ import Image from 'next/image'
 import type { Event, Rsvp } from '@/lib/supabase'
 import DatePicker from '@/components/DatePicker'
 import TimePicker from '@/components/TimePicker'
-import { ProfilePopover } from '@/components/AppHeaderNav'
+import { ProfilePopover, GridIcon } from '@/components/AppHeaderNav'
 import AppFooter from '@/components/AppFooter'
 import EventPreviewCard from '@/components/EventPreviewCard'
 import BgSelector from '@/components/BgSelector'
@@ -259,6 +259,36 @@ export default function DashboardClient({ evento, rsvps, isNovo, userName, userA
             </div>
 
             <div>
+              <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Link externo</label>
+              <input
+                value={form.external_url}
+                onChange={e => set('external_url', e.target.value)}
+                placeholder="https://...(ingresso, mais informações, etc...)"
+                type="url"
+                className="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 outline-none focus:border-brand text-sm"
+              />
+            </div>
+
+            {form.external_url && (
+              <div>
+                <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Texto do botão</label>
+                <input
+                  value={form.external_url_label}
+                  onChange={e => set('external_url_label', e.target.value)}
+                  placeholder="Ex: Comprar ingresso 🎟️"
+                  className="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 outline-none focus:border-brand text-sm"
+                />
+              </div>
+            )}
+
+            <div className="bg-gray-50 rounded-xl p-4 flex items-start gap-3">
+              <p className="text-xs text-gray-500 leading-relaxed">
+                Foto, nome, bio e @Instagram da sua assinatura se editam direto no
+                seu perfil. Acesse: <GridIcon className="inline-block w-3.5 h-3.5 align-[-2px] mx-0.5" /> menu » Editar perfil.
+              </p>
+            </div>
+
+            <div>
               <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Comentários</label>
               <textarea
                 value={form.description}
@@ -292,29 +322,6 @@ export default function DashboardClient({ evento, rsvps, isNovo, userName, userA
             <div className="lg:hidden">
               <BgSelector value={form.bg_image_url} onChange={v => set('bg_image_url', v)} title={form.title} />
             </div>
-
-            <div>
-              <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Link externo</label>
-              <input
-                value={form.external_url}
-                onChange={e => set('external_url', e.target.value)}
-                placeholder="https://...(ingresso, mais informações, etc...)"
-                type="url"
-                className="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 outline-none focus:border-brand text-sm"
-              />
-            </div>
-
-            {form.external_url && (
-              <div>
-                <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Texto do botão</label>
-                <input
-                  value={form.external_url_label}
-                  onChange={e => set('external_url_label', e.target.value)}
-                  placeholder="Ex: Comprar ingresso 🎟️"
-                  className="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 outline-none focus:border-brand text-sm"
-                />
-              </div>
-            )}
 
             <div>
               <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Vídeo do convite</label>

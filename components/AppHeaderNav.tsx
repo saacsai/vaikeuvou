@@ -4,9 +4,9 @@ import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import HeaderPopover from '@/components/HeaderPopover'
 
-function GridIcon() {
+export function GridIcon({ className }: { className?: string }) {
   return (
-    <svg className="w-5 h-5 md:w-[22px] md:h-[22px]" viewBox="0 0 20 20" fill="currentColor">
+    <svg className={className ?? 'w-5 h-5 md:w-[22px] md:h-[22px]'} viewBox="0 0 20 20" fill="currentColor">
       {[2, 9, 16].flatMap(cy =>
         [2, 9, 16].map(cx => <circle key={`${cx}-${cy}`} cx={cx} cy={cy} r="1.6" />)
       )}
