@@ -2,6 +2,58 @@
 
 Última atualização: 2026-08-17
 
+## Sessão 2026-08-17 (parte 3) — Como funciona?, LGPD, Termos e Privacidade
+
+### Página "Como funciona?" (antes stub em branco)
+Construída do zero, didática: intro curta, 3 passos (criar → compartilhar
+→ acompanhar), bloco verde "sempre grátis", cards âmbar do que usa crédito
+(vídeo 1, foto 1, ver quem vai 3, IA 3 — em breve, puxando preço real de
+`CREDIT_PACKAGES`), FAQ em acordeão (`<details>`, sem JS) linkando pro
+Fale conosco, dois CTAs "Comprar créditos →". Depois ganhou um hero:
+`InfoPageShell` recebeu prop opcional `heroImage` — quando presente, troca
+o breadcrumb padrão por logo em cima → foto retangular 2.4:1 → título
+grande centralizado. Foto (galera sorrindo, clima BORA) via Unsplash,
+licença livre, salva em `/public/como-funciona-hero.jpg` — usada só nessa
+página, as outras (Termos, Privacidade, Fale) continuam com o breadcrumb
+padrão.
+
+### LGPD — coleta de telefone, consentimento e documentos legais
+Discussão com o Luciano sobre como sinalizar consentimento pra coleta de
+telefone (login do anfitrião via OTP, e nome+telefone no RSVP do
+convidado). Decisão: **dois níveis**, não um só —
+- **`/criar`, checkbox explícito** (opt-in, desmarcado por padrão),
+  bloqueia "Criar convite" até marcar. Só aparece na primeira vez — grava
+  `terms_accepted_at` (nova coluna em `users`, `supabase_termos.sql`) e
+  nunca mais pergunta depois disso.
+- **`/login` e RSVP (botão BORA)**: texto passivo com links, sem checkbox
+  — são os instantes em que o telefone já está sendo processado (OTP) ou
+  é o gesto mais importante do produto (BORA); um checkbox bloqueante ali
+  derrubaria conversão sem ganho real de proteção jurídica (a base legal
+  é execução do serviço, não consentimento formal).
+
+Termos de Uso e Política de Privacidade escritos de verdade (antes eram
+stubs em branco), baseados no que o app **realmente** coleta e faz — não
+em texto genérico de gerador de política. Responsável pelo tratamento:
+Luciano Maeda Estratégia Empresarial LTDA, CNPJ 44.636.556/0001-44
+(cartão CNPJ fornecido pelo Luciano). Contato: fale@vaikeuvou.app. A
+Política lista os processadores reais (Stripe, Evolution API/WhatsApp,
+Supabase, Vercel), os direitos do titular (LGPD Art. 18) e como exercê-
+los (Fale conosco) — sem prometer nada que o produto não faz de verdade
+hoje (ex: reembolso e exclusão de conta são manuais, via Fale conosco,
+não têm self-service ainda).
+
+### Como foi validado
+Como funciona: screenshot real do dev server (desktop), build limpo.
+LGPD: SQL rodado pelo Luciano (`supabase_termos.sql`), depois validado
+ponta a ponta com sessão de teste temporária na conta real dele —
+checkbox aparece pra quem nunca aceitou, POST `/api/perfil` com
+`accept_terms:true` grava `terms_accepted_at` de verdade, checkbox some
+depois de aceitar. Estado revertido ao final (`terms_accepted_at` voltou
+pra `null` — ele ainda não aceitou de verdade). `npm run build` limpo em
+cada etapa.
+
+---
+
 ## Sessão 2026-08-17 (parte 2) — motor de créditos: vídeo e foto cobram também na criação
 
 Correção de regra de negócio sobre a 2ª leva do motor de créditos (vídeo,
