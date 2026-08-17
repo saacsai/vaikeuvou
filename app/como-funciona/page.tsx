@@ -89,6 +89,7 @@ export default async function ComoFuncionaPage() {
       userName={session?.users.name ?? null}
       userAvatar={session?.users.avatar_url ?? null}
       userCredits={session?.users.credits}
+      heroImage="/como-funciona-hero.jpg"
     >
       <div className="max-w-2xl mx-auto space-y-12 pb-6">
 
