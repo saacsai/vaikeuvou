@@ -6,7 +6,7 @@ export async function POST(req: NextRequest) {
   const session = await getSession()
   if (!session) return NextResponse.json({ error: 'Não autenticado.' }, { status: 401 })
 
-  const { name, bio, vibe, instagram } = await req.json()
+  const { name, bio, vibe, instagram, accept_terms } = await req.json()
 
   // Update parcial: só grava os campos enviados. `name` é o único que,
   // se enviado, não pode ser vazio — os demais são opcionais mesmo vindo
@@ -26,6 +26,9 @@ export async function POST(req: NextRequest) {
         .replace(/\/$/, '') || null)
     : null
   if (instagram !== undefined) updates.instagram = cleanInstagram
+
+  // Aceite de Termos de Uso/Política de Privacidade (LGPD).
+  if (accept_terms) updates.terms_accepted_at = new Date().toISOString()
 
   if (Object.keys(updates).length === 0) {
     return NextResponse.json({ error: 'Nada para atualizar.' }, { status: 400 })

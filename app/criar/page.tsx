@@ -13,6 +13,7 @@ export default async function CriarPage() {
       userBio={session.users.bio}
       userInstagram={session.users.instagram}
       userCredits={session.users.credits}
+      termsAccepted={!!session.users.terms_accepted_at}
     />
   )
 }

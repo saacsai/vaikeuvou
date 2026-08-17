@@ -27,9 +27,10 @@ type Props = {
   userBio: string | null
   userInstagram: string | null
   userCredits: number
+  termsAccepted: boolean
 }
 
-export default function CriarClient({ userName, userAvatar, userBio, userInstagram, userCredits }: Props) {
+export default function CriarClient({ userName, userAvatar, userBio, userInstagram, userCredits, termsAccepted }: Props) {
   const router = useRouter()
   const [form, setForm] = useState<Form>({
     title: '', event_date: '', event_time: '',
@@ -58,6 +59,9 @@ export default function CriarClient({ userName, userAvatar, userBio, userInstagr
   const [videoStage, setVideoStage] = useState<'idle' | 'confirm' | 'unlocked'>('idle')
   const videoUnlocked = videoStage === 'unlocked'
 
+  // Aceite de Termos/Privacidade — só pergunta uma vez, na primeira criação.
+  const [aceitouTermos, setAceitouTermos] = useState(false)
+
   function set(k: keyof Form, v: string | number) {
     setForm(p => ({ ...p, [k]: v }))
   }
@@ -78,6 +82,11 @@ export default function CriarClient({ userName, userAvatar, userBio, userInstagr
       return
     }
 
+    if (!termsAccepted && !aceitouTermos) {
+      setErro('Você precisa concordar com os Termos de Uso e a Política de Privacidade.')
+      return
+    }
+
     const querVideo  = videoUnlocked && form.video_url.trim() !== ''
     const querImagem = !!pendingHeaderImage
     const custoTotal = (querVideo ? 1 : 0) + (querImagem ? 1 : 0)
@@ -93,10 +102,11 @@ export default function CriarClient({ userName, userAvatar, userBio, userInstagr
 
     // Salva no perfil só os campos que a pessoa preencheu aqui (os que
     // já existiam não são pedidos de novo, então nunca são reenviados).
-    const profileUpdates: Record<string, string> = {}
+    const profileUpdates: Record<string, string | boolean> = {}
     if (!userName && profileName.trim()) profileUpdates.name = profileName.trim()
     if (!userBio && profileBio.trim()) profileUpdates.bio = profileBio.trim()
     if (!userInstagram && profileInstagram.trim()) profileUpdates.instagram = profileInstagram.trim()
+    if (!termsAccepted && aceitouTermos) profileUpdates.accept_terms = true
     if (Object.keys(profileUpdates).length > 0) {
       await fetch('/api/perfil', {
         method: 'POST',
@@ -369,6 +379,21 @@ export default function CriarClient({ userName, userAvatar, userBio, userInstagr
                 </button>
               )}
             </div>
+
+            {!termsAccepted && (
+              <label className="flex items-start gap-2.5 text-xs text-gray-500 leading-relaxed cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={aceitouTermos}
+                  onChange={e => setAceitouTermos(e.target.checked)}
+                  className="mt-0.5 w-4 h-4 flex-shrink-0 accent-brand"
+                />
+                Li e concordo com os{' '}
+                <a href="/termos" target="_blank" rel="noopener noreferrer" className="text-brand font-semibold hover:underline">Termos de Uso</a>
+                {' '}e a{' '}
+                <a href="/privacidade" target="_blank" rel="noopener noreferrer" className="text-brand font-semibold hover:underline">Política de Privacidade</a>
+              </label>
+            )}
 
             {erro && <p className="text-red-500 text-sm">{erro}</p>}
 

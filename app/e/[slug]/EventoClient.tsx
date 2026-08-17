@@ -199,6 +199,12 @@ export default function EventoClient({ evento, rsvps, parentRsvpId, criador }: P
                 />
               </div>
               {erro && <p className="text-red-500 text-sm">{erro}</p>}
+              <p className="text-[10px] text-gray-400 leading-relaxed">
+                Ao confirmar, você concorda com os{' '}
+                <a href="/termos" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Termos de Uso</a>
+                {' '}e a{' '}
+                <a href="/privacidade" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Política de Privacidade</a>.
+              </p>
               <button
                 onClick={confirmar}
                 disabled={saving}
