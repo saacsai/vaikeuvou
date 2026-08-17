@@ -1,6 +1,47 @@
 # vaikeuvou.app — Status
 
-Última atualização: 2026-08-16 (parte 4)
+Última atualização: 2026-08-16 (parte 5)
+
+## Sessão 2026-08-16 (parte 5) — bio, Instagram e "vibe" no perfil
+
+Ideia do Luciano: a assinatura "organizado por Nome" no convite fica pobre
+sem mais nada — queria bio + @instagram junto do nome, e um terceiro campo
+("qual é sua vibe? o que gosta/não gosta de fazer") que não aparece no
+convite, é só pra uma futura IA geradora de imagem entender o estilo do
+usuário.
+
+### Feito
+- **`users` ganhou 3 colunas** (`supabase_perfil_bio.sql`, `ALTER TABLE
+  ... ADD COLUMN IF NOT EXISTS` — já rodado pelo Luciano): `bio`, `vibe`,
+  `instagram`, todas opcionais.
+- **`/perfil`**: campos novos (Bio, limite 140 chars; Instagram, prefixo
+  `@` fixo no input; "Qual é a sua vibe?", textarea livre), cada um com
+  uma linha explicando pra que serve — a de vibe deixa claro que **não**
+  vai pro convite. Nome+bio+instagram+vibe agora salvam juntos num único
+  botão "Salvar perfil" (antes só o nome tinha save próprio).
+  `app/api/perfil/route.ts` normaliza o Instagram no backend (aceita
+  `@handle`, URL colada ou texto puro, guarda só o handle limpo).
+- **Banner "Capriche na sua assinatura!"** — laranja, não-bloqueante,
+  aparece em `/perfil` (quando falta foto/bio/instagram) e em `/criar`
+  (mesma condição, com link "Completar perfil →"). Decisão: nudge em vez
+  de gate — travar o onboarding pra forçar isso brigaria com o pós-login
+  inteligente que já manda o usuário direto pra `/criar`.
+- **Assinatura em produção**: `EventPreviewCard` (preview do `/criar` e
+  do painel) e `EventoClient` (página real do convite, `/e/[slug]`) agora
+  renderizam `Nome · @instagram` + bio numa linha abaixo, mantendo o
+  recado do evento (`description`) como já era — os três nunca competem
+  pelo mesmo espaço, cada um sua linha.
+
+### Como foi validado
+Testado contra a conta real do Luciano: preenchi bio+instagram de teste
+via script, tirei screenshot da assinatura completa no convite real
+("Luciano · @lucianomaeda" + bio + recado do evento, todos exibidos
+juntos corretamente), depois revertido pra `null` (estado real dele hoje
+— ele ainda não preencheu esses campos). Confirmado também que o banner
+de nudge aparece tanto em `/perfil` quanto em `/criar` quando o perfil
+está incompleto.
+
+---
 
 ## Sessão 2026-08-16 (parte 4) — /login, /login/verificar e /perfil pro tema claro
 
