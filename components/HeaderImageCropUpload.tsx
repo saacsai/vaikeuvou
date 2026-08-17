@@ -25,20 +25,18 @@ const OUT_H = 500
 type Props = {
   /** Presente só no painel — habilita upload imediato (sobe e debita na hora). */
   editToken?: string
-  /** Valor atual salvo do convite (não o do form em edição) — usado só pra
-   * saber se já existe uma foto própria (troca = 1 crédito) ou se essa é a
-   * primeira (grátis, "diferencial"). Vazio/preset = ainda não teve foto própria. */
-  currentValue: string
   credits: number
-  onUploaded?: (url: string, charged: boolean) => void
+  onUploaded?: (url: string) => void
   /** Presente no /criar — o convite ainda não existe, então não dá pra subir
    * de verdade ainda. Só guarda o recorte pronto; o upload de verdade (e a
-   * cobrança, se não for a primeira foto) acontece só depois que o convite
-   * for criado. */
+   * cobrança) acontece só depois que o convite for criado. */
   onCropped?: (blob: Blob, previewUrl: string) => void
 }
 
-export default function HeaderImageCropUpload({ editToken, currentValue, credits, onUploaded, onCropped }: Props) {
+type Stage = 'idle' | 'confirmTroca' | 'crop'
+
+export default function HeaderImageCropUpload({ editToken, credits, onUploaded, onCropped }: Props) {
+  const [stage,     setStage]     = useState<Stage>('idle')
   const [uploading, setUploading] = useState(false)
   const [msg,       setMsg]       = useState('')
   const [crop,      setCrop]      = useState<CropState | null>(null)
@@ -46,7 +44,10 @@ export default function HeaderImageCropUpload({ editToken, currentValue, credits
   const fileRef    = useRef<HTMLInputElement>(null)
   const cropCanvas = useRef<HTMLCanvasElement>(null)
 
-  const isFirstUpload = !currentValue || !currentValue.includes('/event-headers/')
+  function abrirSeletor() {
+    if (credits < 1) return
+    fileRef.current?.click()
+  }
 
   function onFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]
@@ -63,6 +64,7 @@ export default function HeaderImageCropUpload({ editToken, currentValue, credits
         scale: minScale,
         dragging: false, startX: 0, startY: 0,
       })
+      setStage('crop')
     }
     img.src = src
     setMsg('')
@@ -105,8 +107,14 @@ export default function HeaderImageCropUpload({ editToken, currentValue, credits
     })
   }
 
-  async function renderBlob(): Promise<Blob | null> {
-    if (!crop) return null
+  function cancelar() {
+    setCrop(null)
+    setStage('idle')
+    setMsg('')
+  }
+
+  async function confirmarCrop() {
+    if (!crop) return
     const canvas = cropCanvas.current!
     canvas.width  = OUT_W
     canvas.height = OUT_H
@@ -125,24 +133,18 @@ export default function HeaderImageCropUpload({ editToken, currentValue, credits
       0, 0, OUT_W, OUT_H,
     )
 
-    return new Promise<Blob | null>(r => canvas.toBlob(r, 'image/jpeg', 0.9))
-  }
-
-  async function confirmarCrop() {
-    if (!crop) return
-
-    const blob = await renderBlob()
+    const blob = await new Promise<Blob | null>(r => canvas.toBlob(r, 'image/jpeg', 0.9))
     if (!blob) { setMsg('Erro ao processar imagem.'); return }
 
     if (onCropped) {
-      // /criar — convite ainda não existe, só guarda o recorte pronto.
+      // /criar — convite ainda não existe, só guarda o recorte pronto. A
+      // cobrança de verdade acontece junto com a criação do convite.
       onCropped(blob, URL.createObjectURL(blob))
-      setCrop(null)
+      cancelar()
       return
     }
 
     if (!editToken) return
-    if (!isFirstUpload && !window.confirm('Trocar a foto vai debitar 1 crédito do seu saldo. Confirma?')) return
 
     setUploading(true)
     setMsg('')
@@ -155,33 +157,69 @@ export default function HeaderImageCropUpload({ editToken, currentValue, credits
     const json = await res.json()
 
     if (res.ok) {
-      onUploaded?.(json.url, json.charged)
-      setCrop(null)
+      onUploaded?.(json.url)
+      cancelar()
     } else {
       setMsg(json.error ?? 'Erro ao enviar imagem.')
+      setUploading(false)
     }
-    setUploading(false)
   }
 
   const minScale = crop ? Math.max(DISPLAY_W / crop.naturalW, DISPLAY_H / crop.naturalH) : 1
 
-  if (!crop) {
+  // Estado ocioso: sempre travado — foto própria custa 1 crédito, mesmo a
+  // primeira vez (na criação do convite ou depois, editando).
+  if (stage === 'idle') {
     return (
       <button
         type="button"
-        onClick={() => fileRef.current?.click()}
-        title={isFirstUpload ? 'Enviar sua própria foto — grátis a primeira vez' : 'Trocar por outra foto — 1 crédito'}
-        className="aspect-square rounded-lg bg-gray-50 hover:bg-brand/5 border-2 border-dashed border-gray-300 hover:border-brand flex flex-col items-center justify-center gap-1 transition-colors"
+        onClick={() => setStage('confirmTroca')}
+        title="Enviar sua própria foto — 1 crédito"
+        className="aspect-square rounded-lg bg-amber-50 hover:bg-amber-100 border-2 border-dashed border-amber-300 flex flex-col items-center justify-center gap-1 transition-colors"
       >
-        <CameraIcon className="w-5 h-5 text-gray-400" />
-        <span className="text-[8px] font-bold text-gray-600 uppercase leading-tight text-center px-1">
-          {isFirstUpload ? 'Enviar foto' : 'Trocar foto'}
-        </span>
-        <span className={`text-[7px] font-bold uppercase ${isFirstUpload ? 'text-green-600' : 'text-brand'}`}>
-          {isFirstUpload ? 'Grátis' : '1 crédito'}
-        </span>
+        <LockIcon className="w-5 h-5 text-amber-500" />
+        <span className="text-[8px] font-bold text-gray-600 uppercase leading-tight text-center px-1">Enviar foto</span>
+        <span className="text-[7px] font-bold text-amber-600 uppercase">1 crédito</span>
         <input ref={fileRef} type="file" accept="image/*" onChange={onFileChange} className="hidden" />
       </button>
+    )
+  }
+
+  // Aviso de custo — aparece ANTES de abrir o seletor de arquivo, não depois
+  // de já ter recortado a foto.
+  if (stage === 'confirmTroca') {
+    return (
+      <div className="col-span-4 p-4 bg-amber-50 border-2 border-amber-200 rounded-xl space-y-3 text-center">
+        <LockIcon className="w-5 h-5 text-amber-500 mx-auto" />
+        <p className="text-sm font-semibold text-gray-800">Enviar foto própria custa 1 crédito</p>
+        <p className="text-xs text-gray-500">
+          {editToken
+            ? `Vai debitar 1 crédito do seu saldo (${credits} disponíveis) assim que você escolher a foto.`
+            : 'Vai debitar 1 crédito do seu saldo quando você criar o convite.'}
+        </p>
+        {credits < 1 && (
+          <p className="text-xs text-red-500 font-semibold">
+            Saldo insuficiente. <a href="/creditos" className="underline">Comprar créditos</a>
+          </p>
+        )}
+        <div className="flex gap-2">
+          <button
+            type="button"
+            onClick={() => setStage('idle')}
+            className="flex-1 py-2 rounded-lg bg-white border border-gray-200 text-gray-600 font-semibold text-xs uppercase tracking-wide hover:bg-gray-50"
+          >
+            Cancelar
+          </button>
+          <button
+            type="button"
+            onClick={() => { setStage('idle'); abrirSeletor() }}
+            disabled={credits < 1}
+            className="flex-1 py-2 rounded-lg bg-brand hover:bg-brand-dark disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold text-xs uppercase tracking-wide"
+          >
+            Continuar
+          </button>
+        </div>
+      </div>
     )
   }
 
@@ -191,28 +229,30 @@ export default function HeaderImageCropUpload({ editToken, currentValue, credits
 
       <div
         className="mx-auto rounded-lg overflow-hidden select-none border-2 border-brand"
-        style={{ width: DISPLAY_W, height: DISPLAY_H, position: 'relative', cursor: crop.dragging ? 'grabbing' : 'grab' }}
+        style={{ width: DISPLAY_W, height: DISPLAY_H, position: 'relative', cursor: crop?.dragging ? 'grabbing' : 'grab' }}
         onPointerDown={onPointerDown}
         onPointerMove={onPointerMove}
         onPointerUp={onPointerUp}
         onPointerCancel={onPointerUp}
       >
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src={crop.src}
-          alt="crop"
-          draggable={false}
-          style={{
-            position: 'absolute',
-            width:    crop.naturalW * crop.scale,
-            height:   crop.naturalH * crop.scale,
-            maxWidth: 'none',
-            left:     crop.x,
-            top:      crop.y,
-            userSelect: 'none',
-            pointerEvents: 'none',
-          }}
-        />
+        {crop && (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={crop.src}
+            alt="crop"
+            draggable={false}
+            style={{
+              position: 'absolute',
+              width:    crop.naturalW * crop.scale,
+              height:   crop.naturalH * crop.scale,
+              maxWidth: 'none',
+              left:     crop.x,
+              top:      crop.y,
+              userSelect: 'none',
+              pointerEvents: 'none',
+            }}
+          />
+        )}
       </div>
 
       <input
@@ -220,21 +260,15 @@ export default function HeaderImageCropUpload({ editToken, currentValue, credits
         min={minScale}
         max={Math.min(minScale * 4, 3)}
         step={0.005}
-        value={crop.scale}
+        value={crop?.scale ?? minScale}
         onChange={onZoom}
         className="w-full accent-brand"
       />
 
-      {!isFirstUpload && credits < 1 && (
-        <p className="text-xs text-red-500 text-center">
-          Você não tem créditos suficientes. <a href="/creditos" className="font-bold hover:underline">Comprar créditos</a>
-        </p>
-      )}
-
       <div className="flex gap-2">
         <button
           type="button"
-          onClick={() => setCrop(null)}
+          onClick={cancelar}
           className="flex-1 py-2 rounded-lg bg-gray-100 text-gray-600 font-semibold text-xs uppercase tracking-wide hover:bg-gray-200"
         >
           Cancelar
@@ -242,10 +276,10 @@ export default function HeaderImageCropUpload({ editToken, currentValue, credits
         <button
           type="button"
           onClick={confirmarCrop}
-          disabled={uploading || (!isFirstUpload && credits < 1)}
+          disabled={uploading}
           className="flex-1 py-2 rounded-lg bg-brand hover:bg-brand-dark disabled:opacity-50 text-white font-bold text-xs uppercase tracking-wide"
         >
-          {uploading ? 'Enviando…' : isFirstUpload ? 'Usar (grátis)' : 'Usar (1 crédito)'}
+          {uploading ? 'Enviando…' : editToken ? 'Confirmar (1 crédito)' : 'Usar essa foto'}
         </button>
       </div>
 
@@ -256,11 +290,11 @@ export default function HeaderImageCropUpload({ editToken, currentValue, credits
   )
 }
 
-function CameraIcon({ className }: { className?: string }) {
+function LockIcon({ className }: { className?: string }) {
   return (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
-      <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
-      <circle cx="12" cy="13" r="4" />
+      <rect x="3" y="11" width="18" height="11" rx="2" />
+      <path d="M7 11V7a5 5 0 0 1 10 0v4" />
     </svg>
   )
 }

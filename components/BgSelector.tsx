@@ -8,18 +8,14 @@ type Props = {
   title: string
   /** Só definido no painel — habilita upload imediato (sobe e debita na hora). */
   editToken?: string
-  /** Valor salvo do convite (não o do form em edição) — se já contém uma foto
-   * própria, trocar custa 1 crédito; senão a próxima foto é grátis. No /criar
-   * sempre vazio, então a primeira foto de um convite novo é sempre grátis. */
-  currentValue?: string
   credits?: number
-  onUploaded?: (v: string, charged: boolean) => void
+  onUploaded?: (v: string) => void
   /** Presente no /criar — convite ainda não existe, upload fica pendente até
-   * a criação ser confirmada (sempre grátis nesse caso, é a primeira foto). */
+   * a criação ser confirmada (cobra 1 crédito junto com a criação). */
   onCropped?: (blob: Blob, previewUrl: string) => void
 }
 
-export default function BgSelector({ value, onChange, title, editToken, currentValue, credits, onUploaded, onCropped }: Props) {
+export default function BgSelector({ value, onChange, title, editToken, credits, onUploaded, onCropped }: Props) {
   const auto = titleToHeader(title.trim() || 'vaikeuvou')
   return (
     <div className="rounded-2xl bg-white border border-gray-100 p-4 space-y-3">
@@ -47,18 +43,17 @@ export default function BgSelector({ value, onChange, title, editToken, currentV
         ))}
 
         <div
-          title="Imagem gerada por IA — em breve"
+          title="Imagem gerada por IA — em breve, 3 créditos"
           className="aspect-square rounded-lg bg-gray-50 border-2 border-dashed border-gray-200 flex flex-col items-center justify-center gap-1 cursor-not-allowed"
         >
           <span className="text-base text-gray-400">✨</span>
           <span className="text-[8px] font-bold text-gray-500 uppercase leading-tight text-center px-1">Imagem por IA</span>
-          <span className="text-[7px] font-bold text-gray-400 uppercase">Em breve</span>
+          <span className="text-[7px] font-bold text-gray-400 uppercase">Em breve · 3 créditos</span>
         </div>
 
         {(editToken || onCropped) && (
           <HeaderImageCropUpload
             editToken={editToken}
-            currentValue={currentValue ?? ''}
             credits={credits ?? 0}
             onUploaded={onUploaded ?? onChange}
             onCropped={onCropped}

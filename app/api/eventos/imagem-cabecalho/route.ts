@@ -16,7 +16,7 @@ export async function POST(req: NextRequest) {
   const sb = getSupabaseAdmin()
   const { data: evento } = await sb
     .from('events')
-    .select('id, title, user_id, bg_image_url')
+    .select('id, title, user_id')
     .eq('edit_token', editToken)
     .single()
 
@@ -25,18 +25,13 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Esse convite não é seu.' }, { status: 403 })
   }
 
-  // Primeira foto própria de um convite é grátis (diferencial) — só trocar
-  // uma foto que já existe custa crédito.
-  const isFirstUpload = !evento.bg_image_url || !evento.bg_image_url.includes('/event-headers/')
-
-  if (!isFirstUpload) {
-    const { data: debited } = await sb.rpc('debit_user_credits', {
-      p_user_id: session.user_id,
-      p_amount: COST,
-    })
-    if (!debited) {
-      return NextResponse.json({ error: 'Créditos insuficientes.' }, { status: 402 })
-    }
+  // Foto própria custa 1 crédito sempre — inclusive a primeira, na criação.
+  const { data: debited } = await sb.rpc('debit_user_credits', {
+    p_user_id: session.user_id,
+    p_amount: COST,
+  })
+  if (!debited) {
+    return NextResponse.json({ error: 'Créditos insuficientes.' }, { status: 402 })
   }
 
   const path  = `${evento.id}/header-${Date.now()}.jpg`
@@ -48,9 +43,7 @@ export async function POST(req: NextRequest) {
 
   if (upErr) {
     // Upload falhou depois de já ter debitado — devolve o crédito.
-    if (!isFirstUpload) {
-      await sb.rpc('increment_user_credits', { p_user_id: session.user_id, p_amount: COST })
-    }
+    await sb.rpc('increment_user_credits', { p_user_id: session.user_id, p_amount: COST })
     return NextResponse.json({ error: upErr.message }, { status: 500 })
   }
 
@@ -58,15 +51,13 @@ export async function POST(req: NextRequest) {
 
   await sb.from('events').update({ bg_image_url: publicUrl }).eq('id', evento.id)
 
-  if (!isFirstUpload) {
-    await sb.from('credit_transactions').insert({
-      user_id: session.user_id,
-      amount: -COST,
-      type: 'debit',
-      reason: `Trocar imagem de cabeçalho — ${evento.title}`,
-      event_id: evento.id,
-    })
-  }
+  await sb.from('credit_transactions').insert({
+    user_id: session.user_id,
+    amount: -COST,
+    type: 'debit',
+    reason: `Foto de cabeçalho — ${evento.title}`,
+    event_id: evento.id,
+  })
 
-  return NextResponse.json({ ok: true, url: publicUrl, charged: !isFirstUpload })
+  return NextResponse.json({ ok: true, url: publicUrl })
 }

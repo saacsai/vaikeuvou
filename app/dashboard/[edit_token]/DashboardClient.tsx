@@ -109,10 +109,10 @@ export default function DashboardClient({ evento, rsvps, isNovo, userName, userA
     setVideoUnlocking(false)
   }
 
-  function onHeaderImageUploaded(url: string, charged: boolean) {
+  function onHeaderImageUploaded(url: string) {
     setForm(p => ({ ...p, bg_image_url: url }))
     setInitial(p => ({ ...p, bg_image_url: url }))
-    if (charged) setCreditsLeft(c => c - 1)
+    setCreditsLeft(c => c - 1)
   }
 
   async function desbloquear() {
@@ -396,7 +396,6 @@ export default function DashboardClient({ evento, rsvps, isNovo, userName, userA
                 onChange={v => set('bg_image_url', v)}
                 title={form.title}
                 editToken={evento.edit_token}
-                currentValue={evento.bg_image_url ?? ''}
                 credits={creditsLeft}
                 onUploaded={onHeaderImageUploaded}
               />
@@ -462,7 +461,6 @@ export default function DashboardClient({ evento, rsvps, isNovo, userName, userA
                 onChange={v => set('bg_image_url', v)}
                 title={form.title}
                 editToken={evento.edit_token}
-                currentValue={evento.bg_image_url ?? ''}
                 credits={creditsLeft}
                 onUploaded={onHeaderImageUploaded}
               />
