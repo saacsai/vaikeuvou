@@ -10,6 +10,7 @@ import AppFooter from '@/components/AppFooter'
 import EventPreviewCard from '@/components/EventPreviewCard'
 import BgSelector from '@/components/BgSelector'
 import AvatarCropUpload from '@/components/AvatarCropUpload'
+import CreditLockPanel from '@/components/CreditLockPanel'
 import type { EventFormFields } from '@/lib/eventForm'
 
 const PRIVACIDADE = [
@@ -54,7 +55,8 @@ export default function CriarClient({ userName, userAvatar, userBio, userInstagr
 
   // Vídeo custa 1 crédito, sempre — mesmo o primeiro. Fica travado até a
   // pessoa reconhecer o aviso, pra ninguém digitar achando que é de graça.
-  const [videoUnlocked, setVideoUnlocked] = useState(false)
+  const [videoStage, setVideoStage] = useState<'idle' | 'confirm' | 'unlocked'>('idle')
+  const videoUnlocked = videoStage === 'unlocked'
 
   function set(k: keyof Form, v: string | number) {
     setForm(p => ({ ...p, [k]: v }))
@@ -335,21 +337,31 @@ export default function CriarClient({ userName, userAvatar, userBio, userInstagr
               <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">
                 Vídeo do convite
               </label>
-              {videoUnlocked ? (
+              {videoStage === 'unlocked' && (
                 <>
                   <input
                     value={form.video_url}
                     onChange={e => set('video_url', e.target.value)}
-                    placeholder="YouTube ou Vimeo"
+                    placeholder="Cole o link do vídeo do YouTube/Vimeo"
                     type="url"
                     className="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 outline-none focus:border-brand text-sm"
                   />
                   <p className="text-[10px] text-gray-400 mt-1">Aparece abaixo do botão BORA na página do convite</p>
                 </>
-              ) : (
+              )}
+              {videoStage === 'confirm' && (
+                <CreditLockPanel
+                  title="Adicionar vídeo custa 1 crédito"
+                  message="Vai debitar 1 crédito do seu saldo quando você criar o convite."
+                  credits={userCredits}
+                  onCancel={() => setVideoStage('idle')}
+                  onContinue={() => setVideoStage('unlocked')}
+                />
+              )}
+              {videoStage === 'idle' && (
                 <button
                   type="button"
-                  onClick={() => setVideoUnlocked(true)}
+                  onClick={() => setVideoStage('confirm')}
                   className="w-full flex items-center justify-center gap-2 bg-amber-50 hover:bg-amber-100 border-2 border-dashed border-amber-300 rounded-xl px-4 py-3 text-amber-700 font-semibold text-sm transition-colors"
                 >
                   <LockIcon className="w-4 h-4 text-amber-500" />

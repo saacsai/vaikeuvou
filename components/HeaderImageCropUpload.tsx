@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useRef, useCallback, useEffect } from 'react'
+import CreditLockPanel from '@/components/CreditLockPanel'
 
 type CropState = {
   src: string
@@ -189,37 +190,18 @@ export default function HeaderImageCropUpload({ editToken, credits, onUploaded, 
   // de já ter recortado a foto.
   if (stage === 'confirmTroca') {
     return (
-      <div className="col-span-4 p-4 bg-amber-50 border-2 border-amber-200 rounded-xl space-y-3 text-center">
-        <LockIcon className="w-5 h-5 text-amber-500 mx-auto" />
-        <p className="text-sm font-semibold text-gray-800">Enviar foto própria custa 1 crédito</p>
-        <p className="text-xs text-gray-500">
-          {editToken
+      <CreditLockPanel
+        className="col-span-4"
+        title="Enviar foto própria custa 1 crédito"
+        message={
+          editToken
             ? `Vai debitar 1 crédito do seu saldo (${credits} disponíveis) assim que você escolher a foto.`
-            : 'Vai debitar 1 crédito do seu saldo quando você criar o convite.'}
-        </p>
-        {credits < 1 && (
-          <p className="text-xs text-red-500 font-semibold">
-            Saldo insuficiente. <a href="/creditos" className="underline">Comprar créditos</a>
-          </p>
-        )}
-        <div className="flex gap-2">
-          <button
-            type="button"
-            onClick={() => setStage('idle')}
-            className="flex-1 py-2 rounded-lg bg-white border border-gray-200 text-gray-600 font-semibold text-xs uppercase tracking-wide hover:bg-gray-50"
-          >
-            Cancelar
-          </button>
-          <button
-            type="button"
-            onClick={() => { setStage('idle'); abrirSeletor() }}
-            disabled={credits < 1}
-            className="flex-1 py-2 rounded-lg bg-brand hover:bg-brand-dark disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold text-xs uppercase tracking-wide"
-          >
-            Continuar
-          </button>
-        </div>
-      </div>
+            : 'Vai debitar 1 crédito do seu saldo quando você criar o convite.'
+        }
+        credits={credits}
+        onCancel={() => setStage('idle')}
+        onContinue={() => { setStage('idle'); abrirSeletor() }}
+      />
     )
   }
 

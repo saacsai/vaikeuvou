@@ -9,6 +9,7 @@ import { ProfilePopover, GridIcon } from '@/components/AppHeaderNav'
 import AppFooter from '@/components/AppFooter'
 import EventPreviewCard from '@/components/EventPreviewCard'
 import BgSelector from '@/components/BgSelector'
+import CreditLockPanel from '@/components/CreditLockPanel'
 import type { EventFormFields } from '@/lib/eventForm'
 
 const PRIVACIDADE = [
@@ -89,12 +90,11 @@ export default function DashboardClient({ evento, rsvps, isNovo, userName, userA
   const [unlockErro, setUnlockErro] = useState('')
   const [creditsLeft, setCreditsLeft] = useState(userCredits)
 
-  const [videoUnlocked,  setVideoUnlocked]  = useState(false)
+  const [videoStage,     setVideoStage]     = useState<'idle' | 'confirm' | 'unlocked'>('idle')
   const [videoUnlocking, setVideoUnlocking] = useState(false)
   const [videoErro,      setVideoErro]      = useState('')
 
   async function desbloquearVideo() {
-    if (!window.confirm('Trocar o vídeo vai debitar 1 crédito do seu saldo. Confirma?')) return
     setVideoUnlocking(true)
     setVideoErro('')
     const res = await fetch('/api/creditos/desbloquear-video', {
@@ -104,7 +104,7 @@ export default function DashboardClient({ evento, rsvps, isNovo, userName, userA
     })
     const json = await res.json()
     if (!res.ok) { setVideoErro(json.error ?? 'Erro ao desbloquear.'); setVideoUnlocking(false); return }
-    setVideoUnlocked(true)
+    setVideoStage('unlocked')
     setCreditsLeft(c => c - 1)
     setVideoUnlocking(false)
   }
@@ -403,34 +403,50 @@ export default function DashboardClient({ evento, rsvps, isNovo, userName, userA
 
             <div>
               <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Vídeo do convite</label>
-              {evento.video_url && !videoUnlocked ? (
-                <div className="bg-gray-50 border border-gray-200 rounded-xl p-3 space-y-2">
-                  <p className="text-sm text-gray-500 truncate">{evento.video_url}</p>
+              {videoStage === 'unlocked' && (
+                <>
+                  <input
+                    value={form.video_url}
+                    onChange={e => set('video_url', e.target.value)}
+                    placeholder="Cole o link do vídeo do YouTube/Vimeo"
+                    type="url"
+                    className="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 outline-none focus:border-brand text-sm"
+                  />
+                  <p className="text-[10px] text-gray-400 mt-1">Aparece abaixo do botão BORA na página do convite</p>
+                </>
+              )}
+              {videoStage === 'confirm' && (
+                <CreditLockPanel
+                  title={evento.video_url ? 'Trocar o vídeo custa 1 crédito' : 'Adicionar vídeo custa 1 crédito'}
+                  message={`Vai debitar 1 crédito do seu saldo (${creditsLeft} disponíveis) assim que você confirmar.`}
+                  credits={creditsLeft}
+                  onCancel={() => setVideoStage('idle')}
+                  onContinue={desbloquearVideo}
+                  continuing={videoUnlocking}
+                  erro={videoErro}
+                />
+              )}
+              {videoStage === 'idle' && (
+                evento.video_url ? (
+                  <div className="bg-gray-50 border border-gray-200 rounded-xl p-3 space-y-2">
+                    <p className="text-sm text-gray-500 truncate">{evento.video_url}</p>
+                    <button
+                      type="button"
+                      onClick={() => setVideoStage('confirm')}
+                      className="px-3 py-1.5 rounded-lg bg-white border border-gray-200 hover:border-brand text-xs font-semibold uppercase tracking-wide text-gray-700 transition-colors"
+                    >
+                      🔒 Trocar (1 crédito)
+                    </button>
+                  </div>
+                ) : (
                   <button
                     type="button"
-                    onClick={desbloquearVideo}
-                    disabled={videoUnlocking}
-                    className="px-3 py-1.5 rounded-lg bg-white border border-gray-200 hover:border-brand disabled:opacity-50 text-xs font-semibold uppercase tracking-wide text-gray-700 transition-colors"
+                    onClick={() => setVideoStage('confirm')}
+                    className="w-full flex items-center justify-center gap-2 bg-amber-50 hover:bg-amber-100 border-2 border-dashed border-amber-300 rounded-xl px-4 py-3 text-amber-700 font-semibold text-sm transition-colors"
                   >
-                    🔒 {videoUnlocking ? 'Desbloqueando…' : 'Trocar (1 crédito)'}
+                    🔒 Adicionar vídeo — 1 crédito
                   </button>
-                  {videoErro && (
-                    <p className="text-xs text-red-500">
-                      {videoErro}
-                      {videoErro.includes('insuficientes') && (
-                        <> — <a href="/creditos" className="text-brand font-bold hover:underline">Comprar créditos</a></>
-                      )}
-                    </p>
-                  )}
-                </div>
-              ) : (
-                <input
-                  value={form.video_url}
-                  onChange={e => set('video_url', e.target.value)}
-                  placeholder="YouTube ou Vimeo"
-                  type="url"
-                  className="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 outline-none focus:border-brand text-sm"
-                />
+                )
               )}
               <p className="text-[10px] text-gray-400 mt-1">Aparece abaixo do botão BORA na página do convite</p>
             </div>
