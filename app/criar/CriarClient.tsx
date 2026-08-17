@@ -221,7 +221,7 @@ export default function CriarClient({ userName, userAvatar, userBio, userInstagr
             <button
               onClick={criar}
               disabled={saving}
-              className="w-full py-4 rounded-xl bg-brand hover:bg-brand-dark disabled:opacity-50 text-white font-bold text-lg transition-colors"
+              className="w-full py-4 rounded-xl bg-brand hover:bg-brand-dark disabled:opacity-50 text-white font-bold text-lg uppercase tracking-wide transition-colors"
             >
               {saving ? 'Criando…' : 'Criar convite'}
             </button>

@@ -90,7 +90,7 @@ function VerificarForm() {
             <button
               onClick={verificar}
               disabled={saving}
-              className="w-full py-4 rounded-xl bg-brand hover:bg-brand-dark disabled:opacity-50 text-white font-bold text-lg transition-colors"
+              className="w-full py-4 rounded-xl bg-brand hover:bg-brand-dark disabled:opacity-50 text-white font-bold text-lg uppercase tracking-wide transition-colors"
             >
               {saving ? 'Verificando…' : 'Entrar ✓'}
             </button>
@@ -98,7 +98,7 @@ function VerificarForm() {
             <button
               onClick={reenviar}
               disabled={reenvio}
-              className="w-full text-gray-400 text-sm py-2 hover:text-gray-600 disabled:opacity-50"
+              className="w-full text-gray-400 text-sm py-2 hover:text-gray-600 disabled:opacity-50 uppercase tracking-wide"
             >
               {reenvio ? 'Reenviando…' : 'Reenviar código'}
             </button>

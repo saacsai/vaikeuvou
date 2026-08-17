@@ -50,7 +50,7 @@ export function ProfilePopover({ userName, userAvatar }: ProfileProps) {
 
         <a
           href="/perfil"
-          className="block text-center mt-4 py-2.5 rounded-lg bg-gray-50 hover:bg-gray-100 text-sm font-semibold text-gray-700"
+          className="block text-center mt-4 py-2.5 rounded-lg bg-gray-50 hover:bg-gray-100 text-sm font-semibold uppercase tracking-wide text-gray-700"
         >
           Editar perfil
         </a>
@@ -58,7 +58,7 @@ export function ProfilePopover({ userName, userAvatar }: ProfileProps) {
         <button
           type="button"
           onClick={sair}
-          className="block w-full text-center mt-2 py-2.5 rounded-lg hover:bg-gray-50 text-sm font-semibold text-gray-400"
+          className="block w-full text-center mt-2 py-2.5 rounded-lg hover:bg-gray-50 text-sm font-semibold uppercase tracking-wide text-gray-400"
         >
           Sair
         </button>

@@ -202,7 +202,7 @@ export default function EventoClient({ evento, rsvps, parentRsvpId, criador }: P
               <button
                 onClick={confirmar}
                 disabled={saving}
-                className="w-full py-4 rounded-lg bg-brand hover:bg-brand-dark disabled:opacity-50 text-white font-bold text-lg transition-colors flex items-center justify-center gap-2"
+                className="w-full py-4 rounded-lg bg-brand hover:bg-brand-dark disabled:opacity-50 text-white font-bold text-lg uppercase tracking-wide transition-colors flex items-center justify-center gap-2"
               >
                 {saving ? (
                   'Confirmando…'
@@ -216,7 +216,7 @@ export default function EventoClient({ evento, rsvps, parentRsvpId, criador }: P
                   </>
                 )}
               </button>
-              <button onClick={() => setEtapa('convite')} className="w-full text-gray-400 text-sm py-2">
+              <button onClick={() => setEtapa('convite')} className="w-full text-gray-400 text-sm py-2 uppercase tracking-wide">
                 Voltar
               </button>
             </div>
@@ -241,7 +241,7 @@ export default function EventoClient({ evento, rsvps, parentRsvpId, criador }: P
                     />
                     <button
                       onClick={() => navigator.clipboard.writeText(linkConvite)}
-                      className="px-3 py-2 rounded-xl bg-gray-200 text-xs text-gray-700 font-semibold whitespace-nowrap hover:bg-gray-300"
+                      className="px-3 py-2 rounded-xl bg-gray-200 text-xs text-gray-700 font-semibold uppercase tracking-wide whitespace-nowrap hover:bg-gray-300"
                     >
                       Copiar
                     </button>

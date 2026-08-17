@@ -192,7 +192,7 @@ export default function PerfilClient({ phone, name: initialName, avatarUrl: init
               </div>
             )}
             <div className="absolute inset-0 rounded-full bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-              <span className="text-white text-xs font-semibold">✏️ alterar</span>
+              <span className="text-white text-xs font-semibold uppercase tracking-wide">Alterar ✏️</span>
             </div>
           </button>
           <p className="text-gray-400 text-xs">Toque na foto para alterar</p>
@@ -247,14 +247,14 @@ export default function PerfilClient({ phone, name: initialName, avatarUrl: init
           <div className="flex gap-3">
             <button
               onClick={() => setCrop(null)}
-              className="flex-1 py-3 rounded-xl bg-gray-100 text-gray-600 font-semibold text-sm hover:bg-gray-200"
+              className="flex-1 py-3 rounded-xl bg-gray-100 text-gray-600 font-semibold text-sm uppercase tracking-wide hover:bg-gray-200"
             >
               Cancelar
             </button>
             <button
               onClick={confirmarCrop}
               disabled={uploading}
-              className="flex-1 py-3 rounded-xl bg-brand hover:bg-brand-dark disabled:opacity-50 text-white font-bold text-sm"
+              className="flex-1 py-3 rounded-xl bg-brand hover:bg-brand-dark disabled:opacity-50 text-white font-bold text-sm uppercase tracking-wide"
             >
               {uploading ? 'Salvando…' : 'Usar esta foto ✓'}
             </button>
@@ -324,7 +324,7 @@ export default function PerfilClient({ phone, name: initialName, avatarUrl: init
           <button
             onClick={salvarPerfil}
             disabled={saving || !name.trim()}
-            className="w-full py-3 rounded-xl bg-brand hover:bg-brand-dark disabled:opacity-50 text-white font-bold transition-colors"
+            className="w-full py-3 rounded-xl bg-brand hover:bg-brand-dark disabled:opacity-50 text-white font-bold uppercase tracking-wide transition-colors"
           >
             {saving ? 'Salvando…' : 'Salvar perfil'}
           </button>

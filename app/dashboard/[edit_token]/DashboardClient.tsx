@@ -181,7 +181,7 @@ export default function DashboardClient({ evento, rsvps, isNovo, userName, userA
               />
               <button
                 onClick={() => copiar(linkConvite)}
-                className="px-3 py-2 rounded-lg bg-gray-100 hover:bg-gray-200 text-xs font-semibold text-gray-700"
+                className="px-3 py-2 rounded-lg bg-gray-100 hover:bg-gray-200 text-xs font-semibold text-gray-700 uppercase tracking-wide"
               >
                 {copiado ? '✓' : 'Copiar'}
               </button>
@@ -201,9 +201,9 @@ export default function DashboardClient({ evento, rsvps, isNovo, userName, userA
           <div className="mb-12">
             <button
               onClick={() => setEditando(true)}
-              className="flex items-center gap-2 px-5 py-3 rounded-xl border border-gray-200 hover:border-brand hover:bg-brand/5 text-gray-700 font-semibold text-sm transition-colors"
+              className="flex items-center gap-2 px-5 py-3 rounded-xl border border-gray-200 hover:border-brand hover:bg-brand/5 text-gray-700 font-semibold text-sm uppercase tracking-wide transition-colors"
             >
-              ✏️ Editar convite
+              Editar convite ✏️
             </button>
           </div>
         ) : (
@@ -212,7 +212,7 @@ export default function DashboardClient({ evento, rsvps, isNovo, userName, userA
           <div className="space-y-5">
             <div className="flex items-center gap-3">
               <p className="text-xs font-bold text-gray-400 uppercase tracking-wide">Editar convite</p>
-              <button onClick={() => setEditando(false)} className="text-xs font-bold text-brand hover:text-brand-dark">
+              <button onClick={() => setEditando(false)} className="text-xs font-bold text-brand hover:text-brand-dark uppercase tracking-wide">
                 Fechar ✕
               </button>
             </div>
@@ -325,7 +325,7 @@ export default function DashboardClient({ evento, rsvps, isNovo, userName, userA
             <button
               onClick={salvar}
               disabled={saving || !dirty}
-              className={`w-full py-4 rounded-xl font-bold text-lg transition-colors ${
+              className={`w-full py-4 rounded-xl font-bold text-lg uppercase tracking-wide transition-colors ${
                 dirty
                   ? 'bg-brand hover:bg-brand-dark text-white'
                   : 'bg-gray-100 text-gray-400 cursor-not-allowed'

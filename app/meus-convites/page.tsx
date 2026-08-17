@@ -61,7 +61,7 @@ export default async function MeusEventosPage({ searchParams }: Props) {
           {/* Criar novo */}
           <a
             href="/criar"
-            className="inline-flex items-center justify-center gap-2 w-full sm:w-auto px-8 py-4 rounded-xl bg-brand hover:bg-brand-dark text-white font-bold text-base transition-colors"
+            className="inline-flex items-center justify-center gap-2 w-full sm:w-auto px-8 py-4 rounded-xl bg-brand hover:bg-brand-dark text-white font-bold text-base uppercase tracking-wide transition-colors"
           >
             + Criar novo convite
           </a>
@@ -81,13 +81,13 @@ export default async function MeusEventosPage({ searchParams }: Props) {
                       <div className="flex flex-col gap-2 shrink-0">
                         <a
                           href={`/dashboard/${e.edit_token}`}
-                          className="px-3 py-1.5 rounded-lg bg-gray-100 hover:bg-gray-200 text-xs font-semibold text-gray-700 text-center"
+                          className="px-3 py-1.5 rounded-lg bg-gray-100 hover:bg-gray-200 text-xs font-semibold text-gray-700 uppercase tracking-wide text-center"
                         >
                           Painel
                         </a>
                         <a
                           href={`/e/${e.slug}`}
-                          className="px-3 py-1.5 rounded-lg bg-gray-50 hover:bg-gray-100 text-xs font-semibold text-gray-500 text-center"
+                          className="px-3 py-1.5 rounded-lg bg-gray-50 hover:bg-gray-100 text-xs font-semibold text-gray-500 uppercase tracking-wide text-center"
                           target="_blank"
                         >
                           Ver convite
@@ -101,19 +101,19 @@ export default async function MeusEventosPage({ searchParams }: Props) {
               {totalPages > 1 && (
                 <div className="flex items-center justify-center gap-4 pt-2">
                   {page > 1 ? (
-                    <a href={`/meus-convites?page=${page - 1}`} className="px-4 py-2 rounded-lg bg-gray-100 hover:bg-gray-200 text-sm font-semibold text-gray-700">
+                    <a href={`/meus-convites?page=${page - 1}`} className="px-4 py-2 rounded-lg bg-gray-100 hover:bg-gray-200 text-sm font-semibold uppercase tracking-wide text-gray-700">
                       ‹ Anterior
                     </a>
                   ) : (
-                    <span className="px-4 py-2 rounded-lg bg-gray-50 text-sm font-semibold text-gray-300 cursor-not-allowed">‹ Anterior</span>
+                    <span className="px-4 py-2 rounded-lg bg-gray-50 text-sm font-semibold uppercase tracking-wide text-gray-300 cursor-not-allowed">‹ Anterior</span>
                   )}
                   <span className="text-sm text-gray-500">Página {page} de {totalPages}</span>
                   {page < totalPages ? (
-                    <a href={`/meus-convites?page=${page + 1}`} className="px-4 py-2 rounded-lg bg-gray-100 hover:bg-gray-200 text-sm font-semibold text-gray-700">
+                    <a href={`/meus-convites?page=${page + 1}`} className="px-4 py-2 rounded-lg bg-gray-100 hover:bg-gray-200 text-sm font-semibold uppercase tracking-wide text-gray-700">
                       Próxima ›
                     </a>
                   ) : (
-                    <span className="px-4 py-2 rounded-lg bg-gray-50 text-sm font-semibold text-gray-300 cursor-not-allowed">Próxima ›</span>
+                    <span className="px-4 py-2 rounded-lg bg-gray-50 text-sm font-semibold uppercase tracking-wide text-gray-300 cursor-not-allowed">Próxima ›</span>
                   )}
                 </div>
               )}
