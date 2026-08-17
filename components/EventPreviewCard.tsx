@@ -48,13 +48,7 @@ export default function EventPreviewCard({ form, userName, userAvatar, userBio, 
               {iniciais}
             </div>
           )}
-          <div className="min-w-0">
-            <p className="text-xs text-gray-400 truncate">
-              organizado por <span className="font-semibold text-gray-600">{nome}</span>
-              {userInstagram && <span className="text-gray-400"> · @{userInstagram}</span>}
-            </p>
-            {userBio && <p className="text-[10px] text-gray-400 truncate">{userBio}</p>}
-          </div>
+          <p className="text-xs text-gray-400">organizado por <span className="font-semibold text-gray-600">{nome}</span></p>
         </div>
 
         <p className="text-gray-900 font-semibold text-sm mb-2">Vamo aí?</p>
@@ -62,7 +56,25 @@ export default function EventPreviewCard({ form, userName, userAvatar, userBio, 
           <Image src="/letra_bora.png" alt="BORA" width={130} height={53} className="h-5 w-auto" />
           <Image src="/icone_bora.png" alt="" width={57} height={61} className="h-6 w-auto" />
         </div>
+
+        <div className="mt-4 space-y-1">
+          <p className="text-[10px] text-gray-400">Organizado por <span className="font-semibold text-gray-500">{nome}</span></p>
+          {userBio && <p className="text-[10px] text-gray-400">{userBio}</p>}
+          {userInstagram && (
+            <InstagramIcon className="w-3.5 h-3.5 text-gray-400" />
+          )}
+        </div>
       </div>
     </div>
+  )
+}
+
+function InstagramIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className={className}>
+      <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
+      <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
+      <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" />
+    </svg>
   )
 }

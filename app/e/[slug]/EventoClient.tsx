@@ -153,15 +153,10 @@ export default function EventoClient({ evento, rsvps, parentRsvpId, criador }: P
               </div>
             )}
             <div className="min-w-0">
-              <p className="text-sm text-gray-900 font-semibold">
-                {criadorNome}
-                {criadorInstagram && (
-                  <span className="text-gray-400 font-normal"> · @{criadorInstagram}</span>
-                )}
-              </p>
-              {criadorBio && <p className="text-xs text-gray-400 mt-0.5">{criadorBio}</p>}
-              {evento.description && (
-                <p className="text-sm text-gray-700 italic mt-1">&ldquo;{evento.description}&rdquo;</p>
+              {evento.description ? (
+                <p className="text-sm text-gray-700 italic">&ldquo;{evento.description}&rdquo;</p>
+              ) : (
+                <p className="text-sm text-gray-400">Organizado por {criadorNome}</p>
               )}
             </div>
           </div>
@@ -277,9 +272,32 @@ export default function EventoClient({ evento, rsvps, parentRsvpId, criador }: P
             </div>
           )}
 
-          <p className="text-xs text-gray-400 mt-6">Organizado por <span className="font-semibold text-gray-500">{criadorNome}</span></p>
+          <div className="mt-6 space-y-1">
+            <p className="text-xs text-gray-400">Organizado por <span className="font-semibold text-gray-500">{criadorNome}</span></p>
+            {criadorBio && <p className="text-xs text-gray-400">{criadorBio}</p>}
+            {criadorInstagram && (
+              <a
+                href={`https://instagram.com/${criadorInstagram}`}
+                target="_blank" rel="noopener noreferrer"
+                className="inline-flex items-center justify-center w-6 h-6 rounded-full text-gray-400 hover:text-brand transition-colors"
+                aria-label={`Instagram de ${criadorNome}`}
+              >
+                <InstagramIcon className="w-4 h-4" />
+              </a>
+            )}
+          </div>
         </div>
       </div>
     </div>
+  )
+}
+
+function InstagramIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className={className}>
+      <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
+      <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
+      <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" />
+    </svg>
   )
 }
