@@ -1,6 +1,36 @@
 # vaikeuvou.app — Status
 
-Última atualização: 2026-08-16 (parte 5)
+Última atualização: 2026-08-16 (parte 6)
+
+## Sessão 2026-08-16 (parte 6) — ajuste fino: assinatura no rodapé, botão BORA
+
+Dois acabamentos pequenos, pedidos ao vivo depois de ver a parte 5 no ar.
+
+### Feito
+- **Assinatura reorganizada** (`EventoClient.tsx` + `EventPreviewCard.tsx`):
+  o layout da parte 5 misturava nome/bio/instagram no bloco ao lado da
+  foto de 100px do anfitrião, competindo com o recado do evento
+  (`description`). Luciano não gostou — revertido: **ao lado da foto
+  fica só o recado** (comportamento de antes da parte 5). Bio e Instagram
+  **mudaram pro rodapé** da página: "Organizado por Nome" → bio numa
+  linha abaixo → ícone do Instagram embaixo da bio, linkando pra
+  `instagram.com/<handle>` em nova aba. Mesmo ajuste replicado no preview
+  compacto (`EventPreviewCard`, usado em `/criar` e no painel).
+- **Botão de confirmação invertido**: era "Confirmar [BORA]", virou
+  "[BORA] Confirmar" — a imagem BORA+ícone agora vem antes do texto
+  "Confirmar", não depois.
+
+### Como foi validado
+Assinatura: testado de novo com bio/instagram reais preenchidos
+temporariamente na conta do Luciano (script + screenshot), confirmando
+que o recado fica isolado ao lado da foto e a assinatura completa aparece
+no rodapé — revertido depois (perfil real dele segue com bio/instagram
+`null`, ele ainda vai preencher em `/perfil`). Botão BORA: só revisão de
+código + build limpo — clique programático não é confiável no Chrome
+headless local pra esse fluxo (limitação de ferramenta já documentada em
+sessões anteriores, não vale re-investigar), Luciano confere no celular.
+
+---
 
 ## Sessão 2026-08-16 (parte 5) — bio, Instagram e "vibe" no perfil
 
