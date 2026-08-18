@@ -1,5 +1,6 @@
 import { getSupabase, getSupabaseAdmin } from '@/lib/supabase'
 import { fmtDate } from '@/lib/slug'
+import { titleToHeader } from '@/lib/headers'
 import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
 import EventoClient from './EventoClient'
@@ -9,12 +10,18 @@ type Props = { params: Promise<{ slug: string }>; searchParams: Promise<{ ref?: 
 export async function generateMetadata({ params, searchParams }: Props): Promise<Metadata> {
   const { slug } = await params
   const sb       = getSupabase()
-  const { data } = await sb.from('events').select('title, event_date, location').eq('slug', slug).single()
+  const { data } = await sb.from('events').select('title, event_date, location, bg_image_url').eq('slug', slug).single()
   if (!data) return { title: 'vaikeuvou.app' }
 
-  const base    = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://vaikeuvou.app'
+  const base = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://vaikeuvou.app'
   const dateStr = fmtDate(data.event_date)
-  const ogUrl   = `${base}/api/og?title=${encodeURIComponent(data.title)}&date=${encodeURIComponent(dateStr)}${data.location ? `&location=${encodeURIComponent(data.location)}` : ''}`
+
+  // O preview do WhatsApp mostra a foto de cabeçalho de verdade do convite
+  // (a mesma que a pessoa escolheu ou subiu) — nada de gerar um cartão à
+  // parte com texto por cima, que só duplicava título/data/local (isso já
+  // vai no og:title/og:description abaixo, como texto de verdade).
+  const headerSrc = data.bg_image_url || titleToHeader(data.title).src
+  const imageUrl  = headerSrc.startsWith('http') ? headerSrc : `${base}${headerSrc}`
 
   return {
     title: `${data.title} — vaikeuvou.app`,
@@ -22,10 +29,10 @@ export async function generateMetadata({ params, searchParams }: Props): Promise
     openGraph: {
       title: data.title,
       description: 'Clique em BORA para confirmar presença!',
-      images: [{ url: ogUrl, width: 1200, height: 630 }],
+      images: [{ url: imageUrl }],
       type: 'website',
     },
-    twitter: { card: 'summary_large_image', title: data.title, images: [ogUrl] },
+    twitter: { card: 'summary_large_image', title: data.title, images: [imageUrl] },
   }
 }
 
