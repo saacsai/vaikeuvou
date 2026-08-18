@@ -8,16 +8,18 @@ const COST = 3
 type Props = {
   editToken: string
   credits: number
+  hasAvatar?: boolean
   onUploaded: (url: string) => void
 }
 
 type Stage = 'idle' | 'confirm' | 'prompt'
 
-export default function AiImageGenerate({ editToken, credits, onUploaded }: Props) {
-  const [stage,      setStage]      = useState<Stage>('idle')
-  const [prompt,     setPrompt]     = useState('')
-  const [generating, setGenerating] = useState(false)
-  const [msg,        setMsg]        = useState('')
+export default function AiImageGenerate({ editToken, credits, hasAvatar, onUploaded }: Props) {
+  const [stage,         setStage]         = useState<Stage>('idle')
+  const [prompt,        setPrompt]        = useState('')
+  const [includeAvatar, setIncludeAvatar] = useState(false)
+  const [generating,    setGenerating]    = useState(false)
+  const [msg,           setMsg]           = useState('')
 
   async function gerar() {
     if (!prompt.trim()) { setMsg('Descreva o clima do seu evento.'); return }
@@ -27,7 +29,7 @@ export default function AiImageGenerate({ editToken, credits, onUploaded }: Prop
     const res  = await fetch('/api/eventos/imagem-ia', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ edit_token: editToken, prompt }),
+      body: JSON.stringify({ edit_token: editToken, prompt, includeAvatar }),
     })
     const json = await res.json()
 
@@ -83,6 +85,18 @@ export default function AiImageGenerate({ editToken, credits, onUploaded }: Prop
         disabled={generating}
         className="w-full bg-white border border-gray-300 rounded-xl px-3 py-2 text-gray-900 placeholder-gray-400 outline-none focus:border-brand text-sm resize-none"
       />
+      {hasAvatar && (
+        <label className="flex items-start gap-2 text-xs text-gray-600 cursor-pointer">
+          <input
+            type="checkbox"
+            checked={includeAvatar}
+            onChange={e => setIncludeAvatar(e.target.checked)}
+            disabled={generating}
+            className="mt-0.5 w-3.5 h-3.5 flex-shrink-0 accent-brand"
+          />
+          <span>Incluir minha foto (vira uma ilustração estilo caricatura, tipo a capa do &ldquo;18 anos depois&rdquo;)</span>
+        </label>
+      )}
       {msg && <p className="text-xs text-red-500">{msg}</p>}
       <div className="flex gap-2">
         <button

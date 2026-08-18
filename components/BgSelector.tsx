@@ -10,13 +10,16 @@ type Props = {
   /** Só definido no painel — habilita upload imediato (sobe e debita na hora). */
   editToken?: string
   credits?: number
+  /** Se a pessoa tem avatar no perfil — habilita a opção de usar como
+   * referência na geração por IA (vira ilustração estilo caricatura). */
+  hasAvatar?: boolean
   onUploaded?: (v: string) => void
   /** Presente no /criar — convite ainda não existe, upload fica pendente até
    * a criação ser confirmada (cobra 1 crédito junto com a criação). */
   onCropped?: (blob: Blob, previewUrl: string) => void
 }
 
-export default function BgSelector({ value, onChange, title, editToken, credits, onUploaded, onCropped }: Props) {
+export default function BgSelector({ value, onChange, title, editToken, credits, hasAvatar, onUploaded, onCropped }: Props) {
   const auto = titleToHeader(title.trim() || 'vaikeuvou')
   return (
     <div className="rounded-2xl bg-white border border-gray-100 p-4 space-y-3">

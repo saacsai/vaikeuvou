@@ -10,7 +10,7 @@ export async function POST(req: NextRequest) {
   const session = await getSession()
   if (!session) return NextResponse.json({ error: 'Não autenticado.' }, { status: 401 })
 
-  const { edit_token, prompt } = await req.json()
+  const { edit_token, prompt, includeAvatar } = await req.json()
   if (!edit_token || !prompt?.trim()) {
     return NextResponse.json({ error: 'Dados incompletos.' }, { status: 400 })
   }
@@ -38,9 +38,29 @@ export async function POST(req: NextRequest) {
   }
 
   try {
+    // Se a pessoa pediu, usa o avatar dela como referência e vira uma
+    // ilustração estilo caricatura (mesmo espírito da capa do "18 anos
+    // depois") — em vez de uma cena genérica sem ninguém reconhecível.
+    let imagePrompt: string | { images: Uint8Array[]; text: string } =
+      `Crie uma imagem de banner para a capa de um convite de evento chamado "${evento.title}". ${prompt.trim()}. Estilo: foto vibrante, cores quentes, formato paisagem, sem nenhum texto, letra ou palavra escrita na imagem.`
+
+    if (includeAvatar) {
+      const { data: user } = await sb.from('users').select('avatar_url').eq('id', session.user_id).single()
+      if (user?.avatar_url) {
+        const avatarRes = await fetch(user.avatar_url)
+        if (avatarRes.ok) {
+          const avatarBytes = new Uint8Array(await avatarRes.arrayBuffer())
+          imagePrompt = {
+            images: [avatarBytes],
+            text: `Transforme a pessoa desta foto numa ilustração estilo caricatura semi-realista, traço de ilustração digital vibrante, mantendo a semelhança do rosto. Cenário: banner de capa para um convite de evento chamado "${evento.title}". ${prompt.trim()}. Formato paisagem, sem nenhum texto, letra ou palavra escrita na imagem.`,
+          }
+        }
+      }
+    }
+
     const result = await generateImage({
       model: google.image('gemini-3-pro-image-preview'),
-      prompt: `Crie uma imagem de banner para a capa de um convite de evento chamado "${evento.title}". ${prompt.trim()}. Estilo: foto vibrante, cores quentes, formato paisagem, sem nenhum texto, letra ou palavra escrita na imagem.`,
+      prompt: imagePrompt,
       aspectRatio: '21:9',
     })
 

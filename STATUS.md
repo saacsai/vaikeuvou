@@ -2,6 +2,36 @@
 
 Última atualização: 2026-08-18
 
+## Sessão 2026-08-18 (parte 7) — imagem por IA usando o avatar da pessoa (modo caricatura)
+
+Evolução direta da parte 6: quando a pessoa gera imagem de cabeçalho
+por IA e já tem avatar no perfil, aparece um checkbox opcional
+"Incluir minha foto (vira uma ilustração estilo caricatura, tipo a
+capa do '18 anos depois')". Marcando, a geração vira image-to-image — usa o
+avatar como referência em vez de cena genérica sem ninguém
+reconhecível, no mesmo espírito da capa da página "18 anos depois".
+
+- **Técnico**: Vercel AI SDK aceita `prompt: { images: DataContent[],
+  text: string }` além de string simples — busca os bytes do
+  `avatar_url` (`fetch` + `Uint8Array`) e envia junto com o prompt de
+  texto pedindo estilo "caricatura semi-realista". Sem avatar ou
+  checkbox desmarcado, cai no prompt de texto puro de sempre (mesmo
+  comportamento da parte 6).
+- Custo/regra de crédito não mudam (3 créditos, sempre, mesmo gate).
+- Testado ponta a ponta com dado real (avatar do Luciano, sessão e
+  evento temporários, limpos ao final): resultado — caricatura
+  reconhecível do rosto integrada numa cena de churrasco na laje, sem
+  nenhum texto na imagem, aspect ratio 21:9 correto. Crédito debitado
+  (-3), `bg_image_url` atualizado, `credit_transactions` registrada
+  corretamente.
+- Arquivos: `app/api/eventos/imagem-ia/route.ts` (parâmetro
+  `includeAvatar`), `components/AiImageGenerate.tsx` (checkbox,
+  só aparece se `hasAvatar`), `components/BgSelector.tsx` e
+  `app/dashboard/[edit_token]/DashboardClient.tsx` (prop `hasAvatar`
+  threaded a partir do avatar real do usuário).
+
+---
+
 ## Sessão 2026-08-18 (parte 6) — preview do WhatsApp com foto real + imagem por IA
 
 ### Preview do WhatsApp mostra a foto de verdade do convite

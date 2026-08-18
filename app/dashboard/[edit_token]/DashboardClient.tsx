@@ -490,6 +490,7 @@ export default function DashboardClient({ evento, rsvps, isNovo, userName, userA
                 title={form.title}
                 editToken={evento.edit_token}
                 credits={creditsLeft}
+                hasAvatar={!!userAvatar}
                 onUploaded={onHeaderImageUploaded}
               />
             </div>
@@ -571,6 +572,7 @@ export default function DashboardClient({ evento, rsvps, isNovo, userName, userA
                 title={form.title}
                 editToken={evento.edit_token}
                 credits={creditsLeft}
+                hasAvatar={!!userAvatar}
                 onUploaded={onHeaderImageUploaded}
               />
             </div>
