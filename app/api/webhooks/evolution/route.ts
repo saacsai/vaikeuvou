@@ -1,0 +1,58 @@
+import { NextRequest, NextResponse } from 'next/server'
+import { getSupabaseAdmin } from '@/lib/supabase'
+
+const COOLDOWN_MS = 24 * 60 * 60 * 1000
+
+const AUTOREPLY_TEXT =
+  'Esse número é só pra enviar códigos de login do vaikeuvou.app — a gente ainda não consegue responder mensagens por aqui. ' +
+  'Se precisar de ajuda, fala com a gente por vaikeuvou.app/fale 🙂'
+
+export async function POST(req: NextRequest) {
+  const body = await req.json().catch(() => null)
+  if (!body) return NextResponse.json({ ok: true })
+
+  // Evolution ecoa a própria apikey no corpo do webhook — usa como
+  // autenticação simples (mesmo padrão que ela já usa nas chamadas de saída).
+  if (body.apikey !== process.env.EVOLUTION_API_KEY) {
+    return NextResponse.json({ error: 'unauthorized' }, { status: 401 })
+  }
+
+  if (body.event !== 'messages.upsert') return NextResponse.json({ ok: true })
+
+  const data = body.data
+  const remoteJid: string | undefined = data?.key?.remoteJid
+  const fromMe: boolean = !!data?.key?.fromMe
+
+  // Ignora mensagens que a gente mesma envia (ex: o código de OTP — senão
+  // vira loop infinito), grupos e status/broadcast.
+  if (fromMe || !remoteJid || remoteJid.endsWith('@g.us') || remoteJid.endsWith('@broadcast')) {
+    return NextResponse.json({ ok: true })
+  }
+
+  const phone = remoteJid.split('@')[0]
+  const sb = getSupabaseAdmin()
+
+  const { data: existing } = await sb
+    .from('whatsapp_autoreplies')
+    .select('last_sent_at')
+    .eq('phone', phone)
+    .single()
+
+  if (existing && Date.now() - new Date(existing.last_sent_at).getTime() < COOLDOWN_MS) {
+    return NextResponse.json({ ok: true, skipped: 'cooldown' })
+  }
+
+  const evoUrl  = process.env.EVOLUTION_API_URL!
+  const evoKey  = process.env.EVOLUTION_API_KEY!
+  const evoInst = process.env.EVOLUTION_INSTANCE!
+
+  await fetch(`${evoUrl}/message/sendText/${evoInst}`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', apikey: evoKey },
+    body: JSON.stringify({ number: phone, text: AUTOREPLY_TEXT }),
+  })
+
+  await sb.from('whatsapp_autoreplies').upsert({ phone, last_sent_at: new Date().toISOString() })
+
+  return NextResponse.json({ ok: true })
+}
