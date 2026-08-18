@@ -1,4 +1,3 @@
-import Image from 'next/image'
 import { getSession } from '@/lib/auth'
 import InfoPageShell from '@/components/InfoPageShell'
 
@@ -10,7 +9,7 @@ export default async function HistoriaPage() {
       userName={session?.users.name ?? null}
       userAvatar={session?.users.avatar_url ?? null}
       userCredits={session?.users.credits}
-      heroImage="/como-funciona-hero.jpg"
+      heroImage="/historia-hero.jpg"
     >
       <div className="max-w-2xl mx-auto space-y-6 text-sm text-gray-600 leading-relaxed pb-6">
 
@@ -108,27 +107,27 @@ export default async function HistoriaPage() {
 
         <p className="text-gray-900 font-semibold text-[23px] pt-2">Vamo aí?</p>
 
-        <div className="flex items-center gap-3 pt-6 border-t border-gray-100">
-          <Image
-            src="https://lntgfqbuqfiukgnhdvxe.supabase.co/storage/v1/object/public/avatars/64f23c6e-986b-411d-a76b-5153371a9fb9/avatar.jpg"
-            alt="Luciano Maeda"
-            width={44}
-            height={44}
-            className="w-11 h-11 rounded-full object-cover flex-shrink-0"
-            unoptimized
-          />
-          <div>
-            <p className="text-sm font-bold text-gray-900">Luciano Maeda</p>
-            <p className="text-xs text-gray-400">
-              Cofundador vaikeuvou | São Paulino | Curtidor de praia, cerveja, churrasco e pizza com a família e amigos | Corredor pra compensar.
-            </p>
+        <div className="pt-6 border-t border-gray-100">
+          <p className="text-sm font-bold text-gray-900">Luciano Maeda</p>
+          <p className="text-xs text-gray-400">
+            Cofundador vaikeuvou | São Paulino | Curtidor de praia, cerveja, churrasco e pizza com a família e amigos | Corredor pra compensar.
+          </p>
+          <div className="flex items-center gap-3 mt-1.5">
             <a
               href="https://instagram.com/maedaluciano"
               target="_blank" rel="noopener noreferrer"
-              className="inline-flex items-center gap-1 text-gray-400 hover:text-brand transition-colors mt-1"
+              className="inline-flex items-center gap-1 text-gray-400 hover:text-brand transition-colors"
             >
               <InstagramIcon className="w-3.5 h-3.5" />
               <span className="text-xs">@maedaluciano</span>
+            </a>
+            <a
+              href="https://www.linkedin.com/in/eailucianomaeda/"
+              target="_blank" rel="noopener noreferrer"
+              className="inline-flex items-center gap-1 text-gray-400 hover:text-brand transition-colors"
+            >
+              <LinkedinIcon className="w-3.5 h-3.5" />
+              <span className="text-xs">LinkedIn</span>
             </a>
           </div>
         </div>
@@ -144,6 +143,14 @@ function InstagramIcon({ className }: { className?: string }) {
       <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
       <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
       <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" />
+    </svg>
+  )
+}
+
+function LinkedinIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="currentColor" className={className}>
+      <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 1 1 0-4.124 2.062 2.062 0 0 1 0 4.124zM7.114 20.452H3.558V9h3.556v11.452z"/>
     </svg>
   )
 }
