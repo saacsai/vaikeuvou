@@ -2,6 +2,66 @@
 
 Última atualização: 2026-08-18
 
+## Sessão 2026-08-18 (parte 5) — 🚀 PRODUÇÃO: Stripe live, Pix solicitado, branding, e-mail
+
+**vaikeuvou.app está oficialmente em produção, aceitando pagamento real.**
+
+### Stripe: teste → produção
+- Chave restrita **live** criada pelo Luciano e configurada no Vercel
+  (`STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET` de produção) — webhook
+  live registrado apontando pra `https://vaikeuvou.app/api/webhooks/stripe`.
+- **Bug no meio do caminho**: as duas variáveis foram salvas vazias no
+  Vercel na primeira tentativa (edição via Dashboard não gravou o
+  valor) — diagnosticado comparando o comprimento do valor puxado via
+  `vercel env pull` contra uma variável de controle que sabíamos ter
+  valor real (mesmo resultado vazio nas duas, confirmando bug na
+  gravação, não no meu método de checagem). Resolvido excluindo e
+  recriando as duas variáveis do zero.
+- **Validado com compra real**: R$19,90 (pacote de 10 créditos) via
+  cartão do próprio Luciano — `stripe_session_id` com prefixo `cs_live_`
+  confirmando modo produção, crédito caiu certinho (5→15). Redeploy
+  disparado antes do teste (variável de ambiente só afeta deployments
+  futuros no Vercel, não os já publicados).
+
+### Pix — solicitado, aguardando aprovação
+Pix pra contas Brasil no Stripe é **por convite**, não é toggle livre
+no Dashboard (achado direto na documentação oficial, depois de
+"não aparece Pix" ser investigado). Luciano já deixou o e-mail no
+formulário de solicitação do Stripe. **Nenhuma mudança de código
+necessária** quando aprovar — o checkout já omite `payment_method_types`
+(dynamic payment methods), então o Pix aparece sozinho assim que for
+ativado no Dashboard.
+
+### Branding do Checkout
+Antes aparecia "SAACS" na tela de pagamento (nome antigo herdado da
+conta Stripe) — trocado pro nome público "vaikeuvou", ícone quadrado
+laranja (mesmo arquivo do favicon, copiado também pra
+`Vaikeuvou/logos e botoes/icone_stripe_512.png` como referência), cor
+da marca `#E36811`, e o "Statement descriptor" (nome que aparece na
+fatura do cartão do cliente) também ajustado.
+
+### Recibo por e-mail + captura do e-mail do comprador
+- Ativado "Pagamentos concluídos" nas configurações de e-mail do
+  Stripe — recibo automático pra toda venda a partir de agora
+  (não retroage pra pagamentos já feitos antes de ligar).
+- **`users.email` passou a ser preenchido de verdade**: o Checkout do
+  Stripe sempre coleta e-mail na tela de pagamento, mas o webhook só
+  usava isso pra nada — agora grava em `users.email` (coluna que já
+  existia no schema, nunca populada, já que login é telefone+OTP sem
+  e-mail). Testado com webhook assinado localmente.
+- **Domínio próprio pro envio de e-mail do Stripe**: registros SPF e
+  DKIM adicionados, e DMARC (`_dmarc.vaikeuvou.app`, `p=none` —
+  modo monitoramento, seguro pra começar) — aguardando validação
+  automática do Stripe.
+
+### Pendências
+1. Pix — aguardando aprovação do Stripe.
+2. Validação do DMARC pelo Stripe (automática, só esperar).
+3. Decidir o que fazer com os créditos de teste acumulados na conta
+   do Luciano (ficar com eles ou pedir reembolso da compra real).
+
+---
+
 ## Sessão 2026-08-18 (parte 4) — troca de data paga, Meus convites separados, eventos passados travados
 
 ### Motor de créditos: troca de data (2ª em diante)
