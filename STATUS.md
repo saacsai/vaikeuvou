@@ -1,6 +1,71 @@
 # vaikeuvou.app — Status
 
-Última atualização: 2026-08-17
+Última atualização: 2026-08-18
+
+## Sessão 2026-08-18 — ajuste no checkbox de termos, página Fale conosco, auto-resposta no WhatsApp
+
+### Fix: espaço duplo/quebra estranha no checkbox de Termos (`/criar`)
+O `<label>` do aceite de Termos/Privacidade usa `flex`; como os dois `<a>`
+apareciam soltos entre o texto, cada trecho virava um item flex separado
+(ganhando o `gap` do flex além do espaço normal do texto) — daí o espaço
+duplo no desktop e a quebra em blocos no mobile. Fix: envolver a frase
+inteira num `<span>` (único item flex ao lado do checkbox). Depois,
+reduzido `gap-2.5` → `gap-1.5` (estava descolado). Validado com
+screenshot real via CDP do Chrome (sessão autenticada), desktop e mobile.
+
+### Página "Fale conosco" (antes stub em branco)
+Sem WhatsApp de atendimento (decisão do Luciano: vira "insuportável" sem
+IA por trás) — canal é e-mail (`fale@vaikeuvou.app`, link direto) +
+formulário por assunto (Dúvidas/sugestões, Reclamações, Cancelamento de
+conta, Parcerias, Outros). Sem serviço de e-mail configurado ainda no
+projeto (nem Resend nem nada) — formulário grava numa tabela nova
+`contact_messages` no Supabase (`supabase_fale.sql`), consultada direto
+no Table Editor por enquanto. FAQ repetida da página "Como funciona?" —
+extraída pra `lib/faq.ts` compartilhado, evita duplicar texto que
+precisaria sincronizar manualmente. Rodapé com razão social e CNPJ
+(mesmo padrão da Política de Privacidade) — endereço completo deixado de
+fora por prudência (hoje é o único ponto físico de operação do
+vaikeuvou, expor no contato público é exposição sem necessidade real).
+
+### Webhook do Evolution API: resposta automática apontando pro Fale conosco
+Quem responder/mandar mensagem pro número que envia os códigos de OTP
+(`+55 11 91017-2081`, perfil "Lorelai") recebe um aviso automático fixo
+(não é chatbot, não conversa) direcionando pra `/fale`. Cooldown de 24h
+por número (tabela `whatsapp_autoreplies`) pra não parecer bot repetitivo
+numa ida-e-volta. Ignora mensagens enviadas por nós mesmos (`fromMe`,
+evita loop com o próprio envio de OTP), grupos e broadcast.
+
+**Payload e endpoint confirmados direto no código-fonte oficial**
+(github.com/EvolutionAPI/evolution-api, v2.3.7 — a versão rodando na
+VPS): `POST /webhook/set/{instance}` com corpo `{ webhook: { enabled,
+url, events, byEvents, base64, headers } }`, evento `MESSAGES_UPSERT`.
+
+**Bug real encontrado e corrigido no caminho**: a primeira tentativa de
+autenticar o webhook comparava com o campo `apikey` que a Evolution ecoa
+no corpo — mas esse campo é o **token da própria instância**
+(`this.token`, diferente da chave global usada pra chamar a API dela), e
+só vem preenchido se uma config do servidor (`EXPOSE_IN_FETCH_INSTANCES`)
+estiver ligada. Resultado: todo webhook chegava e levava 401 da nossa
+própria rota. Diagnosticado direto nos logs do container na VPS (`docker
+service logs evolution_evolution`, com autorização do Luciano pra acessar
+via SSH) — o log mostrava exatamente `"Request failed with status code
+401"` bem na entrega. Corrigido trocando pra um header customizado
+(`X-Evolution-Secret`) configurado no próprio `webhook/set`, que a
+Evolution reenvia como header HTTP de verdade. Testado com mensagem real
+do WhatsApp do Luciano — confirmado no log da VPS (sem erro), na tabela
+`whatsapp_autoreplies` (registro gravado) e na resposta recebida de
+verdade no celular dele.
+
+### Como foi validado
+Build limpo em cada etapa. Termos: screenshot real via CDP headless
+(sessão autenticada). Fale conosco: envio real via `curl`, checado no
+Supabase, dado de teste removido. Webhook: teste real de ponta a ponta
+com o WhatsApp do Luciano — sem simulação de payload sintético pra
+número de terceiro (bloqueado pelo próprio classificador de segurança,
+corretamente, por ser uma ação com efeito real num número não
+verificado).
+
+---
 
 ## Sessão 2026-08-17 (parte 4) — acabamentos finais: raio da foto hero e favicon
 
