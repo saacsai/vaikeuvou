@@ -9,6 +9,7 @@ export default async function PrivacidadePage() {
       userName={session?.users.name ?? null}
       userAvatar={session?.users.avatar_url ?? null}
       userCredits={session?.users.credits}
+      heroImage="/privacidade-hero.jpg"
     >
       <div className="max-w-2xl mx-auto space-y-8 text-sm text-gray-600 leading-relaxed pb-6">
 
