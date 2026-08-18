@@ -10,6 +10,7 @@ import AppFooter from '@/components/AppFooter'
 import EventPreviewCard from '@/components/EventPreviewCard'
 import BgSelector from '@/components/BgSelector'
 import CreditLockPanel from '@/components/CreditLockPanel'
+import { fmtDate } from '@/lib/slug'
 import type { EventFormFields } from '@/lib/eventForm'
 
 const PRIVACIDADE = [
@@ -40,6 +41,7 @@ type Props = {
 }
 
 const UNLOCK_COST = 3
+const DATE_UNLOCK_COST = 2
 
 function parseEventDate(iso: string): { date: string; time: string } {
   const d = new Date(iso)
@@ -60,6 +62,12 @@ function parseEventDate(iso: string): { date: string; time: string } {
     date: `${get('year')}-${get('month')}-${get('day')}`,
     time: `${get('hour')}:${get('minute')}`,
   }
+}
+
+function fmtDataHora(date: string, time: string): string {
+  if (!date) return ''
+  const [y, m, d] = date.split('-')
+  return `${d}/${m}/${y} às ${time}`
 }
 
 function toForm(evento: Event): EventFormFields {
@@ -93,6 +101,28 @@ export default function DashboardClient({ evento, rsvps, isNovo, userName, userA
   const [videoStage,     setVideoStage]     = useState<'idle' | 'confirm' | 'unlocked'>('idle')
   const [videoUnlocking, setVideoUnlocking] = useState(false)
   const [videoErro,      setVideoErro]      = useState('')
+
+  // Troca de data: primeira é grátis, da segunda em diante trava e cobra
+  // DATE_UNLOCK_COST a cada troca — nunca volta a ser grátis.
+  const [dateChangesCount, setDateChangesCount] = useState(evento.date_changes_count)
+  const [dateStage,        setDateStage]        = useState<'idle' | 'confirm' | 'unlocked'>('idle')
+  const [dateUnlocking,    setDateUnlocking]    = useState(false)
+  const [dateErro,         setDateErro]         = useState('')
+
+  async function desbloquearData() {
+    setDateUnlocking(true)
+    setDateErro('')
+    const res = await fetch('/api/creditos/desbloquear-data', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ edit_token: evento.edit_token }),
+    })
+    const json = await res.json()
+    if (!res.ok) { setDateErro(json.error ?? 'Erro ao desbloquear.'); setDateUnlocking(false); return }
+    setDateStage('unlocked')
+    setCreditsLeft(c => c - DATE_UNLOCK_COST)
+    setDateUnlocking(false)
+  }
 
   async function desbloquearVideo() {
     setVideoUnlocking(true)
@@ -138,6 +168,7 @@ export default function DashboardClient({ evento, rsvps, isNovo, userName, userA
   }
 
   const linkConvite = `https://vaikeuvou.app/e/${evento.slug}`
+  const isPast = new Date(evento.event_date).getTime() < Date.now()
 
   const nivel1 = rsvps.filter(r => r.depth_level === 1)
   const nivel2 = rsvps.filter(r => r.depth_level === 2)
@@ -167,6 +198,12 @@ export default function DashboardClient({ evento, rsvps, isNovo, userName, userA
     const json = await res.json()
 
     if (!res.ok) { setMsg(json.error ?? 'Erro ao salvar.'); setSaving(false); return }
+
+    const dataMudou = form.event_date !== initial.event_date || form.event_time !== initial.event_time
+    if (dataMudou) {
+      if (dateChangesCount === 0) setDateChangesCount(1)
+      setDateStage('idle')
+    }
 
     setInitial(form)
     setMsg('Salvo!')
@@ -242,26 +279,35 @@ export default function DashboardClient({ evento, rsvps, isNovo, userName, userA
           </div>
 
           <div className="bg-white border border-gray-100 rounded-xl p-4 shadow-sm space-y-2">
-            <p className="text-xs font-bold text-gray-400 uppercase tracking-wide">Link do convite</p>
-            <div className="flex gap-2">
-              <input
-                readOnly value={linkConvite}
-                className="flex-1 bg-gray-50 rounded-lg px-3 py-2 text-xs text-gray-500 font-mono outline-none"
-              />
-              <button
-                onClick={() => copiar(linkConvite)}
-                className="px-3 py-2 rounded-lg bg-gray-100 hover:bg-gray-200 text-xs font-semibold text-gray-700 uppercase tracking-wide"
-              >
-                {copiado ? '✓' : 'Copiar'}
-              </button>
-            </div>
-            <a
-              href={`https://wa.me/?text=${encodeURIComponent(whatsappTxt)}`}
-              target="_blank" rel="noopener noreferrer"
-              className="flex items-center justify-center gap-2 w-full py-2.5 rounded-lg bg-[#25D366] text-white font-bold text-sm"
-            >
-              Compartilhar no WhatsApp
-            </a>
+            {isPast ? (
+              <>
+                <p className="text-xs font-bold text-gray-400 uppercase tracking-wide">Convite encerrado</p>
+                <p className="text-gray-500 text-sm">Esse evento já aconteceu em {fmtDate(evento.event_date)} — não é mais possível compartilhar ou editar.</p>
+              </>
+            ) : (
+              <>
+                <p className="text-xs font-bold text-gray-400 uppercase tracking-wide">Link do convite</p>
+                <div className="flex gap-2">
+                  <input
+                    readOnly value={linkConvite}
+                    className="flex-1 bg-gray-50 rounded-lg px-3 py-2 text-xs text-gray-500 font-mono outline-none"
+                  />
+                  <button
+                    onClick={() => copiar(linkConvite)}
+                    className="px-3 py-2 rounded-lg bg-gray-100 hover:bg-gray-200 text-xs font-semibold text-gray-700 uppercase tracking-wide"
+                  >
+                    {copiado ? '✓' : 'Copiar'}
+                  </button>
+                </div>
+                <a
+                  href={`https://wa.me/?text=${encodeURIComponent(whatsappTxt)}`}
+                  target="_blank" rel="noopener noreferrer"
+                  className="flex items-center justify-center gap-2 w-full py-2.5 rounded-lg bg-[#25D366] text-white font-bold text-sm"
+                >
+                  Compartilhar no WhatsApp
+                </a>
+              </>
+            )}
           </div>
         </div>
 
@@ -276,8 +322,18 @@ export default function DashboardClient({ evento, rsvps, isNovo, userName, userA
           </div>
         )}
 
-        {/* Edição completa — mesma estrutura do /criar */}
-        {!editando ? (
+        {/* Edição completa — mesma estrutura do /criar (eventos futuros); eventos
+            passados mostram só o preview mascarado, sem editar nem compartilhar */}
+        {isPast ? (
+          <div className="mb-12 max-w-sm">
+            <div className="relative">
+              <EventPreviewCard form={initial} userName={userName} userAvatar={userAvatar} userBio={userBio} userInstagram={userInstagram} />
+              <div className="absolute inset-0 bg-white/85 backdrop-blur-[1px] rounded-lg flex items-center justify-center p-6">
+                <p className="text-center text-gray-600 font-bold text-sm">Esse evento já aconteceu.</p>
+              </div>
+            </div>
+          </div>
+        ) : !editando ? (
           <div className="mb-12">
             <button
               onClick={() => setEditando(true)}
@@ -308,16 +364,53 @@ export default function DashboardClient({ evento, rsvps, isNovo, userName, userA
               />
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div className="min-w-0">
-                <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Data *</label>
-                <DatePicker value={form.event_date} onChange={v => set('event_date', v)} />
+            {dateChangesCount === 0 || dateStage === 'unlocked' ? (
+              <div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div className="min-w-0">
+                    <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Data *</label>
+                    <DatePicker value={form.event_date} onChange={v => set('event_date', v)} />
+                  </div>
+                  <div className="min-w-0">
+                    <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Horário *</label>
+                    <TimePicker value={form.event_time} onChange={v => set('event_time', v)} />
+                  </div>
+                </div>
+                {dateChangesCount === 0 && (
+                  <p className="text-[10px] text-gray-400 mt-1.5">
+                    Você pode alterar a data 1 vez de graça — depois disso, cada troca custa {DATE_UNLOCK_COST} créditos.
+                  </p>
+                )}
               </div>
-              <div className="min-w-0">
-                <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Horário *</label>
-                <TimePicker value={form.event_time} onChange={v => set('event_time', v)} />
+            ) : dateStage === 'confirm' ? (
+              <div>
+                <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Data e horário</label>
+                <CreditLockPanel
+                  title={`Trocar a data custa ${DATE_UNLOCK_COST} créditos`}
+                  message={`Vai debitar ${DATE_UNLOCK_COST} créditos do seu saldo (${creditsLeft} disponíveis) assim que você confirmar.`}
+                  credits={creditsLeft}
+                  cost={DATE_UNLOCK_COST}
+                  onCancel={() => setDateStage('idle')}
+                  onContinue={desbloquearData}
+                  continuing={dateUnlocking}
+                  erro={dateErro}
+                />
               </div>
-            </div>
+            ) : (
+              <div>
+                <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Data e horário</label>
+                <div className="bg-gray-50 border border-gray-200 rounded-xl p-3 space-y-2">
+                  <p className="text-sm text-gray-500">{fmtDataHora(form.event_date, form.event_time)}</p>
+                  <button
+                    type="button"
+                    onClick={() => setDateStage('confirm')}
+                    className="px-3 py-1.5 rounded-lg bg-white border border-gray-200 hover:border-brand text-xs font-semibold uppercase tracking-wide text-gray-700 transition-colors"
+                  >
+                    🔒 Alterar data ({DATE_UNLOCK_COST} créditos)
+                  </button>
+                </div>
+              </div>
+            )}
 
             <div>
               <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Local</label>

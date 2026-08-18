@@ -30,6 +30,7 @@ export type Event = {
   created_at: string
   user_id: string | null
   guest_list_unlocked_at: string | null
+  date_changes_count: number
 }
 
 export type Rsvp = {

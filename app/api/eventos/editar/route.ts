@@ -13,6 +13,22 @@ export async function PATCH(req: NextRequest) {
   if (Object.keys(updates).length === 0) return NextResponse.json({ error: 'Nenhum campo para atualizar' }, { status: 400 })
 
   const sb = getSupabaseAdmin()
+
+  // Troca de data: primeira é grátis, da segunda em diante o crédito já foi
+  // debitado antes (via /api/creditos/desbloquear-data) — aqui só contamos.
+  if ('event_date' in updates) {
+    const { data: evento } = await sb
+      .from('events')
+      .select('event_date, date_changes_count')
+      .eq('edit_token', edit_token)
+      .single()
+
+    const changed = evento && new Date(evento.event_date).getTime() !== new Date(updates.event_date as string).getTime()
+    if (changed) {
+      updates.date_changes_count = evento!.date_changes_count + 1
+    }
+  }
+
   const { error } = await sb.from('events').update(updates).eq('edit_token', edit_token)
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 

@@ -48,8 +48,10 @@ export default function EventoClient({ evento, rsvps, parentRsvpId, criador }: P
   const embedUrl    = evento.video_url ? getVideoEmbed(evento.video_url) : null
   const linkLabel   = evento.external_url_label ?? 'Saiba mais'
   const podeConvidar = evento.max_depth > 1
+  const isPast       = new Date(evento.event_date).getTime() < Date.now()
 
   async function confirmar() {
+    if (isPast) return
     if (!nome.trim() || !telefone.trim()) { setErro('Preencha seu nome e WhatsApp.'); return }
     setSaving(true)
     setErro('')
@@ -75,7 +77,17 @@ export default function EventoClient({ evento, rsvps, parentRsvpId, criador }: P
 
   return (
     <div className="min-h-screen flex flex-col items-center" style={{ backgroundColor: header.bg }}>
-      <div className="w-full max-w-lg bg-white sm:my-8 sm:rounded-lg sm:shadow-xl overflow-hidden">
+      <div className="relative w-full max-w-lg bg-white sm:my-8 sm:rounded-lg sm:shadow-xl overflow-hidden">
+
+        {isPast && (
+          <div className="absolute inset-0 z-10 bg-white/90 backdrop-blur-[2px] flex items-center justify-center p-8">
+            <div className="text-center">
+              <p className="text-3xl mb-2">🕓</p>
+              <p className="text-gray-700 font-bold text-lg">Esse evento já aconteceu.</p>
+              <p className="text-gray-400 text-sm mt-1">Confirmações de presença foram encerradas.</p>
+            </div>
+          </div>
+        )}
 
         {/* Banner — proporção medida do mockup: ~22% da altura do card */}
         <div className="relative w-full aspect-[2.4/1]">
