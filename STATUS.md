@@ -2,6 +2,30 @@
 
 Última atualização: 2026-08-18
 
+## Sessão 2026-08-18 (parte 2) — página "18 anos depois", última pendente de conteúdo
+
+Mesmo layout de capa da "Como funciona?" (logo → foto retangular → título
+grande, via `heroImage` do `InfoPageShell`) — reaproveitando a mesma foto
+provisória (galera reunida) até o Luciano indicar a definitiva pra essa
+página especificamente. Texto completo fornecido por ele: a origem do
+vaiqueuvou.com em 2008 (Incubadora de Santos), o desvio de foco pra virar
+rede social estilo MySpace, o fracasso, a metáfora do whisky Single Malt
+18 anos maturando no barril, e o relançamento em 2026 como vaikeuvou.app.
+Fecha com "Vamo aí?" (mesmo estilo do card de convite) e assinatura no
+mesmo padrão usado nos convites — avatar, nome, bio, Instagram (dados
+reais do perfil do Luciano, hardcoded nesta página por ser conteúdo
+autoral fixo, não dependente de quem está logado).
+
+**Com isso, todas as 5 páginas institucionais (Termos, Privacidade, Como
+funciona, Fale conosco, 18 anos depois) têm conteúdo real — não sobra
+nenhum stub em branco no app.**
+
+### Como foi validado
+Build limpo. Screenshot real via Chrome headless conferindo o layout
+completo (hero, texto, assinatura).
+
+---
+
 ## Sessão 2026-08-18 — ajuste no checkbox de termos, página Fale conosco, auto-resposta no WhatsApp
 
 ### Fix: espaço duplo/quebra estranha no checkbox de Termos (`/criar`)
