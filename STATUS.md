@@ -2,6 +2,60 @@
 
 Última atualização: 2026-08-18
 
+## Sessão 2026-08-18 (parte 4) — troca de data paga, Meus convites separados, eventos passados travados
+
+### Motor de créditos: troca de data (2ª em diante)
+Regra combinada com o Luciano: **1ª troca de data é grátis** (faz
+sentido pra adiar um evento), **da 2ª em diante custa 2 créditos por
+troca**, pra sempre. Mesmo padrão visual já usado em vídeo/foto: campo
+trava (cadeado + `CreditLockPanel`) depois da troca grátis ser
+consumida. Implementação:
+- `events.date_changes_count` (novo, `supabase_data_credits.sql`) —
+  contador simples, nunca reseta.
+- `/api/eventos/editar`: sempre que `event_date` muda de verdade
+  (compara timestamps via `Date.getTime()`, não string crua — evita
+  falso positivo por notação de timezone diferente entre o que o
+  Postgres devolve e o que o cliente manda), incrementa o contador.
+- `/api/creditos/desbloquear-data` (novo): cobra 2 créditos, mesmo
+  padrão dos outros endpoints de desbloqueio (sessão, ownership,
+  `debit_user_credits`, log em `credit_transactions`).
+- `DashboardClient.tsx`: campo Data/Horário mostra normal enquanto
+  `date_changes_count === 0` (com aviso "1ª troca é grátis..."), trava
+  depois disso — clicar em "Alterar data" abre o `CreditLockPanel` de
+  confirmação antes de liberar os campos pra edição.
+
+### "Meus convites" separado: Vai acontecer / Já aconteceu
+Duas queries independentes (`event_date >= now()` ascendente vs `<
+now()` descendente), cada uma com sua própria paginação
+(`?futuro=N&passado=M`). Cards de eventos passados ganham badge
+"Encerrado".
+
+### Painel e link público de eventos passados
+No painel (`/dashboard/[edit_token]`), evento com `event_date` no
+passado: sem botão "Editar convite", sem link/compartilhar (vira um
+aviso "Convite encerrado — não é mais possível compartilhar ou
+editar"), preview do card mascarado com "Esse evento já aconteceu."
+sobre uma versão desfocada do card real. **Mesma máscara aplicada na
+página pública `/e/[slug]`** — cobre o caso de um link já compartilhado
+continuar circulando depois do evento (o pedido explícito do Luciano:
+"importante também colocarmos a máscara em links vencidos que
+circulam"). A confirmação de presença (BORA) fica bloqueada também via
+guarda no `confirmar()`, não só visualmente.
+
+### Como foi validado
+Testado com dado real de ponta a ponta: 1ª troca de data grátis
+(inclusive numa conta com saldo zero), 2ª troca cobrando 2 créditos
+corretamente, rejeição 402 com saldo insuficiente. `/meus-convites`
+conferido com eventos futuros e passados reais, badge aparecendo
+certo. Painel e página pública de evento passado testados via
+screenshot real (CDP do Chrome, sessão autenticada) — sem "Editar
+convite", sem compartilhar, máscara aparecendo nos dois lugares. Todo
+dado de teste (eventos, transações, sessões) removido depois, saldo de
+créditos revertido ao valor original. `npm run build` limpo em cada
+etapa.
+
+---
+
 ## Sessão 2026-08-18 (parte 2) — página "18 anos depois", última pendente de conteúdo
 
 Mesmo layout de capa da "Como funciona?" (logo → foto retangular → título
@@ -23,6 +77,34 @@ nenhum stub em branco no app.**
 ### Como foi validado
 Build limpo. Screenshot real via Chrome headless conferindo o layout
 completo (hero, texto, assinatura).
+
+---
+
+## Sessão 2026-08-18 (parte 3) — acabamentos: fotos definitivas, simetria, padronização
+
+Sequência de ajustes finos pedidos ao vivo depois da parte 2:
+- **Foto definitiva do "18 anos depois"**: troca a foto provisória por
+  uma ilustração fornecida pelo Luciano (ele no home office, tema
+  código+valores+praia). Assinatura perdeu o avatar (repetia a foto de
+  cima) — ficou só nome + bio + ícones de Instagram e LinkedIn (sem
+  texto do link ao lado). Bio ganhou "Aprendiz de Filósofo" depois de
+  "Cofundador vaikeuvou" — atualizado também no perfil real dele
+  (`users.bio`), não só nesta página, pra refletir em convites futuros.
+- **Simetria de espaçamento**: no layout de capa (`InfoPageShell`
+  `heroImage`), o espaço entre a foto e o título e entre o título e o
+  primeiro parágrafo ficou igual (`mb-8` nos dois, antes a foto tinha
+  só `mb-6`) — afeta as duas páginas que usam esse layout.
+- **Padronização das 3 páginas restantes**: Termos, Privacidade e Fale
+  conosco ganharam o mesmo layout de capa das outras duas, com fotos
+  temáticas do Unsplash (licença gratuita): aperto de mão sobre
+  documentos assinados (Termos), cadeado sobre teclado (Privacidade),
+  pessoa sorrindo no laptop (Fale conosco — trocada de uma opção mais
+  séria/escura pra combinar com o tom do app). Com isso as 5 páginas
+  institucionais seguem o mesmo padrão visual completo.
+
+### Como foi validado
+Build limpo a cada etapa. Screenshot real conferindo cada foto aplicada
+e a simetria de espaçamento nas duas páginas afetadas.
 
 ---
 
