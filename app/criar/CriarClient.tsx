@@ -381,7 +381,7 @@ export default function CriarClient({ userName, userAvatar, userBio, userInstagr
             </div>
 
             {!termsAccepted && (
-              <label className="flex items-start gap-2.5 text-xs text-gray-500 leading-relaxed cursor-pointer">
+              <label className="flex items-start gap-1.5 text-xs text-gray-500 leading-relaxed cursor-pointer">
                 <input
                   type="checkbox"
                   checked={aceitouTermos}
