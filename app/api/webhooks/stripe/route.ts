@@ -39,6 +39,13 @@ export async function POST(req: NextRequest) {
           stripe_session_id: session.id,
         })
         await sb.rpc('increment_user_credits', { p_user_id: userId, p_amount: credits })
+
+        // O Stripe Checkout sempre coleta e-mail na tela de pagamento — guarda
+        // aqui também (hoje só existia do lado do Stripe).
+        const email = session.customer_details?.email
+        if (email) {
+          await sb.from('users').update({ email }).eq('id', userId)
+        }
       }
     }
   }
