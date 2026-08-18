@@ -11,9 +11,12 @@ export async function POST(req: NextRequest) {
   const body = await req.json().catch(() => null)
   if (!body) return NextResponse.json({ ok: true })
 
-  // Evolution ecoa a própria apikey no corpo do webhook — usa como
-  // autenticação simples (mesmo padrão que ela já usa nas chamadas de saída).
-  if (body.apikey !== process.env.EVOLUTION_API_KEY) {
+  // O "apikey" que a Evolution ecoa no corpo é o token da INSTÂNCIA, não a
+  // chave global que usamos pra chamar a API dela (e nem sempre vem
+  // preenchido, depende de config do servidor) — não dá pra autenticar por
+  // ele. Em vez disso, configuramos um header customizado no webhook/set,
+  // que a Evolution reenvia como header de verdade na chamada.
+  if (req.headers.get('x-evolution-secret') !== process.env.EVOLUTION_API_KEY) {
     return NextResponse.json({ error: 'unauthorized' }, { status: 401 })
   }
 
