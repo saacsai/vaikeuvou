@@ -110,24 +110,24 @@ export default async function HistoriaPage() {
         <div className="pt-6 border-t border-gray-100">
           <p className="text-sm font-bold text-gray-900">Luciano Maeda</p>
           <p className="text-xs text-gray-400">
-            Cofundador vaikeuvou | São Paulino | Curtidor de praia, cerveja, churrasco e pizza com a família e amigos | Corredor pra compensar.
+            Cofundador vaikeuvou | Aprendiz de Filósofo | São Paulino | Curtidor de praia, cerveja, churrasco e pizza com a família e amigos | Corredor pra compensar.
           </p>
           <div className="flex items-center gap-3 mt-1.5">
             <a
               href="https://instagram.com/maedaluciano"
               target="_blank" rel="noopener noreferrer"
-              className="inline-flex items-center gap-1 text-gray-400 hover:text-brand transition-colors"
+              className="text-gray-400 hover:text-brand transition-colors"
+              aria-label="Instagram de Luciano Maeda"
             >
-              <InstagramIcon className="w-3.5 h-3.5" />
-              <span className="text-xs">@maedaluciano</span>
+              <InstagramIcon className="w-4 h-4" />
             </a>
             <a
               href="https://www.linkedin.com/in/eailucianomaeda/"
               target="_blank" rel="noopener noreferrer"
-              className="inline-flex items-center gap-1 text-gray-400 hover:text-brand transition-colors"
+              className="text-gray-400 hover:text-brand transition-colors"
+              aria-label="LinkedIn de Luciano Maeda"
             >
-              <LinkedinIcon className="w-3.5 h-3.5" />
-              <span className="text-xs">LinkedIn</span>
+              <LinkedinIcon className="w-4 h-4" />
             </a>
           </div>
         </div>
