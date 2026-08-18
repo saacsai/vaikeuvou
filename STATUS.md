@@ -2,6 +2,63 @@
 
 Última atualização: 2026-08-18
 
+## Sessão 2026-08-18 (parte 6) — preview do WhatsApp com foto real + imagem por IA
+
+### Preview do WhatsApp mostra a foto de verdade do convite
+`og:image` trocou de gerar um cartão à parte (gradiente + logo + texto)
+pra apontar direto pra foto de cabeçalho real (preset ou upload
+próprio). Título/data/local saíram da imagem — já iam como texto real
+(`og:title`/`og:description`), estavam duplicados e poluíam a arte.
+Rota `/api/og` removida (sem uso). Detalhes de UX do preview discutidos
+e esclarecidos: WhatsApp só tem 1 slot de imagem (sem segunda imagem no
+texto), fonte/tamanho/cor do texto são 100% do WhatsApp (zero controle
+via Open Graph), descrição corta em ~2 linhas (ordem importa).
+
+### Imagem de cabeçalho gerada por IA (3 créditos, sempre)
+Quadradinho "✨ Imagem por IA" no `BgSelector` saiu do "em breve" e
+ficou funcional no painel (`components/AiImageGenerate.tsx`, mesmo
+padrão de cadeado/confirm de vídeo/foto/data). Pessoa descreve o clima
+do evento em texto livre, gera e a imagem já vira o cabeçalho.
+
+- **Stack**: Vercel AI SDK (`ai` + `@ai-sdk/google`), modelo
+  `gemini-3-pro-image-preview` ("Nano Banana Pro"). Prompt combina
+  título do evento + descrição da pessoa, pede explicitamente
+  "sem nenhum texto, letra ou palavra escrita na imagem" (aprendido do
+  problema que acabamos de corrigir no preview — não repetir arte
+  poluída por texto).
+- **Aspect ratio**: API só aceita uma lista fixa (`1:1`, `16:9`,
+  `21:9`, etc.), não qualquer proporção arbitrária — usamos `21:9`
+  (2.33:1), a mais próxima do 2.4:1 dos cabeçalhos do app.
+- **Custo real validado antes de construir**: ~US$0,034–0,039/imagem
+  (Gemini/OpenAI, pesquisado com preço atual, não estimado) contra
+  R$3–6 de receita por 3 créditos — margem de 88%+ mesmo no pior
+  cenário. Decisão de qual provedor usar (Gemini primeiro, porque já
+  tinha conta pronta) documentada em [[project_vaikeuvou]].
+- **Setup de billing teve 2 obstáculos reais** (não só "colar a
+  chave"): (1) cota do nível gratuito é zero pra modelos de imagem,
+  precisa vincular faturamento; (2) a cobrança do Gemini é
+  **pré-paga** (carteira, não cartão pós-pago), precisa carregar
+  saldo separadamente. Descoberto testando de verdade, não documentado
+  claramente pelo Google.
+- Testado de ponta a ponta com a API real (créditos pré-pagos
+  carregados) e com o banco de produção: geração, upload pro
+  Storage, débito de crédito, rejeição por saldo insuficiente — tudo
+  validado. Chave em produção (Vercel) adicionada pelo próprio Luciano.
+
+### Decisão: multi-domínio pro/social ABANDONADA
+Luciano e Sandro decidiram, depois de uma reunião, não seguir com dois
+domínios/tons (`pro.vaikeuvou.app` vs `vaikeuvou.app`) — mantém só uma
+versão. Argumento do Sandro: "vaikeuvou é o que é", a marca é
+BORA/"Vamo aí?" pra qualquer público, vaikeuvou é pra pessoas, não pra
+empresas. Ajuste que sobrou: evitar vocabulário de festa específico
+("rolê", "balada", "galera") na copy, mantendo BORA/cor/identidade
+intactos — Sandro vai enviar a marca em formato quadrado pro preview,
+as 10 imagens de header definitivas, e ajustes de design. Detalhe
+completo em `~/.claude/projects/-Users-lucianomaeda/memory/vaikeuvou_multidominio_pro.md`
+(memória, não repo — é uma decisão de produto, não código).
+
+---
+
 ## Sessão 2026-08-18 (parte 5) — 🚀 PRODUÇÃO: Stripe live, Pix solicitado, branding, e-mail
 
 **vaikeuvou.app está oficialmente em produção, aceitando pagamento real.**
