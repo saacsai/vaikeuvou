@@ -388,10 +388,12 @@ export default function CriarClient({ userName, userAvatar, userBio, userInstagr
                   onChange={e => setAceitouTermos(e.target.checked)}
                   className="mt-0.5 w-4 h-4 flex-shrink-0 accent-brand"
                 />
-                Li e concordo com os{' '}
-                <a href="/termos" target="_blank" rel="noopener noreferrer" className="text-brand font-semibold hover:underline">Termos de Uso</a>
-                {' '}e a{' '}
-                <a href="/privacidade" target="_blank" rel="noopener noreferrer" className="text-brand font-semibold hover:underline">Política de Privacidade</a>
+                <span>
+                  Li e concordo com os{' '}
+                  <a href="/termos" target="_blank" rel="noopener noreferrer" className="text-brand font-semibold hover:underline">Termos de Uso</a>
+                  {' '}e a{' '}
+                  <a href="/privacidade" target="_blank" rel="noopener noreferrer" className="text-brand font-semibold hover:underline">Política de Privacidade</a>
+                </span>
               </label>
             )}
 
