@@ -1,6 +1,7 @@
 import Image from 'next/image'
 import { HEADER_PRESETS, titleToHeader } from '@/lib/headers'
 import HeaderImageCropUpload from '@/components/HeaderImageCropUpload'
+import AiImageGenerate from '@/components/AiImageGenerate'
 
 type Props = {
   value: string
@@ -42,14 +43,22 @@ export default function BgSelector({ value, onChange, title, editToken, credits,
           </button>
         ))}
 
-        <div
-          title="Imagem gerada por IA — em breve, 3 créditos"
-          className="aspect-square rounded-lg bg-gray-50 border-2 border-dashed border-gray-200 flex flex-col items-center justify-center gap-1 cursor-not-allowed"
-        >
-          <span className="text-base text-gray-400">✨</span>
-          <span className="text-[8px] font-bold text-gray-500 uppercase leading-tight text-center px-1">Imagem por IA</span>
-          <span className="text-[7px] font-bold text-gray-400 uppercase">Em breve · 3 créditos</span>
-        </div>
+        {editToken ? (
+          <AiImageGenerate
+            editToken={editToken}
+            credits={credits ?? 0}
+            onUploaded={onUploaded ?? onChange}
+          />
+        ) : (
+          <div
+            title="Imagem gerada por IA — disponível depois de criar o convite, 3 créditos"
+            className="aspect-square rounded-lg bg-gray-50 border-2 border-dashed border-gray-200 flex flex-col items-center justify-center gap-1 cursor-not-allowed"
+          >
+            <span className="text-base text-gray-400">✨</span>
+            <span className="text-[8px] font-bold text-gray-500 uppercase leading-tight text-center px-1">Imagem por IA</span>
+            <span className="text-[7px] font-bold text-gray-400 uppercase">Após criar · 3 créditos</span>
+          </div>
+        )}
 
         {(editToken || onCropped) && (
           <HeaderImageCropUpload
