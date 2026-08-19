@@ -31,7 +31,20 @@ com uma geração pendente simulada, recuperou certinho.
 - Card do evento: Local e link externo agora laranja por padrão
   (`text-brand`) e cinza no hover — antes era o contrário.
 
-Commit `d911a9a`, push feito.
+Commit `d911a9a`. Correção seguinte (`88e7913`): a cor só tinha
+chegado na página pública real — o preview do painel/`/criar`
+(`EventPreviewCard.tsx`) nem mostrava o link externo e tinha o Local
+em cinza simples, por isso pareceu que "não mudou nada" ao conferir
+por ali. Corrigido pra bater com a página real.
+
+**Fechamento do dia**: produto testado ao vivo com convite real
+("Encontro Agricultura Familiar e Ceagesp") — confirmações chegando,
+árvore de convidados funcionando (nível 2 confirmado: Diego Oliveira
+→ Claudio José Ferreira, vínculo correto). Árvore já tem
+`overflow-x-auto` pra muitos nós de 1º nível — funciona (vira scroll
+horizontal), mas com dezenas de confirmações diretas pode ficar
+incômodo; não é urgente, registrado como possível melhoria futura
+(quebrar em várias linhas ou virar lista com indentação).
 
 ---
 
