@@ -2,6 +2,25 @@
 
 Última atualização: 2026-08-19
 
+## Sessão 2026-08-19 (parte 4) — fix: repintura forte demais derrapava na identidade do rosto
+
+Efeito colateral do fix da parte 3: forçar repintura completa da cena
+inteira melhorou o estilo, mas também bagunçou a fidelidade do rosto
+de quem estava na foto de referência — testado com a própria foto do
+Luciano, saiu um rosto parecido mas não reconhecível (sinal de
+nascença sumiu, proporções mudaram). "Se ele não tivesse
+descaracterizado minha aparência, diria que estaria perfeito."
+
+Corrigido separando as instruções: repintura agressiva só pro
+ambiente/cenário (mantém a simplificação de detalhe repetitivo que já
+funcionava bem), e instrução à parte, mais rígida, pedindo máxima
+fidelidade no rosto — mesma técnica de pintura, mas sem alterar
+proporções, marcas distintivas ou identidade. Validado com a foto real
+(sinal de nascença voltou, formato do rosto bateu) tanto isolado
+quanto pela rota real de produção. Commit `b82756d`, push feito.
+
+---
+
 ## Sessão 2026-08-19 (parte 3) — fix: modelo tratava referência como filtro leve, não repintura
 
 Bug real reportado testando de verdade: mandando uma foto de referência
