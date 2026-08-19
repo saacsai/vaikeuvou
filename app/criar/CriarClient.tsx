@@ -41,6 +41,11 @@ export default function CriarClient({ userName, userAvatar, userBio, userInstagr
   const [saving, setSaving] = useState(false)
   const [erro,   setErro]   = useState('')
 
+  // Imagem por IA cobra na hora da geração (custo real de API, não dá pra
+  // adiar pro momento de criar o convite como vídeo/foto) — precisa de
+  // saldo ao vivo aqui, diferente do resto do formulário.
+  const [creditsLeft, setCreditsLeft] = useState(userCredits)
+
   // Assinatura do convite — só pergunta o que ainda não está no perfil,
   // pra não obrigar a pessoa a sair daqui e ir preencher /perfil antes
   // de criar o convite.
@@ -66,9 +71,10 @@ export default function CriarClient({ userName, userAvatar, userBio, userInstagr
     setForm(p => ({ ...p, [k]: v }))
   }
 
-  function onBgChange(v: string) {
+  function onBgChange(v: string, cost?: number) {
     setPendingHeaderImage(null)
     set('bg_image_url', v)
+    if (cost) setCreditsLeft(c => c - cost)
   }
 
   function onHeaderImageCropped(blob: Blob, previewUrl: string) {
@@ -173,7 +179,7 @@ export default function CriarClient({ userName, userAvatar, userBio, userInstagr
               <Image src="/logo.png" alt="vaikeuvou" width={480} height={108} className="h-[43px] md:h-[47px] w-auto" />
             </a>
             <div className="flex items-center gap-1 md:hidden">
-              <ProfilePopover userName={userName} userAvatar={userAvatar} userCredits={userCredits} />
+              <ProfilePopover userName={userName} userAvatar={userAvatar} userCredits={creditsLeft} />
             </div>
           </div>
 
@@ -185,7 +191,7 @@ export default function CriarClient({ userName, userAvatar, userBio, userInstagr
           </div>
 
           <div className="hidden md:flex items-center gap-1 flex-shrink-0">
-            <ProfilePopover userName={userName} userAvatar={userAvatar} userCredits={userCredits} />
+            <ProfilePopover userName={userName} userAvatar={userAvatar} userCredits={creditsLeft} />
           </div>
         </div>
 
@@ -338,7 +344,7 @@ export default function CriarClient({ userName, userAvatar, userBio, userInstagr
 
             {/* BG selector — mobile (some antes do botão, no desktop fica junto ao preview) */}
             <div className="lg:hidden">
-              <BgSelector value={form.bg_image_url} onChange={onBgChange} title={form.title} onCropped={onHeaderImageCropped} credits={userCredits} />
+              <BgSelector value={form.bg_image_url} onChange={onBgChange} title={form.title} onCropped={onHeaderImageCropped} credits={creditsLeft} hasAvatar={!!userAvatar} />
             </div>
 
             {/* Vídeo — travado até a pessoa reconhecer o custo, pra ninguém
@@ -362,8 +368,8 @@ export default function CriarClient({ userName, userAvatar, userBio, userInstagr
               {videoStage === 'confirm' && (
                 <CreditLockPanel
                   title="Adicionar vídeo custa 1 crédito"
-                  message={`Vai debitar 1 crédito do seu saldo (${userCredits} disponíveis) quando você criar o convite.`}
-                  credits={userCredits}
+                  message={`Vai debitar 1 crédito do seu saldo (${creditsLeft} disponíveis) quando você criar o convite.`}
+                  credits={creditsLeft}
                   onCancel={() => setVideoStage('idle')}
                   onContinue={() => setVideoStage('unlocked')}
                 />
@@ -413,7 +419,7 @@ export default function CriarClient({ userName, userAvatar, userBio, userInstagr
             <p className="text-xs text-gray-400 uppercase tracking-widest font-semibold mb-3 text-center">Preview</p>
             <div className="sticky top-6 space-y-3">
               <EventPreviewCard form={form} userName={previewName} userAvatar={avatarUrl} userBio={previewBio} userInstagram={previewInstagram} />
-              <BgSelector value={form.bg_image_url} onChange={onBgChange} title={form.title} onCropped={onHeaderImageCropped} credits={userCredits} />
+              <BgSelector value={form.bg_image_url} onChange={onBgChange} title={form.title} onCropped={onHeaderImageCropped} credits={creditsLeft} hasAvatar={!!userAvatar} />
             </div>
           </div>
 

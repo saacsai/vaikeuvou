@@ -1,6 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getSupabaseAdmin } from '@/lib/supabase'
 
+// Só o dia (calendário, fuso de São Paulo) conta pro gate de créditos —
+// trocar só o horário do mesmo dia é sempre livre.
+function saoPauloDateOnly(iso: string): string {
+  return new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Sao_Paulo' }).format(new Date(iso))
+}
+
 export async function PATCH(req: NextRequest) {
   const { edit_token, ...fields } = await req.json()
   if (!edit_token) return NextResponse.json({ error: 'edit_token obrigatório' }, { status: 400 })
@@ -16,6 +22,7 @@ export async function PATCH(req: NextRequest) {
 
   // Troca de data: primeira é grátis, da segunda em diante o crédito já foi
   // debitado antes (via /api/creditos/desbloquear-data) — aqui só contamos.
+  // Só o dia conta — trocar o horário mantendo o mesmo dia não consome nada.
   if ('event_date' in updates) {
     const { data: evento } = await sb
       .from('events')
@@ -23,7 +30,7 @@ export async function PATCH(req: NextRequest) {
       .eq('edit_token', edit_token)
       .single()
 
-    const changed = evento && new Date(evento.event_date).getTime() !== new Date(updates.event_date as string).getTime()
+    const changed = evento && saoPauloDateOnly(evento.event_date) !== saoPauloDateOnly(updates.event_date as string)
     if (changed) {
       updates.date_changes_count = evento!.date_changes_count + 1
     }

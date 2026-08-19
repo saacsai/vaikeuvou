@@ -1,6 +1,54 @@
 # vaikeuvou.app — Status
 
-Última atualização: 2026-08-18
+Última atualização: 2026-08-19
+
+## Sessão 2026-08-19 — aprovar/recusar imagem por IA, liberar no /criar, estilo ilustração, gate de data só no dia
+
+Quatro ajustes pedidos ao vivo testando o produto de verdade pra um
+evento real.
+
+### Aprovar/recusar antes de virar capa
+Gerar continua cobrando 3 créditos na hora, mas a imagem não vira mais
+a capa automaticamente — mostra um preview com "Usar essa imagem" /
+"Gerar de novo". Recusar devolve os 3 créditos e apaga o arquivo do
+Storage; gerar de novo depois é cobrança nova (sem desconto de
+segunda tentativa — decisão explícita do Luciano: mais simples que
+"1 regeneração grátis" e sem risco de abuso). Tabela nova
+`ai_image_generations` (status pending/approved/rejected, `event_id`
+opcional) guarda cada geração até ser resolvida.
+
+### Liberado também no `/criar`, não só na edição
+Antes só existia no painel (`editToken` obrigatório). Como gerar tem
+custo real de API — diferente de vídeo/foto, que não custam nada até
+o upload — a cobrança acontece na hora mesmo antes do convite existir;
+a imagem aprovada fica só no formulário local até a criação (mesmo
+padrão do preset/crop-upload). Descoberto de brinde um bug preexistente:
+o saldo exibido na tela sempre decrementava 1 crédito por upload, até
+pra ação de 3 créditos — corrigido (`onUploaded(url, cost)` agora
+propaga o custo real).
+
+### Prompt sempre em estilo ilustração, nunca fingindo foto real
+Motivo do Luciano: "imagens geradas por IA dão na cara que foram
+geradas por IA" — o estilo fotorrealista que a IA tenta imitar é
+exatamente o que soa artificial (pele lisa demais, luz esquisita).
+Trocado pra sempre pedir ilustração digital/traço desenhado à mão,
+com ou sem avatar de referência — mesma linguagem visual da capa
+"18 anos depois" em toda geração, não só na opção de avatar.
+
+### Gate de troca de data: só o dia conta, horário é sempre livre
+Bug real encontrado testando com evento de verdade: o contador de
+"troca de data" (1ª grátis, 2ª+ paga) contava troca de **horário**
+junto com troca de dia — Luciano mudou só o horário e depois viu o
+cadeado de 2 créditos aparecer, achando que não tinha usado a grátis
+ainda. Corrigido nos dois lados (servidor em
+`app/api/eventos/editar/route.ts` comparando só o dia civil no fuso
+de São Paulo, e painel liberando o `TimePicker` sempre, fora do bloco
+travado) — mudar só o horário nunca mais consome ou cobra.
+Reproduzido/validado com script real batendo na API antes e depois do
+fix; contador do evento real do Luciano resetado de volta pra 0 (a
+troca dele tinha sido só de horário).
+
+---
 
 ## Sessão 2026-08-18 (parte 7) — imagem por IA usando o avatar da pessoa (modo caricatura)
 

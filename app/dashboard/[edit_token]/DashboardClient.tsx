@@ -64,10 +64,10 @@ function parseEventDate(iso: string): { date: string; time: string } {
   }
 }
 
-function fmtDataHora(date: string, time: string): string {
+function fmtData(date: string): string {
   if (!date) return ''
   const [y, m, d] = date.split('-')
-  return `${d}/${m}/${y} às ${time}`
+  return `${d}/${m}/${y}`
 }
 
 function toForm(evento: Event): EventFormFields {
@@ -139,10 +139,10 @@ export default function DashboardClient({ evento, rsvps, isNovo, userName, userA
     setVideoUnlocking(false)
   }
 
-  function onHeaderImageUploaded(url: string) {
+  function onHeaderImageUploaded(url: string, cost = 1) {
     setForm(p => ({ ...p, bg_image_url: url }))
     setInitial(p => ({ ...p, bg_image_url: url }))
-    setCreditsLeft(c => c - 1)
+    setCreditsLeft(c => c - cost)
   }
 
   async function desbloquear() {
@@ -199,7 +199,8 @@ export default function DashboardClient({ evento, rsvps, isNovo, userName, userA
 
     if (!res.ok) { setMsg(json.error ?? 'Erro ao salvar.'); setSaving(false); return }
 
-    const dataMudou = form.event_date !== initial.event_date || form.event_time !== initial.event_time
+    // Só o dia conta pro gate — trocar o horário do mesmo dia é sempre livre.
+    const dataMudou = form.event_date !== initial.event_date
     if (dataMudou) {
       if (dateChangesCount === 0) setDateChangesCount(1)
       setDateStage('idle')
@@ -364,53 +365,47 @@ export default function DashboardClient({ evento, rsvps, isNovo, userName, userA
               />
             </div>
 
-            {dateChangesCount === 0 || dateStage === 'unlocked' ? (
-              <div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <div className="min-w-0">
-                    <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Data *</label>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div className="min-w-0">
+                <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Data *</label>
+                {dateChangesCount === 0 || dateStage === 'unlocked' ? (
+                  <>
                     <DatePicker value={form.event_date} onChange={v => set('event_date', v)} />
+                    {dateChangesCount === 0 && (
+                      <p className="text-[10px] text-gray-400 mt-1.5">
+                        Você pode alterar a data 1 vez de graça — depois disso, cada troca custa {DATE_UNLOCK_COST} créditos.
+                      </p>
+                    )}
+                  </>
+                ) : dateStage === 'confirm' ? (
+                  <CreditLockPanel
+                    title={`Trocar a data custa ${DATE_UNLOCK_COST} créditos`}
+                    message={`Vai debitar ${DATE_UNLOCK_COST} créditos do seu saldo (${creditsLeft} disponíveis) assim que você confirmar.`}
+                    credits={creditsLeft}
+                    cost={DATE_UNLOCK_COST}
+                    onCancel={() => setDateStage('idle')}
+                    onContinue={desbloquearData}
+                    continuing={dateUnlocking}
+                    erro={dateErro}
+                  />
+                ) : (
+                  <div className="bg-gray-50 border border-gray-200 rounded-xl p-3 space-y-2">
+                    <p className="text-sm text-gray-500">{fmtData(form.event_date)}</p>
+                    <button
+                      type="button"
+                      onClick={() => setDateStage('confirm')}
+                      className="px-3 py-1.5 rounded-lg bg-white border border-gray-200 hover:border-brand text-xs font-semibold uppercase tracking-wide text-gray-700 transition-colors"
+                    >
+                      🔒 Trocar data ({DATE_UNLOCK_COST} créditos)
+                    </button>
                   </div>
-                  <div className="min-w-0">
-                    <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Horário *</label>
-                    <TimePicker value={form.event_time} onChange={v => set('event_time', v)} />
-                  </div>
-                </div>
-                {dateChangesCount === 0 && (
-                  <p className="text-[10px] text-gray-400 mt-1.5">
-                    Você pode alterar a data 1 vez de graça — depois disso, cada troca custa {DATE_UNLOCK_COST} créditos.
-                  </p>
                 )}
               </div>
-            ) : dateStage === 'confirm' ? (
-              <div>
-                <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Data e horário</label>
-                <CreditLockPanel
-                  title={`Trocar a data custa ${DATE_UNLOCK_COST} créditos`}
-                  message={`Vai debitar ${DATE_UNLOCK_COST} créditos do seu saldo (${creditsLeft} disponíveis) assim que você confirmar.`}
-                  credits={creditsLeft}
-                  cost={DATE_UNLOCK_COST}
-                  onCancel={() => setDateStage('idle')}
-                  onContinue={desbloquearData}
-                  continuing={dateUnlocking}
-                  erro={dateErro}
-                />
+              <div className="min-w-0">
+                <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Horário *</label>
+                <TimePicker value={form.event_time} onChange={v => set('event_time', v)} />
               </div>
-            ) : (
-              <div>
-                <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Data e horário</label>
-                <div className="bg-gray-50 border border-gray-200 rounded-xl p-3 space-y-2">
-                  <p className="text-sm text-gray-500">{fmtDataHora(form.event_date, form.event_time)}</p>
-                  <button
-                    type="button"
-                    onClick={() => setDateStage('confirm')}
-                    className="px-3 py-1.5 rounded-lg bg-white border border-gray-200 hover:border-brand text-xs font-semibold uppercase tracking-wide text-gray-700 transition-colors"
-                  >
-                    🔒 Alterar data ({DATE_UNLOCK_COST} créditos)
-                  </button>
-                </div>
-              </div>
-            )}
+            </div>
 
             <div>
               <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Local</label>

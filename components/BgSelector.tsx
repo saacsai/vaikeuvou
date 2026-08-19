@@ -5,7 +5,9 @@ import AiImageGenerate from '@/components/AiImageGenerate'
 
 type Props = {
   value: string
-  onChange: (v: string) => void
+  /** cost opcional — repassado pela geração por IA pra quem ouve poder
+   * atualizar o saldo exibido na hora (presets/crop-upload não usam). */
+  onChange: (v: string, cost?: number) => void
   title: string
   /** Só definido no painel — habilita upload imediato (sobe e debita na hora). */
   editToken?: string
@@ -13,7 +15,7 @@ type Props = {
   /** Se a pessoa tem avatar no perfil — habilita a opção de usar como
    * referência na geração por IA (vira ilustração estilo caricatura). */
   hasAvatar?: boolean
-  onUploaded?: (v: string) => void
+  onUploaded?: (v: string, cost?: number) => void
   /** Presente no /criar — convite ainda não existe, upload fica pendente até
    * a criação ser confirmada (cobra 1 crédito junto com a criação). */
   onCropped?: (blob: Blob, previewUrl: string) => void
@@ -46,22 +48,13 @@ export default function BgSelector({ value, onChange, title, editToken, credits,
           </button>
         ))}
 
-        {editToken ? (
-          <AiImageGenerate
-            editToken={editToken}
-            credits={credits ?? 0}
-            onUploaded={onUploaded ?? onChange}
-          />
-        ) : (
-          <div
-            title="Imagem gerada por IA — disponível depois de criar o convite, 3 créditos"
-            className="aspect-square rounded-lg bg-gray-50 border-2 border-dashed border-gray-200 flex flex-col items-center justify-center gap-1 cursor-not-allowed"
-          >
-            <span className="text-base text-gray-400">✨</span>
-            <span className="text-[8px] font-bold text-gray-500 uppercase leading-tight text-center px-1">Imagem por IA</span>
-            <span className="text-[7px] font-bold text-gray-400 uppercase">Após criar · 3 créditos</span>
-          </div>
-        )}
+        <AiImageGenerate
+          editToken={editToken}
+          title={title}
+          credits={credits ?? 0}
+          hasAvatar={hasAvatar}
+          onUploaded={onUploaded ?? onChange}
+        />
 
         {(editToken || onCropped) && (
           <HeaderImageCropUpload
