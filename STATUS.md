@@ -2,6 +2,39 @@
 
 Última atualização: 2026-08-19
 
+## Sessão 2026-08-19 (parte 6) — geração órfã, recuperação de pendente, 3 fixes de UI
+
+Bug real relatado testando pra valer, às vésperas de disparar o
+convite: "não acontece nada" gerando com uma foto específica, e "não
+tem opção de recusar sem perder os créditos". Investigação nos dados
+mostrou que **nenhuma cobrança tinha ficado sem geração correspondente**
+— o problema era outro: a geração leva 15-25s de verdade, mais que os
+"~15s" prometidos na tela, então a pessoa saía/recarregava achando que
+travou, e quando a geração terminava (sim, ela termina — já cobrada),
+ficava "órfã": sem tela pra aprovar ou recusar. Achei e devolvi 3
+gerações reais nesse estado.
+
+**Fix duplo**: `maxDuration = 60` na rota (margem de segurança contra
+timeout de função serverless) + `GET /api/eventos/imagem-ia/pendente`
+— o componente checa ao montar se existe uma geração pendente
+esquecida (do evento, ou do usuário se ainda em `/criar`) e recupera
+ela direto na tela de aprovar/recusar, em vez de deixar sumir. Testado
+com uma geração pendente simulada, recuperou certinho.
+
+**Mais 3 ajustes pedidos junto**:
+- Botão "Transformar em pintura (3 créditos)" ficou cramado/feio —
+  encurtado pra "Transformar (3 créditos)".
+- Preview do WhatsApp: trocado "Clique em BORA para confirmar
+  presença!" (não fazia sentido — BORA é RSVP, não é sobre ver
+  detalhes) por "Dia DD/MM às HH:MM, clique para saber mais
+  detalhes." — formato curto pro espaço limitado do preview.
+- Card do evento: Local e link externo agora laranja por padrão
+  (`text-brand`) e cinza no hover — antes era o contrário.
+
+Commit `d911a9a`, push feito.
+
+---
+
 ## Sessão 2026-08-19 (parte 5) — descrição de cena vira opcional no modo "enviar foto"
 
 Ajuste de UX sugerido pelo próprio Luciano: dos 3 modos de referência
