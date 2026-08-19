@@ -2,6 +2,25 @@
 
 Última atualização: 2026-08-19
 
+## Sessão 2026-08-19 (parte 3) — fix: modelo tratava referência como filtro leve, não repintura
+
+Bug real reportado testando de verdade: mandando uma foto de referência
+bem cheia de detalhe (banca de feira lotada de verduras), o resultado
+saía quase idêntico à foto original — tipo um filtro sutil por cima,
+não uma ilustração de verdade. Comparação lado a lado confirmou.
+
+Causa: o modelo fica conservador demais com referência de imagem em
+cenas complexas — sem instrução explícita, prefere "levemente
+retocar" a repintar. Corrigido pedindo explicitamente **repintura
+completa, não filtro**, e simplificação de detalhe repetitivo
+("agrupe formas e cores em pinceladas maiores, como um pintor faria
+de longe", em vez de tentar preservar cada folha/objeto individual).
+Validado com a mesma foto que expôs o bug (2 iterações até ficar bom)
+e reconfirmado que não ficou exagerado numa foto simples de retrato.
+Commit `9287dc8`, push feito.
+
+---
+
 ## Sessão 2026-08-19 (parte 2) — foto de referência (upload) + estilo pintura digital semi-realista
 
 Depois de testar em produção, o estilo "ilustração vetorial plana" da
