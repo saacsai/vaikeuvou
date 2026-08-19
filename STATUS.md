@@ -2,6 +2,24 @@
 
 Última atualização: 2026-08-19
 
+## Sessão 2026-08-19 (parte 5) — descrição de cena vira opcional no modo "enviar foto"
+
+Ajuste de UX sugerido pelo próprio Luciano: dos 3 modos de referência
+(nenhuma / avatar / enviar foto), só os 2 primeiros fazem sentido
+pedir "descreva o clima do evento" — no modo upload a cena já está
+definida pela foto, pedir descrição de novo era redundante e podia
+até confundir a geração (foto de uma coisa, descrição de outra).
+
+Reordenado: escolha de referência vem primeiro, campo de texto vira
+opcional e é reenquadrado como "instrução extra" (não descrição de
+cena) no modo upload, botão vira "Transformar em pintura". Backend
+aceita prompt vazio quando tem imagem de referência. Testado ponta a
+ponta com prompt vazio pela rota real — funcionou, saiu bem ilustrado
+e sem o texto da camisa que aparecia na foto original. Commit
+`6245a0f`, push feito.
+
+---
+
 ## Sessão 2026-08-19 (parte 4) — fix: repintura forte demais derrapava na identidade do rosto
 
 Efeito colateral do fix da parte 3: forçar repintura completa da cena
