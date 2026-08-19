@@ -112,7 +112,7 @@ export default function EventoClient({ evento, rsvps, parentRsvpId, criador }: P
                   href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(evento.location)}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="hover:text-brand"
+                  className="text-brand hover:text-gray-500"
                 >
                   {evento.location}
                 </a>
@@ -125,7 +125,7 @@ export default function EventoClient({ evento, rsvps, parentRsvpId, criador }: P
                   href={evento.external_url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="hover:text-brand"
+                  className="text-brand hover:text-gray-500"
                 >
                   {linkLabel}
                 </a>

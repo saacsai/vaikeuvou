@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Image from 'next/image'
 import CreditLockPanel from '@/components/CreditLockPanel'
 
@@ -43,6 +43,25 @@ export default function AiImageGenerate({ editToken, title, credits, hasAvatar, 
     setRefFile(file)
     setRefPreview(file ? URL.createObjectURL(file) : '')
   }
+
+  // Se uma geração anterior ficou pendente (a pessoa saiu da tela achando
+  // que tinha travado, mas a geração terminou depois — já cobrou o
+  // crédito), recupera ela aqui em vez de deixar sumir sem forma de
+  // aprovar/recusar.
+  useEffect(() => {
+    const qs = editToken ? `?edit_token=${editToken}` : ''
+    fetch(`/api/eventos/imagem-ia/pendente${qs}`)
+      .then(r => r.json())
+      .then(json => {
+        if (json.pending) {
+          setPreviewUrl(json.pending.url)
+          setGenerationId(json.pending.generationId)
+          setStage('preview')
+        }
+      })
+      .catch(() => {})
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   async function gerar() {
     if (refMode === 'upload') {
@@ -276,11 +295,11 @@ export default function AiImageGenerate({ editToken, title, credits, hasAvatar, 
           type="button"
           onClick={gerar}
           disabled={generating}
-          className="flex-1 py-2 rounded-lg bg-brand hover:bg-brand-dark disabled:opacity-50 text-white font-bold text-xs uppercase tracking-wide"
+          className="flex-1 py-2 px-2 rounded-lg bg-brand hover:bg-brand-dark disabled:opacity-50 text-white font-bold text-xs uppercase tracking-wide leading-tight"
         >
           {generating
-            ? 'Gerando… (~15s)'
-            : refMode === 'upload' ? `Transformar em pintura (${COST} créditos)` : `Gerar (${COST} créditos)`}
+            ? 'Gerando… (~25s)'
+            : refMode === 'upload' ? `Transformar (${COST} créditos)` : `Gerar (${COST} créditos)`}
         </button>
       </div>
     </div>

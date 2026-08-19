@@ -6,6 +6,10 @@ import { getSession } from '@/lib/auth'
 
 const COST = 3
 
+// Geração real leva 15-25s — garante margem contra o limite padrão da
+// função serverless (visto travar no meio antes disso).
+export const maxDuration = 60
+
 export async function POST(req: NextRequest) {
   const session = await getSession()
   if (!session) return NextResponse.json({ error: 'Não autenticado.' }, { status: 401 })

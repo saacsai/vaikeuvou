@@ -1,5 +1,4 @@
 import { getSupabase, getSupabaseAdmin } from '@/lib/supabase'
-import { fmtDate } from '@/lib/slug'
 import { titleToHeader } from '@/lib/headers'
 import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
@@ -14,7 +13,15 @@ export async function generateMetadata({ params, searchParams }: Props): Promise
   if (!data) return { title: 'vaikeuvou.app' }
 
   const base = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://vaikeuvou.app'
-  const dateStr = fmtDate(data.event_date)
+
+  // Formato curto pro preview do WhatsApp — o espaço ali é bem limitado
+  // (~2 linhas antes de truncar), então "quarta-feira, 28 de agosto..."
+  // não cabe. "Dia 28/08 às 22:00" é o suficiente.
+  const diaHoraParts = new Intl.DateTimeFormat('pt-BR', {
+    day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit', timeZone: 'America/Sao_Paulo',
+  }).formatToParts(new Date(data.event_date))
+  const getPart = (t: string) => diaHoraParts.find(p => p.type === t)?.value ?? ''
+  const previewDescricao = `Dia ${getPart('day')}/${getPart('month')} às ${getPart('hour')}:${getPart('minute')}, clique para saber mais detalhes.`
 
   // O preview do WhatsApp mostra a foto de cabeçalho de verdade do convite
   // (a mesma que a pessoa escolheu ou subiu) — nada de gerar um cartão à
@@ -25,10 +32,10 @@ export async function generateMetadata({ params, searchParams }: Props): Promise
 
   return {
     title: `${data.title} — vaikeuvou.app`,
-    description: `${data.location ?? ''} · ${dateStr}. Clique em BORA para confirmar presença!`,
+    description: previewDescricao,
     openGraph: {
       title: data.title,
-      description: 'Clique em BORA para confirmar presença!',
+      description: previewDescricao,
       images: [{ url: imageUrl }],
       type: 'website',
     },
