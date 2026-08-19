@@ -33,7 +33,10 @@ export default function EventPreviewCard({ form, userName, userAvatar, userBio, 
 
         <div className="space-y-1 text-xs text-gray-500 mb-4">
           <p>📅 {dateLabel || 'Data e horário'}</p>
-          <p>📍 {form.location || 'Local'}</p>
+          <p>📍 <span className={form.location ? 'text-brand' : ''}>{form.location || 'Local'}</span></p>
+          {form.external_url && (
+            <p>🔗 <span className="text-brand">{form.external_url_label || 'Saiba mais'}</span></p>
+          )}
           {form.description && (
             <p className="text-gray-500 mt-2 leading-relaxed italic">&ldquo;{form.description}&rdquo;</p>
           )}
