@@ -11,7 +11,9 @@ export async function POST(req: NextRequest) {
   if (!session) return NextResponse.json({ error: 'Não autenticado.' }, { status: 401 })
 
   const { edit_token, title, prompt, includeAvatar, referenceImage } = await req.json()
-  if (!prompt?.trim()) {
+  // Sem referência, a descrição é obrigatória (é a única coisa que define a
+  // cena). Com foto de referência ela é só um extra — a foto já define tudo.
+  if (!prompt?.trim() && !referenceImage) {
     return NextResponse.json({ error: 'Dados incompletos.' }, { status: 400 })
   }
 
@@ -82,13 +84,14 @@ export async function POST(req: NextRequest) {
       // está na foto — por isso a fidelidade do rosto é instrução à parte,
       // mais rígida que o resto da cena (validado visualmente: sem essa
       // separação, o rosto saía parecido mas não reconhecível de verdade).
+      const instrucaoExtra = prompt?.trim() ? ` Instrução extra do usuário: ${prompt.trim()}.` : ''
       imagePrompt = {
         images: [referenceBytes],
         text: `Reimagine o AMBIENTE, o cenário e os objetos desta imagem como uma ${ESTILO} — REPINTURA COMPLETA do fundo, não um filtro. Simplifique detalhes pequenos e repetitivos do cenário em pinceladas maiores (não precisa pintar cada folha ou cada objeto individualmente).
 
 Mas o ROSTO de cada pessoa em primeiro plano é a parte mais importante: precisa manter MÁXIMA fidelidade às feições reais — mesmo formato de rosto, mesma testa, olhos, sobrancelhas, nariz, boca, barba/bigode, e qualquer marca distintiva da pele (pintas, sinais, rugas características) exatamente como na foto original. Aplique a mesma técnica de pintura no rosto (sombreamento suave, pincelada), mas SEM alterar a identidade — alguém que conhece essa pessoa precisa reconhecê-la instantaneamente, como um retrato pintado ao vivo dela, não uma pessoa parecida.
 
-O resultado deve parecer óbvio e imediatamente uma ilustração pintada, nunca uma foto com filtro. Cenário: banner de capa para um convite de evento chamado "${eventTitle}". ${prompt.trim()}. Formato paisagem, sem nenhum texto, letra ou palavra escrita na imagem.`,
+O resultado deve parecer óbvio e imediatamente uma ilustração pintada, nunca uma foto com filtro. Cenário: banner de capa para um convite de evento chamado "${eventTitle}".${instrucaoExtra} Formato paisagem, sem nenhum texto, letra ou palavra escrita na imagem.`,
       }
     }
 

@@ -45,7 +45,12 @@ export default function AiImageGenerate({ editToken, title, credits, hasAvatar, 
   }
 
   async function gerar() {
-    if (!prompt.trim()) { setMsg('Descreva o clima do seu evento.'); return }
+    if (refMode === 'upload') {
+      if (!refFile) { setMsg('Escolha uma foto pra transformar.'); return }
+    } else if (!prompt.trim()) {
+      setMsg('Descreva o clima do seu evento.')
+      return
+    }
     setGenerating(true)
     setMsg('')
 
@@ -176,17 +181,8 @@ export default function AiImageGenerate({ editToken, title, credits, hasAvatar, 
 
   return (
     <div className="col-span-4 space-y-3 p-4 bg-amber-50 border-2 border-amber-200 rounded-xl">
-      <p className="text-xs font-semibold text-gray-700">Descreva o clima do seu evento</p>
-      <textarea
-        value={prompt}
-        onChange={e => setPrompt(e.target.value)}
-        placeholder="Ex: churrasco de fim de tarde na laje, galera reunida, luz dourada do pôr do sol"
-        rows={3}
-        disabled={generating}
-        className="w-full bg-white border border-gray-300 rounded-xl px-3 py-2 text-gray-900 placeholder-gray-400 outline-none focus:border-brand text-sm resize-none"
-      />
       <div className="space-y-1.5">
-        <p className="text-[11px] font-semibold text-gray-500">Foto de referência (opcional)</p>
+        <p className="text-xs font-semibold text-gray-700">Foto de referência</p>
         <label className="flex items-start gap-2 text-xs text-gray-600 cursor-pointer">
           <input
             type="radio"
@@ -208,7 +204,7 @@ export default function AiImageGenerate({ editToken, title, credits, hasAvatar, 
               disabled={generating}
               className="mt-0.5 w-3.5 h-3.5 flex-shrink-0 accent-brand"
             />
-            <span>Minha foto de perfil (vira uma ilustração parecida comigo)</span>
+            <span>Minha foto de perfil (vira uma ilustração parecida comigo, na cena descrita)</span>
           </label>
         )}
         <label className="flex items-start gap-2 text-xs text-gray-600 cursor-pointer">
@@ -220,7 +216,7 @@ export default function AiImageGenerate({ editToken, title, credits, hasAvatar, 
             disabled={generating}
             className="mt-0.5 w-3.5 h-3.5 flex-shrink-0 accent-brand"
           />
-          <span>Enviar uma foto (do local, do grupo etc.) — a IA usa como base</span>
+          <span>Enviar uma foto (do local, do grupo etc.) — transforma ela numa pintura</span>
         </label>
         {refMode === 'upload' && (
           <div className="pl-6 flex items-center gap-2">
@@ -239,6 +235,33 @@ export default function AiImageGenerate({ editToken, title, credits, hasAvatar, 
           </div>
         )}
       </div>
+
+      {refMode === 'upload' ? (
+        <div className="space-y-1">
+          <p className="text-xs font-semibold text-gray-700">Instrução extra (opcional)</p>
+          <textarea
+            value={prompt}
+            onChange={e => setPrompt(e.target.value)}
+            placeholder="Ex: adicione uma faixa de festa, deixe o clima mais noturno..."
+            rows={2}
+            disabled={generating}
+            className="w-full bg-white border border-gray-300 rounded-xl px-3 py-2 text-gray-900 placeholder-gray-400 outline-none focus:border-brand text-sm resize-none"
+          />
+        </div>
+      ) : (
+        <div className="space-y-1">
+          <p className="text-xs font-semibold text-gray-700">Descreva o clima do seu evento</p>
+          <textarea
+            value={prompt}
+            onChange={e => setPrompt(e.target.value)}
+            placeholder="Ex: churrasco de fim de tarde na laje, galera reunida, luz dourada do pôr do sol"
+            rows={3}
+            disabled={generating}
+            className="w-full bg-white border border-gray-300 rounded-xl px-3 py-2 text-gray-900 placeholder-gray-400 outline-none focus:border-brand text-sm resize-none"
+          />
+        </div>
+      )}
+
       {msg && <p className="text-xs text-red-500">{msg}</p>}
       <div className="flex gap-2">
         <button
@@ -255,7 +278,9 @@ export default function AiImageGenerate({ editToken, title, credits, hasAvatar, 
           disabled={generating}
           className="flex-1 py-2 rounded-lg bg-brand hover:bg-brand-dark disabled:opacity-50 text-white font-bold text-xs uppercase tracking-wide"
         >
-          {generating ? 'Gerando… (~15s)' : `Gerar (${COST} créditos)`}
+          {generating
+            ? 'Gerando… (~15s)'
+            : refMode === 'upload' ? `Transformar em pintura (${COST} créditos)` : `Gerar (${COST} créditos)`}
         </button>
       </div>
     </div>
