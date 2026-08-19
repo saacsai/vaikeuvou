@@ -53,7 +53,7 @@ export async function POST(req: NextRequest) {
     // usa o avatar dela como referência e vira uma caricatura (mesmo
     // espírito da capa do "18 anos depois") em vez de uma cena genérica.
     let imagePrompt: string | { images: Uint8Array[]; text: string } =
-      `Crie uma imagem de banner para a capa de um convite de evento chamado "${eventTitle}". ${prompt.trim()}. Estilo: ilustração digital vibrante, traço desenhado à mão, não fotorrealista, cores quentes, clima animado, formato paisagem, sem nenhum texto, letra ou palavra escrita na imagem.`
+      `Crie uma imagem de banner para a capa de um convite de evento chamado "${eventTitle}". ${prompt.trim()}. Estilo: ilustração vetorial plana (flat illustration), traço de cartoon editorial, cores chapadas e vibrantes, contornos definidos, SEM textura de foto, SEM iluminação fotorrealista, SEM pele ou materiais realistas — como uma ilustração de revista ou app, nunca uma fotografia. Formato paisagem, sem nenhum texto, letra ou palavra escrita na imagem.`
 
     if (includeAvatar && session.users.avatar_url) {
       const avatarRes = await fetch(session.users.avatar_url)
@@ -61,7 +61,7 @@ export async function POST(req: NextRequest) {
         const avatarBytes = new Uint8Array(await avatarRes.arrayBuffer())
         imagePrompt = {
           images: [avatarBytes],
-          text: `Transforme a pessoa desta foto numa ilustração estilo caricatura semi-realista, traço de ilustração digital vibrante, mantendo a semelhança do rosto. Cenário: banner de capa para um convite de evento chamado "${eventTitle}". ${prompt.trim()}. Formato paisagem, sem nenhum texto, letra ou palavra escrita na imagem.`,
+          text: `Transforme a pessoa desta foto numa ilustração vetorial plana (flat illustration), traço de cartoon editorial, cores chapadas, contornos definidos, mantendo a semelhança do rosto — SEM textura de foto, SEM iluminação fotorrealista, SEM pele realista, nunca parecendo uma fotografia. Cenário: banner de capa para um convite de evento chamado "${eventTitle}". ${prompt.trim()}. Formato paisagem, sem nenhum texto, letra ou palavra escrita na imagem.`,
         }
       }
     }
