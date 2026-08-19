@@ -78,9 +78,17 @@ export async function POST(req: NextRequest) {
       // sai quase igual à foto original, tipo um filtro leve, principalmente
       // em cenas cheias de detalhe repetitivo (banca de feira lotada etc.).
       // Precisa insistir bastante que é repintura completa, não filtro.
+      // Mas repintar forte demais também derrapa na identidade de quem
+      // está na foto — por isso a fidelidade do rosto é instrução à parte,
+      // mais rígida que o resto da cena (validado visualmente: sem essa
+      // separação, o rosto saía parecido mas não reconhecível de verdade).
       imagePrompt = {
         images: [referenceBytes],
-        text: `Reimagine esta cena inteira como uma ${ESTILO} — NÃO é um filtro sobre a foto, é uma REPINTURA COMPLETA do zero. Simplifique os detalhes pequenos e repetitivos (não precisa pintar cada folha ou cada objeto individualmente — agrupe formas e cores em pinceladas maiores, como um pintor faria de longe), com pinceladas visíveis e contraste de luz forte. O resultado deve parecer óbvio e imediatamente uma ilustração pintada — se alguém olhar rápido, tem que perceber que é arte, não foto. Mantenha reconhecível o rosto das pessoas e a composição geral da cena original. Cenário: banner de capa para um convite de evento chamado "${eventTitle}". ${prompt.trim()}. Formato paisagem, sem nenhum texto, letra ou palavra escrita na imagem.`,
+        text: `Reimagine o AMBIENTE, o cenário e os objetos desta imagem como uma ${ESTILO} — REPINTURA COMPLETA do fundo, não um filtro. Simplifique detalhes pequenos e repetitivos do cenário em pinceladas maiores (não precisa pintar cada folha ou cada objeto individualmente).
+
+Mas o ROSTO de cada pessoa em primeiro plano é a parte mais importante: precisa manter MÁXIMA fidelidade às feições reais — mesmo formato de rosto, mesma testa, olhos, sobrancelhas, nariz, boca, barba/bigode, e qualquer marca distintiva da pele (pintas, sinais, rugas características) exatamente como na foto original. Aplique a mesma técnica de pintura no rosto (sombreamento suave, pincelada), mas SEM alterar a identidade — alguém que conhece essa pessoa precisa reconhecê-la instantaneamente, como um retrato pintado ao vivo dela, não uma pessoa parecida.
+
+O resultado deve parecer óbvio e imediatamente uma ilustração pintada, nunca uma foto com filtro. Cenário: banner de capa para um convite de evento chamado "${eventTitle}". ${prompt.trim()}. Formato paisagem, sem nenhum texto, letra ou palavra escrita na imagem.`,
       }
     }
 
