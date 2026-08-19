@@ -74,9 +74,13 @@ export async function POST(req: NextRequest) {
     }
 
     if (referenceBytes) {
+      // Com foto de referência o modelo tende a ser conservador demais —
+      // sai quase igual à foto original, tipo um filtro leve, principalmente
+      // em cenas cheias de detalhe repetitivo (banca de feira lotada etc.).
+      // Precisa insistir bastante que é repintura completa, não filtro.
       imagePrompt = {
         images: [referenceBytes],
-        text: `Transforme esta foto de referência numa ${ESTILO}, mantendo reconhecíveis os rostos das pessoas e o ambiente/local da imagem original. Cenário: banner de capa para um convite de evento chamado "${eventTitle}". ${prompt.trim()}. Formato paisagem, sem nenhum texto, letra ou palavra escrita na imagem.`,
+        text: `Reimagine esta cena inteira como uma ${ESTILO} — NÃO é um filtro sobre a foto, é uma REPINTURA COMPLETA do zero. Simplifique os detalhes pequenos e repetitivos (não precisa pintar cada folha ou cada objeto individualmente — agrupe formas e cores em pinceladas maiores, como um pintor faria de longe), com pinceladas visíveis e contraste de luz forte. O resultado deve parecer óbvio e imediatamente uma ilustração pintada — se alguém olhar rápido, tem que perceber que é arte, não foto. Mantenha reconhecível o rosto das pessoas e a composição geral da cena original. Cenário: banner de capa para um convite de evento chamado "${eventTitle}". ${prompt.trim()}. Formato paisagem, sem nenhum texto, letra ou palavra escrita na imagem.`,
       }
     }
 
