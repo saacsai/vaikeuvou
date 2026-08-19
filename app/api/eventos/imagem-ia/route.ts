@@ -10,7 +10,7 @@ export async function POST(req: NextRequest) {
   const session = await getSession()
   if (!session) return NextResponse.json({ error: 'Não autenticado.' }, { status: 401 })
 
-  const { edit_token, title, prompt, includeAvatar } = await req.json()
+  const { edit_token, title, prompt, includeAvatar, referenceImage } = await req.json()
   if (!prompt?.trim()) {
     return NextResponse.json({ error: 'Dados incompletos.' }, { status: 400 })
   }
@@ -47,22 +47,36 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    // Sempre ilustração desenhada, nunca tentando parecer foto real — é o
-    // estilo fotorrealista de IA que fica com a "cara de IA" (pele lisa
-    // demais, luz artificial, composição esquisita). Se a pessoa pediu,
-    // usa o avatar dela como referência e vira uma caricatura (mesmo
-    // espírito da capa do "18 anos depois") em vez de uma cena genérica.
-    let imagePrompt: string | { images: Uint8Array[]; text: string } =
-      `Crie uma imagem de banner para a capa de um convite de evento chamado "${eventTitle}". ${prompt.trim()}. Estilo: ilustração vetorial plana (flat illustration), traço de cartoon editorial, cores chapadas e vibrantes, contornos definidos, SEM textura de foto, SEM iluminação fotorrealista, SEM pele ou materiais realistas — como uma ilustração de revista ou app, nunca uma fotografia. Formato paisagem, sem nenhum texto, letra ou palavra escrita na imagem.`
+    // Estilo padrão: pintura digital semi-realista, nem foto (fica com
+    // "cara de IA": pele lisa demais, luz artificial) nem cartoon de cores
+    // chapadas (perde o clima real da cena) — meio-termo validado visualmente
+    // com o Luciano, mesmo espírito da capa do "18 anos depois".
+    const ESTILO = 'pintura digital semi-realista (digital illustration / concept art), com sombreamento suave, volume e profundidade, textura pintada à mão. NÃO é fotografia (sem textura de câmera real), mas também NÃO é desenho animado de cores chapadas com contornos grossos tipo cartoon infantil — é uma ilustração editorial realista, como capa de revista, com luz e sombra naturais porém claramente pintada à mão'
 
-    if (includeAvatar && session.users.avatar_url) {
+    let imagePrompt: string | { images: Uint8Array[]; text: string } =
+      `Crie uma imagem de banner para a capa de um convite de evento chamado "${eventTitle}". ${prompt.trim()}. Estilo: ${ESTILO}. Formato paisagem, sem nenhum texto, letra ou palavra escrita na imagem.`
+
+    // Referência opcional pra ancorar a geração em algo real — o avatar do
+    // perfil ou uma foto que a pessoa envie na hora (do local, do grupo
+    // etc.), em vez de uma cena inteiramente inventada. Upload próprio tem
+    // prioridade se os dois vierem juntos.
+    let referenceBytes: Uint8Array | null = null
+
+    if (typeof referenceImage === 'string') {
+      const match = /^data:image\/[a-zA-Z+.-]+;base64,(.+)$/.exec(referenceImage)
+      if (match) {
+        const buf = Buffer.from(match[1], 'base64')
+        if (buf.byteLength <= 8 * 1024 * 1024) referenceBytes = new Uint8Array(buf)
+      }
+    } else if (includeAvatar && session.users.avatar_url) {
       const avatarRes = await fetch(session.users.avatar_url)
-      if (avatarRes.ok) {
-        const avatarBytes = new Uint8Array(await avatarRes.arrayBuffer())
-        imagePrompt = {
-          images: [avatarBytes],
-          text: `Transforme a pessoa desta foto numa ilustração vetorial plana (flat illustration), traço de cartoon editorial, cores chapadas, contornos definidos, mantendo a semelhança do rosto — SEM textura de foto, SEM iluminação fotorrealista, SEM pele realista, nunca parecendo uma fotografia. Cenário: banner de capa para um convite de evento chamado "${eventTitle}". ${prompt.trim()}. Formato paisagem, sem nenhum texto, letra ou palavra escrita na imagem.`,
-        }
+      if (avatarRes.ok) referenceBytes = new Uint8Array(await avatarRes.arrayBuffer())
+    }
+
+    if (referenceBytes) {
+      imagePrompt = {
+        images: [referenceBytes],
+        text: `Transforme esta foto de referência numa ${ESTILO}, mantendo reconhecíveis os rostos das pessoas e o ambiente/local da imagem original. Cenário: banner de capa para um convite de evento chamado "${eventTitle}". ${prompt.trim()}. Formato paisagem, sem nenhum texto, letra ou palavra escrita na imagem.`,
       }
     }
 

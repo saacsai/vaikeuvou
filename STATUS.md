@@ -2,6 +2,34 @@
 
 Última atualização: 2026-08-19
 
+## Sessão 2026-08-19 (parte 2) — foto de referência (upload) + estilo pintura digital semi-realista
+
+Depois de testar em produção, o estilo "ilustração vetorial plana" da
+parte 1 ficou cartoon demais (Luciano: "ficou desenho total"). Recalibrado
+pra **pintura digital semi-realista** — sombreamento e profundidade,
+claramente ilustrada mas sem virar cartoon de contorno grosso nem foto
+real. Validado visualmente contra a referência real (`historia-hero.jpg`,
+capa do "18 anos depois") antes de subir.
+
+Também adicionada a opção de **enviar uma foto de referência** (do
+local, de um grupo etc.), não só o avatar do perfil — pedido do
+Luciano depois de eu confirmar por teste que o Gemini **não busca foto
+real na web** sozinho (testei citando "Ceagesp": ele simula/inventa uma
+cena genérica de mercado, não a arquitetura real do lugar). Testei
+image-to-image com uma foto real do Ceagesp (Wikimedia, licença livre)
+e com uma foto de grupo (6 pessoas) — os dois casos ficaram bem
+reconhecíveis no estilo novo. Decisão explícita: **não** construir
+busca automática de imagem na web (a maioria das fotos encontradas
+numa busca comum não tem licença livre — risco de direito autoral pra
+um produto comercial); construída a opção de upload de foto
+própria em vez disso (`components/AiImageGenerate.tsx` ganhou um
+seletor com 3 opções: nenhuma / avatar do perfil / enviar foto agora —
+convertida pra base64 no cliente, decodificada no servidor). Testado
+ponta a ponta pela rota real (gerar → aprovar → `bg_image_url`
+atualizado → crédito debitado) com a conta real do Luciano.
+
+---
+
 ## Sessão 2026-08-19 — aprovar/recusar imagem por IA, liberar no /criar, estilo ilustração, gate de data só no dia
 
 Quatro ajustes pedidos ao vivo testando o produto de verdade pra um

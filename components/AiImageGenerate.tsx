@@ -16,26 +16,49 @@ type Props = {
 }
 
 type Stage = 'idle' | 'confirm' | 'prompt' | 'preview'
+type RefMode = 'none' | 'avatar' | 'upload'
+
+function fileToDataUrl(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader()
+    reader.onload = () => resolve(reader.result as string)
+    reader.onerror = reject
+    reader.readAsDataURL(file)
+  })
+}
 
 export default function AiImageGenerate({ editToken, title, credits, hasAvatar, onUploaded }: Props) {
   const [stage,         setStage]         = useState<Stage>('idle')
   const [prompt,        setPrompt]        = useState('')
-  const [includeAvatar, setIncludeAvatar] = useState(false)
+  const [refMode,       setRefMode]       = useState<RefMode>('none')
+  const [refFile,       setRefFile]       = useState<File | null>(null)
+  const [refPreview,    setRefPreview]    = useState('')
   const [generating,    setGenerating]    = useState(false)
   const [resolving,     setResolving]     = useState(false)
   const [msg,           setMsg]           = useState('')
   const [previewUrl,    setPreviewUrl]    = useState('')
   const [generationId,  setGenerationId]  = useState('')
 
+  function onRefFile(file: File | null) {
+    setRefFile(file)
+    setRefPreview(file ? URL.createObjectURL(file) : '')
+  }
+
   async function gerar() {
     if (!prompt.trim()) { setMsg('Descreva o clima do seu evento.'); return }
     setGenerating(true)
     setMsg('')
 
+    const referenceImage = refMode === 'upload' && refFile ? await fileToDataUrl(refFile) : undefined
+
     const res  = await fetch('/api/eventos/imagem-ia', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ edit_token: editToken, title, prompt, includeAvatar }),
+      body: JSON.stringify({
+        edit_token: editToken, title, prompt,
+        includeAvatar: refMode === 'avatar',
+        referenceImage,
+      }),
     })
     const json = await res.json()
 
@@ -67,6 +90,8 @@ export default function AiImageGenerate({ editToken, title, credits, hasAvatar, 
     onUploaded(previewUrl, COST)
     setStage('idle')
     setPrompt('')
+    setRefMode('none')
+    onRefFile(null)
     setPreviewUrl('')
     setGenerationId('')
     setResolving(false)
@@ -160,23 +185,65 @@ export default function AiImageGenerate({ editToken, title, credits, hasAvatar, 
         disabled={generating}
         className="w-full bg-white border border-gray-300 rounded-xl px-3 py-2 text-gray-900 placeholder-gray-400 outline-none focus:border-brand text-sm resize-none"
       />
-      {hasAvatar && (
+      <div className="space-y-1.5">
+        <p className="text-[11px] font-semibold text-gray-500">Foto de referência (opcional)</p>
         <label className="flex items-start gap-2 text-xs text-gray-600 cursor-pointer">
           <input
-            type="checkbox"
-            checked={includeAvatar}
-            onChange={e => setIncludeAvatar(e.target.checked)}
+            type="radio"
+            name="refMode"
+            checked={refMode === 'none'}
+            onChange={() => { setRefMode('none'); onRefFile(null) }}
             disabled={generating}
             className="mt-0.5 w-3.5 h-3.5 flex-shrink-0 accent-brand"
           />
-          <span>Incluir minha foto (vira uma ilustração estilo caricatura, tipo a capa do &ldquo;18 anos depois&rdquo;)</span>
+          <span>Nenhuma — a IA inventa a cena a partir da descrição</span>
         </label>
-      )}
+        {hasAvatar && (
+          <label className="flex items-start gap-2 text-xs text-gray-600 cursor-pointer">
+            <input
+              type="radio"
+              name="refMode"
+              checked={refMode === 'avatar'}
+              onChange={() => { setRefMode('avatar'); onRefFile(null) }}
+              disabled={generating}
+              className="mt-0.5 w-3.5 h-3.5 flex-shrink-0 accent-brand"
+            />
+            <span>Minha foto de perfil (vira uma ilustração parecida comigo)</span>
+          </label>
+        )}
+        <label className="flex items-start gap-2 text-xs text-gray-600 cursor-pointer">
+          <input
+            type="radio"
+            name="refMode"
+            checked={refMode === 'upload'}
+            onChange={() => setRefMode('upload')}
+            disabled={generating}
+            className="mt-0.5 w-3.5 h-3.5 flex-shrink-0 accent-brand"
+          />
+          <span>Enviar uma foto (do local, do grupo etc.) — a IA usa como base</span>
+        </label>
+        {refMode === 'upload' && (
+          <div className="pl-6 flex items-center gap-2">
+            <input
+              type="file"
+              accept="image/*"
+              onChange={e => onRefFile(e.target.files?.[0] ?? null)}
+              disabled={generating}
+              className="text-xs text-gray-500 file:mr-2 file:py-1 file:px-2 file:rounded-md file:border-0 file:bg-amber-100 file:text-amber-700 file:text-xs file:font-semibold"
+            />
+            {refPreview && (
+              <div className="relative w-10 h-10 rounded-md overflow-hidden border border-amber-300 flex-shrink-0">
+                <Image src={refPreview} alt="Foto enviada" fill unoptimized className="object-cover" />
+              </div>
+            )}
+          </div>
+        )}
+      </div>
       {msg && <p className="text-xs text-red-500">{msg}</p>}
       <div className="flex gap-2">
         <button
           type="button"
-          onClick={() => { setStage('idle'); setPrompt(''); setMsg('') }}
+          onClick={() => { setStage('idle'); setPrompt(''); setRefMode('none'); onRefFile(null); setMsg('') }}
           disabled={generating}
           className="flex-1 py-2 rounded-lg bg-white border border-gray-200 text-gray-600 font-semibold text-xs uppercase tracking-wide hover:bg-gray-50 disabled:opacity-50"
         >
