@@ -304,6 +304,12 @@ export default function EventoClient({ evento, rsvps, parentRsvpId, criador }: P
               </a>
             )}
           </div>
+
+          <div className="mt-4 pt-4 border-t border-gray-100 text-center">
+            <a href={base} className="text-[11px] text-gray-300 hover:text-gray-400 transition-colors">
+              Crie seu convite grátis em vaikeuvou.app
+            </a>
+          </div>
         </div>
       </div>
     </div>
