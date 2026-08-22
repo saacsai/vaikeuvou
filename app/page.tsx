@@ -15,7 +15,7 @@ export default async function Home() {
         </div>
       )}
 
-      <div className="flex-1 flex flex-col items-center px-5 pt-[60px] md:pt-0 md:justify-center text-center">
+      <div className="flex-1 flex flex-col items-center justify-center px-5 text-center">
 
         {/* Marca — ícone + wordmark + "Vamo aí?" já vêm com espaçamento definido nessa peça */}
         <Image
@@ -23,7 +23,7 @@ export default async function Home() {
           alt="vaikeuvou — Vamo aí?"
           width={911}
           height={670}
-          className="w-[220px] md:w-[250px] h-auto mb-6 md:mb-[42px]"
+          className="w-[220px] md:w-[250px] h-auto mb-10 md:mb-[42px]"
           priority
         />
 
@@ -37,7 +37,7 @@ export default async function Home() {
           Eu vou. Bora?
         </p>
 
-        <p className="w-full max-w-md text-[14.7px] md:text-[16.7px] font-semibold mb-6 md:mb-[36px]">
+        <p className="w-full max-w-md text-[14.7px] md:text-[16.7px] font-semibold mb-10 md:mb-[36px]">
           Convide. Confirme quem vai. Veja quem foi.
         </p>
 
