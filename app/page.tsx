@@ -34,7 +34,7 @@ export default async function Home() {
           Não saber quem vai? Piorou.
         </p>
         <p className="w-full max-w-md text-gray-400 text-[14.7px] md:text-[16.7px] mb-6 md:mb-[36px] leading-snug">
-          Eu vou. Vamos?
+          Eu vou. Bora?
         </p>
 
         <p className="w-full max-w-md text-[14.7px] md:text-[16.7px] font-semibold mb-6 md:mb-[36px]">
