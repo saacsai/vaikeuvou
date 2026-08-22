@@ -27,18 +27,18 @@ export default async function Home() {
           priority
         />
 
-        <p className="w-full max-w-md text-gray-400 text-[14.7px] md:text-[16.7px] mb-3 md:mb-[24px] leading-snug">
-          Balada, festa, show, academia, correr, caminhar, surfar, andar de bike, bater uma
-          bola, viajar, restaurante, pizza, boteco, cinema, teatro, churrasco, tomar uma,
-          trocar ideia&hellip;
+        <p className="w-full max-w-md text-gray-400 text-[14.7px] md:text-[16.7px] mb-2 leading-snug">
+          Evento vazio? Sem chance.
         </p>
-        <p className="w-full max-w-md text-gray-400 text-[14.7px] md:text-[16.7px] mb-6 md:mb-[40px] leading-snug">
-          Fazer tudo isso é muito legal! Mas, fala a verdade, junto com a galera, junto com
-          os amigos, é muito melhor!
+        <p className="w-full max-w-md text-gray-400 text-[14.7px] md:text-[16.7px] mb-2 leading-snug">
+          Não saber quem vai? Piorou.
+        </p>
+        <p className="w-full max-w-md text-gray-400 text-[14.7px] md:text-[16.7px] mb-6 md:mb-[36px] leading-snug">
+          Eu vou. Vamos?
         </p>
 
         <p className="w-full max-w-md text-[14.7px] md:text-[16.7px] font-semibold mb-6 md:mb-[36px]">
-          Crie. Convide. Compartilhe. Confirme quem vai.
+          Convide. Confirme quem vai. Veja quem foi.
         </p>
 
         <Link
