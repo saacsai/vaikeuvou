@@ -259,7 +259,7 @@ export default function EventoClient({ evento, rsvps, parentRsvpId, criador, ses
 
               {podeConvidar && (
                 <div className="bg-gray-50 rounded-2xl p-5 text-left space-y-3">
-                  <p className="font-bold text-gray-900 text-sm">Chama sua galera também 👇</p>
+                  <p className="font-bold text-gray-900 text-sm">Convide seus amigos e contatos também 👇</p>
                   <div className="flex gap-2">
                     <input
                       readOnly
