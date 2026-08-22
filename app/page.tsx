@@ -28,10 +28,10 @@ export default async function Home() {
         />
 
         <p className="w-full max-w-md text-gray-400 text-[14.7px] md:text-[16.7px] mb-2 leading-snug">
-          Evento vazio? Sem chance.
+          Evento vazio. Sem chance.
         </p>
         <p className="w-full max-w-md text-gray-400 text-[14.7px] md:text-[16.7px] mb-2 leading-snug">
-          Não saber quem vai? Piorou.
+          Não saber quem vai. Piorou.
         </p>
         <p className="w-full max-w-md text-gray-400 text-[14.7px] md:text-[16.7px] mb-6 md:mb-[36px] leading-snug">
           Eu vou. Bora?
