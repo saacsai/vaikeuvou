@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getSupabaseAdmin } from '@/lib/supabase'
-import { fmtPhone } from '@/lib/slug'
+import { normalizePhone } from '@/lib/auth'
 
 export async function POST(req: NextRequest) {
   const { event_id, user_name, user_phone, parent_rsvp_id } = await req.json()
@@ -9,8 +9,8 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'event_id, nome e telefone são obrigatórios' }, { status: 400 })
   }
 
-  const phone = fmtPhone(user_phone)
-  if (phone.length < 10) {
+  const phone = normalizePhone(user_phone)
+  if (phone.length < 12 || phone.length > 13) {
     return NextResponse.json({ error: 'Telefone inválido' }, { status: 400 })
   }
 

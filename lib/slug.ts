@@ -16,10 +16,6 @@ export function generateSlug(title: string): string {
   return `${slugify(title)}-${nanoid(5)}`
 }
 
-export function fmtPhone(raw: string): string {
-  return raw.replace(/\D/g, '')
-}
-
 export function fmtDate(iso: string): string {
   const d = new Date(iso)
   return d.toLocaleDateString('pt-BR', {
