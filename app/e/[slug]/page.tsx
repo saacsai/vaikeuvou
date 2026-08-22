@@ -1,5 +1,6 @@
 import { getSupabase, getSupabaseAdmin } from '@/lib/supabase'
 import { titleToHeader } from '@/lib/headers'
+import { getSession } from '@/lib/auth'
 import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
 import EventoClient from './EventoClient'
@@ -48,6 +49,7 @@ export default async function EventoPage({ params, searchParams }: Props) {
   const { ref }  = await searchParams
   const sb       = getSupabase()
   const sbAdmin  = getSupabaseAdmin()
+  const session  = await getSession()
 
   const { data: evento } = await sb
     .from('events')
@@ -80,6 +82,7 @@ export default async function EventoPage({ params, searchParams }: Props) {
       rsvps={rsvps ?? []}
       parentRsvpId={ref ?? null}
       criador={criador}
+      sessionUser={session ? { name: session.users.name ?? '', phone: session.users.phone } : null}
     />
   )
 }

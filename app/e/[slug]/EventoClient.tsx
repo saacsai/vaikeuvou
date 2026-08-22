@@ -13,6 +13,7 @@ type Props = {
   rsvps: Pick<Rsvp, 'id' | 'user_name' | 'depth_level' | 'created_at'>[]
   parentRsvpId: string | null
   criador: Criador | null
+  sessionUser: { name: string; phone: string } | null
 }
 
 function getVideoEmbed(url: string): string | null {
@@ -23,10 +24,10 @@ function getVideoEmbed(url: string): string | null {
   return null
 }
 
-export default function EventoClient({ evento, rsvps, parentRsvpId, criador }: Props) {
+export default function EventoClient({ evento, rsvps, parentRsvpId, criador, sessionUser }: Props) {
   const [etapa,    setEtapa]    = useState<'convite' | 'form' | 'sucesso'>('convite')
-  const [nome,     setNome]     = useState('')
-  const [telefone, setTelefone] = useState('')
+  const [nome,     setNome]     = useState(sessionUser?.name ?? '')
+  const [telefone, setTelefone] = useState(sessionUser?.phone ?? '')
   const [saving,   setSaving]   = useState(false)
   const [erro,     setErro]     = useState('')
   const [meuRsvpId, setMeuRsvpId] = useState('')
@@ -178,12 +179,20 @@ export default function EventoClient({ evento, rsvps, parentRsvpId, criador }: P
             <div className="space-y-3">
               <p className="text-gray-900 font-semibold text-[23px]">Vamo aí?</p>
               <button
-                onClick={() => setEtapa('form')}
-                className="w-full py-4 rounded-lg bg-brand hover:bg-brand-dark transition-colors shadow-lg shadow-brand/20 flex items-center justify-center gap-[5px]"
+                onClick={() => sessionUser?.name ? confirmar() : setEtapa('form')}
+                disabled={saving}
+                className="w-full py-4 rounded-lg bg-brand hover:bg-brand-dark disabled:opacity-50 transition-colors shadow-lg shadow-brand/20 flex items-center justify-center gap-[5px]"
               >
-                <span className="text-white font-bold text-2xl uppercase tracking-wide">BORA</span>
-                <Image src="/icone_bora.png" alt="" width={474} height={537} className="h-8 w-auto" />
+                {saving ? (
+                  <span className="text-white font-bold text-2xl uppercase tracking-wide">Confirmando…</span>
+                ) : (
+                  <>
+                    <span className="text-white font-bold text-2xl uppercase tracking-wide">BORA</span>
+                    <Image src="/icone_bora.png" alt="" width={474} height={537} className="h-8 w-auto" />
+                  </>
+                )}
               </button>
+              {erro && <p className="text-red-500 text-sm">{erro}</p>}
             </div>
           )}
 
