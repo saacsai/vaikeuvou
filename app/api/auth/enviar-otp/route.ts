@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getSupabaseAdmin } from '@/lib/supabase'
 import { normalizePhone } from '@/lib/auth'
+import { enviarWhatsapp } from '@/lib/evolution'
 
 export async function POST(req: NextRequest) {
   const { phone } = await req.json()
@@ -28,23 +29,9 @@ export async function POST(req: NextRequest) {
 
   await sb.from('otp_codes').insert({ phone: normalized, code, expires_at: expires })
 
-  // Enviar via Evolution API
-  const evoUrl  = process.env.EVOLUTION_API_URL!
-  const evoKey  = process.env.EVOLUTION_API_KEY!
-  const evoInst = process.env.EVOLUTION_INSTANCE!
-
-  const evoRes = await fetch(`${evoUrl}/message/sendText/${evoInst}`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', apikey: evoKey },
-    body: JSON.stringify({
-      number: normalized,
-      text: `Seu código vaikeuvou.app: *${code}*\nVálido por 5 minutos.`,
-    }),
-  })
-
-  if (!evoRes.ok) {
-    const err = await evoRes.text()
-    console.error('Evolution error:', err)
+  const envio = await enviarWhatsapp(normalized, `Seu código vaikeuvou.app: *${code}*\nVálido por 5 minutos.`)
+  if (!envio.ok) {
+    console.error('Evolution error:', envio.error)
     return NextResponse.json({ error: 'Erro ao enviar WhatsApp. Tente novamente.' }, { status: 502 })
   }
 

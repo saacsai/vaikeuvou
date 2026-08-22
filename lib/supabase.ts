@@ -31,6 +31,9 @@ export type Event = {
   user_id: string | null
   guest_list_unlocked_at: string | null
   date_changes_count: number
+  lat: number | null
+  lng: number | null
+  checkin_reminder_sent_at: string | null
 }
 
 export type Rsvp = {
@@ -41,4 +44,8 @@ export type Rsvp = {
   parent_rsvp_id: string | null
   depth_level: number
   created_at: string
+  checked_in_at: string | null
+  checkin_lat: number | null
+  checkin_lng: number | null
+  checkin_verified: boolean
 }

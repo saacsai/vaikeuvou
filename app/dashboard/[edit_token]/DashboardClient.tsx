@@ -580,7 +580,14 @@ export default function DashboardClient({ evento, rsvps, isNovo, userName, userA
         {rsvps.length > 0 && (
           unlocked ? (
             <div className="bg-white border border-gray-100 rounded-xl p-4 shadow-sm">
-              <p className="text-xs font-bold text-gray-400 uppercase tracking-wide mb-3">Confirmados</p>
+              <div className="flex items-center justify-between mb-3">
+                <p className="text-xs font-bold text-gray-400 uppercase tracking-wide">Confirmados</p>
+                {isPast && (
+                  <p className="text-xs font-semibold text-gray-500">
+                    {rsvps.length} confirmaram · {rsvps.filter(r => r.checked_in_at).length} foram
+                  </p>
+                )}
+              </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
                 {rsvps.map(r => (
                   <div key={r.id} className="flex items-center justify-between py-2 px-3 rounded-lg bg-gray-50">
@@ -595,13 +602,25 @@ export default function DashboardClient({ evento, rsvps, isNovo, userName, userA
                         </p>
                       </div>
                     </div>
-                    <span className={`text-xs font-bold px-2 py-0.5 rounded-full flex-shrink-0 ${
-                      r.depth_level === 1 ? 'bg-blue-50 text-blue-600' :
-                      r.depth_level === 2 ? 'bg-pink-50 text-pink-600' :
-                      'bg-orange-50 text-orange-600'
-                    }`}>
-                      Nível {r.depth_level}
-                    </span>
+                    <div className="flex items-center gap-1.5 flex-shrink-0">
+                      {isPast && r.checked_in_at && (
+                        <span
+                          title={r.checkin_verified ? 'Presença verificada por localização' : 'Confirmou que foi'}
+                          className={`text-xs font-bold px-2 py-0.5 rounded-full ${
+                            r.checkin_verified ? 'bg-green-50 text-green-600' : 'bg-gray-100 text-gray-500'
+                          }`}
+                        >
+                          {r.checkin_verified ? '✓✓ foi' : '✓ foi'}
+                        </span>
+                      )}
+                      <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${
+                        r.depth_level === 1 ? 'bg-blue-50 text-blue-600' :
+                        r.depth_level === 2 ? 'bg-pink-50 text-pink-600' :
+                        'bg-orange-50 text-orange-600'
+                      }`}>
+                        Nível {r.depth_level}
+                      </span>
+                    </div>
                   </div>
                 ))}
               </div>

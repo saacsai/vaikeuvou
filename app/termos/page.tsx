@@ -13,7 +13,7 @@ export default async function TermosPage() {
     >
       <div className="max-w-2xl mx-auto space-y-8 text-sm text-gray-600 leading-relaxed pb-6">
 
-        <p className="text-xs text-gray-400">Última atualização: 17 de agosto de 2026</p>
+        <p className="text-xs text-gray-400">Última atualização: 22 de agosto de 2026</p>
 
         <p>
           Estes Termos de Uso regulam o uso do vaikeuvou.app (&ldquo;vaikeuvou&rdquo;, &ldquo;nós&rdquo;),
@@ -52,7 +52,10 @@ export default async function TermosPage() {
             uma conta, serve só pra identificar sua confirmação pro anfitrião e evitar
             confirmações duplicadas ou falsas. Dependendo da configuração de privacidade
             escolhida pelo anfitrião, você também pode convidar outras pessoas a partir do
-            seu convite confirmado.
+            seu convite confirmado. Depois do evento, você pode receber um lembrete por
+            WhatsApp pra confirmar se foi de verdade (&quot;Eu fui&quot;) — essa confirmação é sempre
+            um clique só, nunca obrigatória, e compartilhar sua localização nesse momento é
+            opcional.
           </p>
         </section>
 

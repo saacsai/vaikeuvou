@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getSupabaseAdmin } from '@/lib/supabase'
+import { enviarWhatsapp } from '@/lib/evolution'
 
 const COOLDOWN_MS = 24 * 60 * 60 * 1000
 
@@ -45,15 +46,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ ok: true, skipped: 'cooldown' })
   }
 
-  const evoUrl  = process.env.EVOLUTION_API_URL!
-  const evoKey  = process.env.EVOLUTION_API_KEY!
-  const evoInst = process.env.EVOLUTION_INSTANCE!
-
-  await fetch(`${evoUrl}/message/sendText/${evoInst}`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', apikey: evoKey },
-    body: JSON.stringify({ number: phone, text: AUTOREPLY_TEXT }),
-  })
+  await enviarWhatsapp(phone, AUTOREPLY_TEXT)
 
   await sb.from('whatsapp_autoreplies').upsert({ phone, last_sent_at: new Date().toISOString() })
 

@@ -13,7 +13,7 @@ export default async function PrivacidadePage() {
     >
       <div className="max-w-2xl mx-auto space-y-8 text-sm text-gray-600 leading-relaxed pb-6">
 
-        <p className="text-xs text-gray-400">Última atualização: 17 de agosto de 2026</p>
+        <p className="text-xs text-gray-400">Última atualização: 22 de agosto de 2026</p>
 
         <p>
           Esta Política de Privacidade explica quais dados o vaikeuvou.app coleta, pra que
@@ -42,7 +42,8 @@ export default async function PrivacidadePage() {
           <p><strong className="text-gray-800">De quem confirma presença (convidado):</strong></p>
           <ul className="list-disc list-inside space-y-1 ml-1">
             <li>Nome e número de WhatsApp informados na hora de confirmar — não cria uma conta;</li>
-            <li>Quem convidou quem, quando a estrutura de convite em árvore permite reconvidar.</li>
+            <li>Quem convidou quem, quando a estrutura de convite em árvore permite reconvidar;</li>
+            <li>Se você clicar em &quot;Eu fui&quot; depois do evento, seu navegador pode pedir sua localização pra confirmar que você estava perto do local — é sempre opcional, e negar não impede a confirmação de presença.</li>
           </ul>
           <p><strong className="text-gray-800">Coletados automaticamente:</strong></p>
           <ul className="list-disc list-inside space-y-1 ml-1">
@@ -60,6 +61,7 @@ export default async function PrivacidadePage() {
             <li>Autenticar você via WhatsApp e manter sua sessão ativa;</li>
             <li>Exibir a assinatura do anfitrião e a lista de confirmados nos convites;</li>
             <li>Evitar confirmações falsas ou duplicadas (mesmo telefone só confirma uma vez por convite);</li>
+            <li>Sinalizar pro anfitrião quando a localização do check-in bate com o local do evento (selo de presença verificada);</li>
             <li>Processar a compra e o débito de créditos;</li>
             <li>Enviar o código de verificação por WhatsApp — e, se você ativar no futuro, notificações de novas confirmações;</li>
             <li>Responder dúvidas enviadas pelo Fale conosco.</li>
@@ -76,7 +78,8 @@ export default async function PrivacidadePage() {
           <ul className="list-disc list-inside space-y-1 ml-1">
             <li><strong className="text-gray-800">Stripe</strong> — processamento de pagamento dos pacotes de crédito;</li>
             <li><strong className="text-gray-800">Evolution API / WhatsApp</strong> — envio do código de login e de notificações;</li>
-            <li><strong className="text-gray-800">Supabase e Vercel</strong> — hospedagem do banco de dados, arquivos (fotos) e da aplicação.</li>
+            <li><strong className="text-gray-800">Supabase e Vercel</strong> — hospedagem do banco de dados, arquivos (fotos) e da aplicação;</li>
+            <li><strong className="text-gray-800">OpenStreetMap (Nominatim)</strong> — converte o endereço do evento em coordenadas, só pra comparar com a localização do check-in.</li>
           </ul>
           <p>
             Esses serviços podem processar dados em servidores fora do Brasil. Não

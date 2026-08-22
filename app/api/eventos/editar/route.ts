@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getSupabaseAdmin } from '@/lib/supabase'
+import { geocodeAddress } from '@/lib/geocode'
 
 // Só o dia (calendário, fuso de São Paulo) conta pro gate de créditos —
 // trocar só o horário do mesmo dia é sempre livre.
@@ -38,6 +39,12 @@ export async function PATCH(req: NextRequest) {
 
   const { error } = await sb.from('events').update(updates).eq('edit_token', edit_token)
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+
+  // Geocodificação best-effort — reprocessa lat/lng quando o endereço muda.
+  if (updates.location) {
+    const geo = await geocodeAddress(updates.location as string)
+    if (geo) await sb.from('events').update({ lat: geo.lat, lng: geo.lng }).eq('edit_token', edit_token)
+  }
 
   return NextResponse.json({ ok: true })
 }

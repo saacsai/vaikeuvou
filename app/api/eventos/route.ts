@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getSupabaseAdmin } from '@/lib/supabase'
 import { generateSlug } from '@/lib/slug'
 import { getSession } from '@/lib/auth'
+import { geocodeAddress } from '@/lib/geocode'
 
 export async function POST(req: NextRequest) {
   const session = await getSession()
@@ -49,6 +50,13 @@ export async function POST(req: NextRequest) {
 
   if (error || !data) {
     return NextResponse.json({ error: error?.message ?? 'Erro ao criar evento' }, { status: 500 })
+  }
+
+  // Geocodificação best-effort — usada só pra verificar proximidade no
+  // check-in, nunca bloqueia a criação do evento se falhar.
+  if (location) {
+    const geo = await geocodeAddress(location)
+    if (geo) await sb.from('events').update({ lat: geo.lat, lng: geo.lng }).eq('id', data.id)
   }
 
   return NextResponse.json({ ok: true, slug: data.slug, edit_token: data.edit_token })

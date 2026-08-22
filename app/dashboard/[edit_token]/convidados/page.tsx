@@ -21,7 +21,7 @@ function fmtHora(iso: string) {
   return new Date(iso).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })
 }
 
-function TreeNode({ rsvp, byParent, avatarByPhone }: { rsvp: Rsvp; byParent: Map<string, Rsvp[]>; avatarByPhone: Map<string, string> }) {
+function TreeNode({ rsvp, byParent, avatarByPhone, isPast }: { rsvp: Rsvp; byParent: Map<string, Rsvp[]>; avatarByPhone: Map<string, string>; isPast: boolean }) {
   const filhos = byParent.get(rsvp.id) ?? []
   const cor = NIVEL_COR[(rsvp.depth_level - 1) % NIVEL_COR.length]
   const avatar = avatarByPhone.get(rsvp.user_phone)
@@ -29,13 +29,25 @@ function TreeNode({ rsvp, byParent, avatarByPhone }: { rsvp: Rsvp; byParent: Map
   return (
     <div className="flex flex-col items-center">
       <div className="flex flex-col items-center gap-1 w-[90px]">
-        {avatar ? (
-          <Image src={avatar} alt={rsvp.user_name} width={44} height={44} className="w-11 h-11 rounded-full object-cover flex-shrink-0" />
-        ) : (
-          <div className={`w-11 h-11 rounded-full ${cor} flex items-center justify-center text-sm font-bold text-white flex-shrink-0`}>
-            {rsvp.user_name[0].toUpperCase()}
-          </div>
-        )}
+        <div className="relative">
+          {avatar ? (
+            <Image src={avatar} alt={rsvp.user_name} width={44} height={44} className="w-11 h-11 rounded-full object-cover flex-shrink-0" />
+          ) : (
+            <div className={`w-11 h-11 rounded-full ${cor} flex items-center justify-center text-sm font-bold text-white flex-shrink-0`}>
+              {rsvp.user_name[0].toUpperCase()}
+            </div>
+          )}
+          {isPast && rsvp.checked_in_at && (
+            <span
+              title={rsvp.checkin_verified ? 'Presença verificada por localização' : 'Confirmou que foi'}
+              className={`absolute -bottom-1 -right-1 text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center border border-white ${
+                rsvp.checkin_verified ? 'bg-green-500 text-white' : 'bg-gray-300 text-gray-600'
+              }`}
+            >
+              ✓
+            </span>
+          )}
+        </div>
         <p className="text-xs font-semibold text-gray-900 text-center leading-tight truncate w-full">{rsvp.user_name}</p>
         <p className="text-[10px] text-gray-400">{fmtHora(rsvp.created_at)}</p>
       </div>
@@ -51,7 +63,7 @@ function TreeNode({ rsvp, byParent, avatarByPhone }: { rsvp: Rsvp; byParent: Map
                   className="absolute top-0 h-px bg-gray-200"
                   style={{ left: i === 0 ? '50%' : 0, right: i === filhos.length - 1 ? '50%' : 0 }}
                 />
-                <TreeNode rsvp={f} byParent={byParent} avatarByPhone={avatarByPhone} />
+                <TreeNode rsvp={f} byParent={byParent} avatarByPhone={avatarByPhone} isPast={isPast} />
               </div>
             ))}
           </div>
@@ -102,6 +114,7 @@ export default async function ConvidadosPage({ params }: Props) {
     byParent.get(key)!.push(r)
   }
   const raizes = byParent.get('root') ?? []
+  const isPast = new Date(evento.event_date).getTime() < Date.now()
 
   return (
     <div className="min-h-screen bg-white text-gray-900 flex flex-col">
@@ -134,6 +147,9 @@ export default async function ConvidadosPage({ params }: Props) {
 
         <p className="text-gray-400 text-sm mb-6">
           {rsvps.length} {rsvps.length === 1 ? 'pessoa confirmou' : 'pessoas confirmaram'} — veja a cadeia de quem convidou quem.
+          {isPast && evento.guest_list_unlocked_at && (
+            <> {rsvps.filter(r => r.checked_in_at).length} foram de verdade.</>
+          )}
         </p>
 
         {rsvps.length === 0 ? (
@@ -151,7 +167,7 @@ export default async function ConvidadosPage({ params }: Props) {
         ) : (
           <div className="bg-white border border-gray-100 rounded-xl p-5 shadow-sm overflow-x-auto">
             <div className="flex justify-center gap-6 min-w-fit mx-auto">
-              {raizes.map(r => <TreeNode key={r.id} rsvp={r} byParent={byParent} avatarByPhone={avatarByPhone} />)}
+              {raizes.map(r => <TreeNode key={r.id} rsvp={r} byParent={byParent} avatarByPhone={avatarByPhone} isPast={isPast} />)}
             </div>
           </div>
         )}
