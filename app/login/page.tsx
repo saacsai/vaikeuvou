@@ -37,7 +37,7 @@ function LoginForm() {
         <div className="w-full max-w-sm space-y-6">
           <div className="text-center">
             <a href="/" className="inline-block mb-5">
-              <Image src="/logo.png" alt="vaikeuvou" width={480} height={108} className="h-[43px] w-auto mx-auto" />
+              <Image src="/logo.png" alt="vaikeuvou" width={1161} height={201} className="h-[43px] w-auto mx-auto" />
             </a>
             <h1 className="text-2xl font-extrabold text-gray-900">Entrar</h1>
             <p className="text-gray-400 text-sm mt-1">Vamos te enviar um código no WhatsApp</p>

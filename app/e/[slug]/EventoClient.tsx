@@ -97,7 +97,7 @@ export default function EventoClient({ evento, rsvps, parentRsvpId, criador }: P
         <div className="px-6 pt-6 pb-8 bg-gradient-to-b from-white to-[#fcede1]">
 
           {/* Marca */}
-          <Image src="/logo.png" alt="vaikeuvou" width={480} height={108} className="w-[250px] max-w-full h-auto mb-4" />
+          <Image src="/logo.png" alt="vaikeuvou" width={1161} height={201} className="w-[250px] max-w-full h-auto mb-4" />
 
           {/* Título — continua a frase do wordmark: "vai que eu vou" + título */}
           <h1 className="text-3xl font-bold leading-tight text-gray-900 mb-3">{evento.title}</h1>
@@ -182,7 +182,7 @@ export default function EventoClient({ evento, rsvps, parentRsvpId, criador }: P
                 className="w-full py-4 rounded-lg bg-brand hover:bg-brand-dark transition-colors shadow-lg shadow-brand/20 flex items-center justify-center gap-[5px]"
               >
                 <Image src="/letra_bora.png" alt="BORA" width={130} height={53} className="h-7 w-auto" />
-                <Image src="/icone_bora.png" alt="" width={57} height={61} className="h-8 w-auto" />
+                <Image src="/icone_bora.png" alt="" width={474} height={537} className="h-8 w-auto" />
               </button>
             </div>
           )}
@@ -228,7 +228,7 @@ export default function EventoClient({ evento, rsvps, parentRsvpId, criador }: P
                   <>
                     <span className="flex items-center gap-[5px]">
                       <Image src="/letra_bora.png" alt="BORA" width={130} height={53} className="h-6 w-auto" />
-                      <Image src="/icone_bora.png" alt="" width={57} height={61} className="h-7 w-auto" />
+                      <Image src="/icone_bora.png" alt="" width={474} height={537} className="h-7 w-auto" />
                     </span>
                     Confirmar
                   </>

@@ -26,7 +26,7 @@ export default function EventPreviewCard({ form, userName, userAvatar, userBio, 
       </div>
 
       <div className="px-5 pt-5 pb-6 bg-gradient-to-b from-white to-[#fcede1]">
-        <Image src="/logo.png" alt="vaikeuvou" width={480} height={108} className="h-7 w-auto mb-0.5" />
+        <Image src="/logo.png" alt="vaikeuvou" width={1161} height={201} className="h-7 w-auto mb-0.5" />
         <h1 className={`text-xl font-bold leading-tight mb-3 ${hasTitle ? 'text-gray-900' : 'text-gray-300'}`}>
           {hasTitle ? form.title : 'Nome do evento'}
         </h1>
@@ -57,7 +57,7 @@ export default function EventPreviewCard({ form, userName, userAvatar, userBio, 
         <p className="text-gray-900 font-semibold text-sm mb-2">Vamo aí?</p>
         <div className="w-full py-3 rounded-lg bg-brand select-none flex items-center justify-center gap-[5px]">
           <Image src="/letra_bora.png" alt="BORA" width={130} height={53} className="h-5 w-auto" />
-          <Image src="/icone_bora.png" alt="" width={57} height={61} className="h-6 w-auto" />
+          <Image src="/icone_bora.png" alt="" width={474} height={537} className="h-6 w-auto" />
         </div>
 
         <div className="mt-4 space-y-1">

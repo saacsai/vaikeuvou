@@ -60,7 +60,7 @@ export default async function MeusEventosPage({ searchParams }: Props) {
           <div className="flex flex-col md:flex-row md:items-center gap-x-2 gap-y-1">
             <div className="flex items-center justify-between md:contents">
               <a href="/" className="flex-shrink-0">
-                <Image src="/logo.png" alt="vaikeuvou" width={480} height={108} className="h-[43px] md:h-[47px] w-auto" />
+                <Image src="/logo.png" alt="vaikeuvou" width={1161} height={201} className="h-[43px] md:h-[47px] w-auto" />
               </a>
               <div className="flex items-center gap-1 md:hidden">
                 <ProfilePopover userName={user.name} userAvatar={user.avatar_url} userCredits={user.credits} />

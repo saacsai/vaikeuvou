@@ -21,8 +21,8 @@ export default async function Home() {
         <Image
           src="/logo-vertical.png"
           alt="vaikeuvou — Vamo aí?"
-          width={261}
-          height={223}
+          width={911}
+          height={670}
           className="w-[220px] md:w-[250px] h-auto mb-6 md:mb-[42px]"
           priority
         />
