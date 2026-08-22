@@ -1,5 +1,0 @@
-{
-  "crons": [
-    { "path": "/api/cron/checkin-lembrete", "schedule": "*/15 * * * *" }
-  ]
-}

@@ -1,0 +1,15 @@
+name: Lembrete de check-in
+
+on:
+  schedule:
+    - cron: '*/15 * * * *'
+  workflow_dispatch:
+
+jobs:
+  disparar:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Chamar endpoint de lembrete
+        run: |
+          curl -sf -X GET "https://vaikeuvou.app/api/cron/checkin-lembrete" \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}"
