@@ -128,6 +128,10 @@ export default function CheckinPhotoShare({ eventoTitulo, onPular }: Props) {
         Pular
       </button>
 
+      <a href="/" className="block w-full text-center text-gray-400 text-sm py-2">
+        Sair
+      </a>
+
       <canvas ref={canvasRef} className="hidden" />
     </div>
   )
