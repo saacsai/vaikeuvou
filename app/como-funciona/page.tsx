@@ -90,12 +90,12 @@ export default async function ComoFuncionaPage() {
         </section>
 
         {/* Grátis */}
-        <section className="bg-green-50 border border-green-100 rounded-2xl p-5">
-          <h2 className="text-xs font-bold text-green-700 uppercase tracking-wide mb-3">Sempre grátis</h2>
+        <section className="bg-brand/5 border border-brand/20 rounded-2xl p-5">
+          <h2 className="text-xs font-bold text-brand uppercase tracking-wide mb-3">Sempre grátis</h2>
           <ul className="space-y-2">
             {GRATIS.map(item => (
               <li key={item} className="flex items-start gap-2 text-sm text-gray-700">
-                <span className="text-green-500 font-bold flex-shrink-0">✓</span>
+                <span className="text-brand font-bold flex-shrink-0">✓</span>
                 {item}
               </li>
             ))}
