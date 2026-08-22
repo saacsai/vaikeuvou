@@ -181,7 +181,7 @@ export default function EventoClient({ evento, rsvps, parentRsvpId, criador }: P
                 onClick={() => setEtapa('form')}
                 className="w-full py-4 rounded-lg bg-brand hover:bg-brand-dark transition-colors shadow-lg shadow-brand/20 flex items-center justify-center gap-[5px]"
               >
-                <span className="text-white font-bold text-xl uppercase tracking-wide">BORA</span>
+                <span className="text-white font-bold text-2xl uppercase tracking-wide">BORA</span>
                 <Image src="/icone_bora.png" alt="" width={474} height={537} className="h-8 w-auto" />
               </button>
             </div>
@@ -227,7 +227,7 @@ export default function EventoClient({ evento, rsvps, parentRsvpId, criador }: P
                 ) : (
                   <>
                     <span className="flex items-center gap-[5px]">
-                      BORA
+                      <span className="text-[21.6px]">BORA</span>
                       <Image src="/icone_bora.png" alt="" width={474} height={537} className="h-7 w-auto" />
                     </span>
                     Confirmar

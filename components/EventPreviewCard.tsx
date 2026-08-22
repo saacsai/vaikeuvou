@@ -56,7 +56,7 @@ export default function EventPreviewCard({ form, userName, userAvatar, userBio, 
 
         <p className="text-gray-900 font-semibold text-sm mb-2">Vamo aí?</p>
         <div className="w-full py-3 rounded-lg bg-brand select-none flex items-center justify-center gap-[5px]">
-          <span className="text-white font-bold text-base uppercase tracking-wide">BORA</span>
+          <span className="text-white font-bold text-[19.2px] uppercase tracking-wide">BORA</span>
           <Image src="/icone_bora.png" alt="" width={474} height={537} className="h-6 w-auto" />
         </div>
 
