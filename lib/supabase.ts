@@ -18,6 +18,7 @@ export type Event = {
   title: string
   slug: string
   event_date: string
+  duration_minutes: number | null
   location: string | null
   description: string | null
   bg_image_url: string | null

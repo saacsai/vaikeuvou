@@ -9,7 +9,7 @@ export async function POST(req: NextRequest) {
   if (!session) return NextResponse.json({ error: 'Não autenticado.' }, { status: 401 })
 
   const {
-    title, event_date, location, description, max_depth, bg_image_url,
+    title, event_date, duration_minutes, location, description, max_depth, bg_image_url,
     video_url, external_url, external_url_label,
   } = await req.json()
 
@@ -35,6 +35,7 @@ export async function POST(req: NextRequest) {
       title,
       slug,
       event_date,
+      duration_minutes:     duration_minutes || null,
       location:            location || null,
       description:         description || null,
       max_depth:            max_depth ?? 2,

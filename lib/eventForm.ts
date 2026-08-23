@@ -2,6 +2,7 @@ export type EventFormFields = {
   title: string
   event_date: string
   event_time: string
+  duration_minutes: number | ''
   location: string
   description: string
   max_depth: number
@@ -10,6 +11,16 @@ export type EventFormFields = {
   video_url: string
   bg_image_url: string
 }
+
+export const DURACAO_OPCOES = [
+  { label: '1 hora',           value: 60 },
+  { label: '2 horas',          value: 120 },
+  { label: '3 horas',          value: 180 },
+  { label: 'Período da manhã', value: 240 },
+  { label: 'Período da tarde', value: 240 },
+  { label: 'Período da noite', value: 240 },
+  { label: 'Dia inteiro',      value: 480 },
+]
 
 export function fmtPreviewDate(date: string, time: string): string {
   if (!date) return ''

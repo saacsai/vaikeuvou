@@ -11,7 +11,7 @@ import EventPreviewCard from '@/components/EventPreviewCard'
 import BgSelector from '@/components/BgSelector'
 import CreditLockPanel from '@/components/CreditLockPanel'
 import { fmtDate } from '@/lib/slug'
-import type { EventFormFields } from '@/lib/eventForm'
+import { DURACAO_OPCOES, type EventFormFields } from '@/lib/eventForm'
 
 const PRIVACIDADE = [
   { value: 1,   label: 'Privado',          desc: 'Só você convida' },
@@ -76,6 +76,7 @@ function toForm(evento: Event): EventFormFields {
     title: evento.title,
     event_date: date,
     event_time: time,
+    duration_minutes: evento.duration_minutes ?? '',
     location: evento.location ?? '',
     description: evento.description ?? '',
     max_depth: evento.max_depth,
@@ -405,6 +406,20 @@ export default function DashboardClient({ evento, rsvps, isNovo, userName, userA
                 <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Horário *</label>
                 <TimePicker value={form.event_time} onChange={v => set('event_time', v)} />
               </div>
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Duração</label>
+              <select
+                value={form.duration_minutes}
+                onChange={e => set('duration_minutes', e.target.value ? Number(e.target.value) : '')}
+                className="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-gray-900 outline-none focus:border-brand text-sm"
+              >
+                <option value="">Não informar</option>
+                {DURACAO_OPCOES.map((o, i) => (
+                  <option key={i} value={o.value}>{o.label}</option>
+                ))}
+              </select>
             </div>
 
             <div>

@@ -11,7 +11,7 @@ import EventPreviewCard from '@/components/EventPreviewCard'
 import BgSelector from '@/components/BgSelector'
 import AvatarCropUpload from '@/components/AvatarCropUpload'
 import CreditLockPanel from '@/components/CreditLockPanel'
-import type { EventFormFields } from '@/lib/eventForm'
+import { DURACAO_OPCOES, type EventFormFields } from '@/lib/eventForm'
 
 const PRIVACIDADE = [
   { value: 1,   label: 'Privado',          desc: 'Só você convida' },
@@ -33,7 +33,7 @@ type Props = {
 export default function CriarClient({ userName, userAvatar, userBio, userInstagram, userCredits, termsAccepted }: Props) {
   const router = useRouter()
   const [form, setForm] = useState<Form>({
-    title: '', event_date: '', event_time: '',
+    title: '', event_date: '', event_time: '', duration_minutes: '',
     location: '', description: '', max_depth: 2,
     external_url: '', external_url_label: '', video_url: '',
     bg_image_url: '',
@@ -220,6 +220,20 @@ export default function CriarClient({ userName, userAvatar, userBio, userInstagr
                 <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Horário *</label>
                 <TimePicker value={form.event_time} onChange={v => set('event_time', v)} />
               </div>
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Duração</label>
+              <select
+                value={form.duration_minutes}
+                onChange={e => set('duration_minutes', e.target.value ? Number(e.target.value) : '')}
+                className="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-gray-900 outline-none focus:border-brand text-sm"
+              >
+                <option value="">Não informar</option>
+                {DURACAO_OPCOES.map((o, i) => (
+                  <option key={i} value={o.value}>{o.label}</option>
+                ))}
+              </select>
             </div>
 
             <div>
