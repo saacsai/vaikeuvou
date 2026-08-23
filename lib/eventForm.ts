@@ -16,10 +16,10 @@ export const DURACAO_OPCOES = [
   { label: '1 hora',           value: 60 },
   { label: '2 horas',          value: 120 },
   { label: '3 horas',          value: 180 },
-  { label: 'Período da manhã', value: 240 },
-  { label: 'Período da tarde', value: 240 },
-  { label: 'Período da noite', value: 240 },
-  { label: 'Dia inteiro',      value: 480 },
+  { label: 'Período da manhã (4 horas)', value: 240 },
+  { label: 'Período da tarde (4 horas)', value: 240 },
+  { label: 'Período da noite (4 horas)', value: 240 },
+  { label: 'Dia inteiro (8 horas)',      value: 480 },
 ]
 
 export function fmtPreviewDate(date: string, time: string): string {
