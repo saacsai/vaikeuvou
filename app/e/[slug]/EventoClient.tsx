@@ -4,6 +4,10 @@ import { useState } from 'react'
 import Image from 'next/image'
 import type { Event, Rsvp } from '@/lib/supabase'
 import { fmtDate } from '@/lib/slug'
+
+function fmtHora(iso: string): string {
+  return new Intl.DateTimeFormat('pt-BR', { hour: '2-digit', minute: '2-digit', timeZone: 'America/Sao_Paulo' }).format(new Date(iso))
+}
 import { titleToHeader } from '@/lib/headers'
 
 type Criador = { name: string | null; avatar_url: string | null; bio: string | null; instagram: string | null }
@@ -50,6 +54,9 @@ export default function EventoClient({ evento, rsvps, parentRsvpId, criador, ses
   const linkLabel   = evento.external_url_label ?? 'Saiba mais'
   const podeConvidar = evento.max_depth > 1
   const isPast       = new Date(evento.event_date).getTime() < Date.now()
+  const fimIso        = evento.duration_minutes
+    ? new Date(new Date(evento.event_date).getTime() + evento.duration_minutes * 60000).toISOString()
+    : null
 
   async function confirmar() {
     if (isPast) return
@@ -105,7 +112,7 @@ export default function EventoClient({ evento, rsvps, parentRsvpId, criador, ses
 
           {/* Detalhes */}
           <div className="space-y-3 text-sm text-gray-500 mb-[26px]">
-            <p>📅 {fmtDate(evento.event_date)}</p>
+            <p>📅 {fmtDate(evento.event_date)}{fimIso && ` às ${fmtHora(fimIso)}`}</p>
             {evento.location && (
               <div className="flex items-center gap-1.5 w-fit">
                 <span>📍</span>

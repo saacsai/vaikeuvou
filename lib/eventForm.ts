@@ -22,11 +22,20 @@ export const DURACAO_OPCOES = [
   { label: 'Dia inteiro (8 horas)',      value: 480 },
 ]
 
-export function fmtPreviewDate(date: string, time: string): string {
+export function fmtPreviewDate(date: string, time: string, durationMinutes?: number | ''): string {
   if (!date) return ''
   const [y, m, d] = date.split('-').map(Number)
   const obj = new Date(y, m - 1, d)
   const days   = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb']
   const months = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez']
-  return `${days[obj.getDay()]}, ${d} ${months[m - 1]}${time ? ` às ${time}` : ''}`
+
+  let horaLabel = time ? ` às ${time}` : ''
+  if (time && durationMinutes) {
+    const [h, min] = time.split(':').map(Number)
+    const fim = new Date(0, 0, 0, h, min + durationMinutes)
+    const fimStr = `${String(fim.getHours()).padStart(2, '0')}:${String(fim.getMinutes()).padStart(2, '0')}`
+    horaLabel = ` das ${time} às ${fimStr}`
+  }
+
+  return `${days[obj.getDay()]}, ${d} ${months[m - 1]}${horaLabel}`
 }

@@ -17,7 +17,7 @@ export default function EventPreviewCard({ form, userName, userAvatar, userBio, 
     : titleToHeader(hasTitle ? form.title : 'vaikeuvou')
   const nome      = userName ?? 'Você'
   const iniciais  = nome.slice(0, 2).toUpperCase()
-  const dateLabel = fmtPreviewDate(form.event_date, form.event_time)
+  const dateLabel = fmtPreviewDate(form.event_date, form.event_time, form.duration_minutes)
 
   return (
     <div className="rounded-lg overflow-hidden shadow-lg border border-gray-100">
