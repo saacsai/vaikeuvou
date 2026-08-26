@@ -1,6 +1,5 @@
-// Presets de imagem de cabeçalho do convite — hoje são placeholders de banco de imagem
-// gratuito (Picsum) só pra marcar o layout. O Sandro vai entregar as 10 definitivas depois,
-// aí é só trocar o `src` de cada item mantendo os mesmos `id`.
+// Presets de imagem de cabeçalho do convite — imagens definitivas do Sandro (duotone laranja
+// da marca), entregues em 2026-08-26. Cada `bg` é o tom pastel derivado da própria foto.
 export type HeaderPreset = {
   id: string
   label: string
@@ -10,16 +9,16 @@ export type HeaderPreset = {
 }
 
 export const HEADER_PRESETS: HeaderPreset[] = [
-  { id: 'balada',    label: 'Balada',    src: '/headers/balada.jpg',    bg: '#f2f6f7' },
-  { id: 'show',      label: 'Show',      src: '/headers/show.jpg',      bg: '#ebedee' },
-  { id: 'praia',     label: 'Praia',     src: '/headers/praia.jpg',     bg: '#deeaf2' },
-  { id: 'corrida',   label: 'Corrida',   src: '/headers/corrida.jpg',   bg: '#dfe3e6' },
-  { id: 'futebol',   label: 'Futebol',   src: '/headers/futebol.jpg',   bg: '#e6e5e3' },
-  { id: 'viagem',    label: 'Viagem',    src: '/headers/viagem.jpg',    bg: '#e1eaf2' },
-  { id: 'pizza',     label: 'Pizza',     src: '/headers/pizza.jpg',     bg: '#e5dcd5' },
-  { id: 'cinema',    label: 'Cinema',    src: '/headers/cinema.jpg',    bg: '#e1e1e0' },
-  { id: 'churrasco', label: 'Churrasco', src: '/headers/churrasco.jpg', bg: '#f0eae9' },
-  { id: 'bike',      label: 'Bike',      src: '/headers/bike.jpg',      bg: '#ece4e4' },
+  { id: 'show',             label: 'Show',             src: '/headers/show.jpg',             bg: '#e8e1df' },
+  { id: 'futebol',          label: 'Futebol',          src: '/headers/futebol.jpg',          bg: '#f3e7e2' },
+  { id: 'aventura',         label: 'Aventura',         src: '/headers/aventura.jpg',         bg: '#f4ebe8' },
+  { id: 'reuniao',          label: 'Reunião',          src: '/headers/reuniao.jpg',          bg: '#efe7e4' },
+  { id: 'amigos',           label: 'Amigos',           src: '/headers/amigos.jpg',           bg: '#f8ece7' },
+  { id: 'confraternizacao', label: 'Confraternização', src: '/headers/confraternizacao.jpg', bg: '#efe8e5' },
+  { id: 'bem-estar',        label: 'Bem-estar',        src: '/headers/bem-estar.jpg',        bg: '#f2eae6' },
+  { id: 'praia',            label: 'Praia',            src: '/headers/praia.jpg',            bg: '#f0e5e0' },
+  { id: 'surf',             label: 'Surf',             src: '/headers/surf.jpg',             bg: '#f6eeeb' },
+  { id: 'corrida',          label: 'Corrida',          src: '/headers/corrida.jpg',          bg: '#ebe2df' },
 ]
 
 /** Seleção automática determinística por título — mesma lógica do titleToGradient antigo. */
