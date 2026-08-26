@@ -1,6 +1,41 @@
 # vaikeuvou.app — Status
 
-Última atualização: 2026-08-19
+Última atualização: 2026-08-26
+
+> Este arquivo ficou parado entre 2026-08-19 e 2026-08-26 — as sessões
+> desse período (logo final do Sandro, check-in "Eu fui", painel
+> `/admin`, campo de duração de evento) estão documentadas em
+> `~/.claude/projects/-Users-lucianomaeda/memory/project_vaikeuvou.md`,
+> não aqui. Ver aquele arquivo pra esse intervalo.
+
+## Sessão 2026-08-26 — imagens definitivas de cabeçalho (10 presets)
+
+Sandro entregou as 10 fotos definitivas (duotone laranja da marca),
+substituindo os placeholders do Picsum que estavam no ar desde
+2026-08-15. As fotos não bateram 1:1 com as categorias antigas
+(`balada, show, praia, corrida, futebol, viagem, pizza, cinema,
+churrasco, bike`) — vieram temas novos (reunião corporativa,
+yoga/bem-estar, confraternização) e faltaram outros (pizza, cinema,
+churrasco, bike, viagem). Categorias novas, mapeadas pelo conteúdo
+real e aprovadas pelo Luciano: **Show, Futebol, Aventura, Reunião,
+Amigos, Confraternização, Bem-estar, Praia, Surf, Corrida**.
+
+Antes de apagar qualquer arquivo, consultei a tabela `events` de
+produção: 4 convites reais ainda tinham `bg_image_url` apontando pra
+`pizza.jpg`/`cinema.jpg`/`churrasco.jpg` — esses **ficaram no disco**
+(só saíram da lista de seleção pra convites novos) pra não quebrar a
+imagem de convites já compartilhados. Só `balada.jpg`/`viagem.jpg`/
+`bike.jpg` foram apagados, confirmados sem uso real.
+`show.jpg`/`futebol.jpg`/`praia.jpg`/`corrida.jpg` foram sobrescritos
+com as fotos novas (mesmo nome de arquivo) — melhora retroativamente
+até o evento real "Show do Deep Purple", que já usava `show.jpg`.
+
+Cada preset em `lib/headers.ts` agora deriva seu tom pastel de fundo
+(`bg`) da cor média da própria foto (script Python/PIL, clareado
+~85% em direção ao branco), no lugar dos tons genéricos hardcoded
+antigos. Commit `e414c24`, build limpo, push feito.
+
+---
 
 ## Sessão 2026-08-19 (parte 6) — geração órfã, recuperação de pendente, 3 fixes de UI
 
