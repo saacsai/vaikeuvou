@@ -1,0 +1,15 @@
+name: Monitor da instância WhatsApp
+
+on:
+  schedule:
+    - cron: '*/30 * * * *'
+  workflow_dispatch:
+
+jobs:
+  checar:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checar estado da instância e alertar se desconectada
+        run: |
+          curl -sf -X GET "https://vaikeuvou.app/api/cron/monitor-evolution" \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}"
