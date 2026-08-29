@@ -598,14 +598,25 @@ export default function DashboardClient({ evento, rsvps, isNovo, userName, userA
               <div className="flex items-center justify-between mb-3">
                 <p className="text-xs font-bold text-gray-400 uppercase tracking-wide">Confirmados</p>
                 {isPast && (
-                  <p className="text-xs font-semibold text-gray-500">
-                    {rsvps.length} confirmaram · {rsvps.filter(r => r.checked_in_at).length} foram
+                  <p className="flex items-baseline gap-1">
+                    <span className="text-2xl font-black text-green-600 leading-none">
+                      {rsvps.filter(r => r.checked_in_at).length}
+                    </span>
+                    <span className="text-xs font-semibold text-gray-500">de {rsvps.length} foram</span>
                   </p>
                 )}
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
-                {rsvps.map(r => (
-                  <div key={r.id} className="flex items-center justify-between py-2 px-3 rounded-lg bg-gray-50">
+                {(isPast
+                  ? [...rsvps].sort((a, b) => (b.checked_in_at ? 1 : 0) - (a.checked_in_at ? 1 : 0))
+                  : rsvps
+                ).map(r => (
+                  <div
+                    key={r.id}
+                    className={`flex items-center justify-between py-2 px-3 rounded-lg border ${
+                      isPast && r.checked_in_at ? 'bg-green-50 border-green-200' : 'bg-gray-50 border-transparent'
+                    }`}
+                  >
                     <div className="flex items-center gap-3 min-w-0">
                       <div className="w-8 h-8 rounded-full bg-brand flex items-center justify-center text-xs font-bold text-white flex-shrink-0">
                         {r.user_name[0].toUpperCase()}
@@ -622,7 +633,7 @@ export default function DashboardClient({ evento, rsvps, isNovo, userName, userA
                         <span
                           title={r.checkin_verified ? 'Presença verificada por localização' : 'Confirmou que foi'}
                           className={`text-xs font-bold px-2 py-0.5 rounded-full ${
-                            r.checkin_verified ? 'bg-green-50 text-green-600' : 'bg-gray-100 text-gray-500'
+                            r.checkin_verified ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'
                           }`}
                         >
                           {r.checkin_verified ? '✓✓ foi' : '✓ foi'}

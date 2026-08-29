@@ -148,7 +148,10 @@ export default async function ConvidadosPage({ params }: Props) {
         <p className="text-gray-400 text-sm mb-6">
           {rsvps.length} {rsvps.length === 1 ? 'pessoa confirmou' : 'pessoas confirmaram'} — veja a cadeia de quem convidou quem.
           {isPast && evento.guest_list_unlocked_at && (
-            <> {rsvps.filter(r => r.checked_in_at).length} foram de verdade.</>
+            <>
+              {' '}
+              <span className="text-green-600 font-bold">{rsvps.filter(r => r.checked_in_at).length}</span> foram de verdade.
+            </>
           )}
         </p>
 
