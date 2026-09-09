@@ -168,6 +168,14 @@ export default function HeaderImageCropUpload({ editToken, credits, onUploaded, 
 
   const minScale = crop ? Math.max(DISPLAY_W / crop.naturalW, DISPLAY_H / crop.naturalH) : 1
 
+  // O input de arquivo fica sempre montado, independente do stage — antes ele só existia
+  // dentro do branch 'idle', então abrirSeletor() (chamado a partir do 'confirmTroca', ao
+  // clicar Continuar) rodava com fileRef.current ainda nulo: setStage('idle') e
+  // fileRef.current?.click() são disparados na mesma função, e o React só remonta o input
+  // depois que o handler termina, então o .click() virava um no-op silencioso e a tela só
+  // voltava pro estado inicial sem nunca abrir o seletor.
+  const inputArquivo = <input ref={fileRef} type="file" accept="image/*" onChange={onFileChange} className="hidden" />
+
   // Estado ocioso: sempre travado — foto própria custa 1 crédito, mesmo a
   // primeira vez (na criação do convite ou depois, editando).
   if (stage === 'idle') {
@@ -181,7 +189,7 @@ export default function HeaderImageCropUpload({ editToken, credits, onUploaded, 
         <LockIcon className="w-5 h-5 text-amber-500" />
         <span className="text-[8px] font-bold text-gray-600 uppercase leading-tight text-center px-1">Enviar foto</span>
         <span className="text-[7px] font-bold text-amber-600 uppercase">1 crédito</span>
-        <input ref={fileRef} type="file" accept="image/*" onChange={onFileChange} className="hidden" />
+        {inputArquivo}
       </button>
     )
   }
@@ -190,18 +198,21 @@ export default function HeaderImageCropUpload({ editToken, credits, onUploaded, 
   // de já ter recortado a foto.
   if (stage === 'confirmTroca') {
     return (
-      <CreditLockPanel
-        className="col-span-4"
-        title="Enviar foto própria custa 1 crédito"
-        message={
-          editToken
-            ? `Vai debitar 1 crédito do seu saldo (${credits} disponíveis) assim que você escolher a foto.`
-            : `Vai debitar 1 crédito do seu saldo (${credits} disponíveis) quando você criar o convite.`
-        }
-        credits={credits}
-        onCancel={() => setStage('idle')}
-        onContinue={() => { setStage('idle'); abrirSeletor() }}
-      />
+      <>
+        <CreditLockPanel
+          className="col-span-4"
+          title="Enviar foto própria custa 1 crédito"
+          message={
+            editToken
+              ? `Vai debitar 1 crédito do seu saldo (${credits} disponíveis) assim que você escolher a foto.`
+              : `Vai debitar 1 crédito do seu saldo (${credits} disponíveis) quando você criar o convite.`
+          }
+          credits={credits}
+          onCancel={() => setStage('idle')}
+          onContinue={() => { setStage('idle'); abrirSeletor() }}
+        />
+        {inputArquivo}
+      </>
     )
   }
 
