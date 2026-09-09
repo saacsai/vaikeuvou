@@ -168,37 +168,40 @@ export default function HeaderImageCropUpload({ editToken, credits, onUploaded, 
 
   const minScale = crop ? Math.max(DISPLAY_W / crop.naturalW, DISPLAY_H / crop.naturalH) : 1
 
-  // O input de arquivo fica sempre montado, independente do stage — antes ele só existia
-  // dentro do branch 'idle', então abrirSeletor() (chamado a partir do 'confirmTroca', ao
-  // clicar Continuar) rodava com fileRef.current ainda nulo: setStage('idle') e
-  // fileRef.current?.click() são disparados na mesma função, e o React só remonta o input
-  // depois que o handler termina, então o .click() virava um no-op silencioso e a tela só
-  // voltava pro estado inicial sem nunca abrir o seletor.
-  const inputArquivo = <input ref={fileRef} type="file" accept="image/*" onChange={onFileChange} className="hidden" />
+  // O input de arquivo precisa ficar SEMPRE no mesmo lugar da árvore (fora de qualquer branch
+  // condicional por stage) pra nunca ser desmontado pelo React entre o clique e o evento
+  // 'change'. Antes ele só existia dentro do branch 'idle'; quando abrirSeletor() rodava a
+  // partir do 'confirmTroca' (clicar Continuar), duas coisas quebravam em sequência:
+  // 1) fileRef.current ainda era nulo no instante do clique (o input do stage 'idle' só monta
+  //    depois do re-render, que ainda não tinha acontecido) — o .click() virava um no-op.
+  // 2) mesmo corrigindo isso montando o input também no 'confirmTroca', o setStage('idle') que
+  //    roda junto troca a árvore renderizada e o React desmonta aquele input (removendo-o do
+  //    DOM) enquanto o seletor nativo do SO ainda está aberto — quando o usuário finalmente
+  //    escolhe o arquivo, o evento 'change' dispara num elemento que não está mais na árvore,
+  //    então nunca chega no listener delegado do React e onFileChange nunca roda.
+  // Um input fixo, montado uma vez só, fora do switch de stage, resolve os dois problemas.
+  return (
+    <>
+      <input ref={fileRef} type="file" accept="image/*" onChange={onFileChange} className="hidden" />
 
-  // Estado ocioso: sempre travado — foto própria custa 1 crédito, mesmo a
-  // primeira vez (na criação do convite ou depois, editando).
-  if (stage === 'idle') {
-    return (
-      <button
-        type="button"
-        onClick={() => setStage('confirmTroca')}
-        title="Enviar sua própria foto — 1 crédito"
-        className="aspect-square rounded-lg bg-amber-50 hover:bg-amber-100 border-2 border-dashed border-amber-300 flex flex-col items-center justify-center gap-1 transition-colors"
-      >
-        <LockIcon className="w-5 h-5 text-amber-500" />
-        <span className="text-[8px] font-bold text-gray-600 uppercase leading-tight text-center px-1">Enviar foto</span>
-        <span className="text-[7px] font-bold text-amber-600 uppercase">1 crédito</span>
-        {inputArquivo}
-      </button>
-    )
-  }
+      {stage === 'idle' && (
+        // Estado ocioso: sempre travado — foto própria custa 1 crédito, mesmo a
+        // primeira vez (na criação do convite ou depois, editando).
+        <button
+          type="button"
+          onClick={() => setStage('confirmTroca')}
+          title="Enviar sua própria foto — 1 crédito"
+          className="aspect-square rounded-lg bg-amber-50 hover:bg-amber-100 border-2 border-dashed border-amber-300 flex flex-col items-center justify-center gap-1 transition-colors"
+        >
+          <LockIcon className="w-5 h-5 text-amber-500" />
+          <span className="text-[8px] font-bold text-gray-600 uppercase leading-tight text-center px-1">Enviar foto</span>
+          <span className="text-[7px] font-bold text-amber-600 uppercase">1 crédito</span>
+        </button>
+      )}
 
-  // Aviso de custo — aparece ANTES de abrir o seletor de arquivo, não depois
-  // de já ter recortado a foto.
-  if (stage === 'confirmTroca') {
-    return (
-      <>
+      {stage === 'confirmTroca' && (
+        // Aviso de custo — aparece ANTES de abrir o seletor de arquivo, não depois
+        // de já ter recortado a foto.
         <CreditLockPanel
           className="col-span-4"
           title="Enviar foto própria custa 1 crédito"
@@ -209,77 +212,76 @@ export default function HeaderImageCropUpload({ editToken, credits, onUploaded, 
           }
           credits={credits}
           onCancel={() => setStage('idle')}
-          onContinue={() => { setStage('idle'); abrirSeletor() }}
+          onContinue={abrirSeletor}
         />
-        {inputArquivo}
-      </>
-    )
-  }
+      )}
 
-  return (
-    <div className="col-span-4 space-y-3 p-3 bg-gray-50 rounded-xl border border-gray-200">
-      <p className="text-xs font-semibold text-gray-700 text-center">Arraste para posicionar — sai sempre 1200×500, sem distorcer</p>
+      {stage === 'crop' && (
+        <div className="col-span-4 space-y-3 p-3 bg-gray-50 rounded-xl border border-gray-200">
+          <p className="text-xs font-semibold text-gray-700 text-center">Arraste para posicionar — sai sempre 1200×500, sem distorcer</p>
 
-      <div
-        className="mx-auto rounded-lg overflow-hidden select-none border-2 border-brand"
-        style={{ width: DISPLAY_W, height: DISPLAY_H, position: 'relative', cursor: crop?.dragging ? 'grabbing' : 'grab' }}
-        onPointerDown={onPointerDown}
-        onPointerMove={onPointerMove}
-        onPointerUp={onPointerUp}
-        onPointerCancel={onPointerUp}
-      >
-        {crop && (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={crop.src}
-            alt="crop"
-            draggable={false}
-            style={{
-              position: 'absolute',
-              width:    crop.naturalW * crop.scale,
-              height:   crop.naturalH * crop.scale,
-              maxWidth: 'none',
-              left:     crop.x,
-              top:      crop.y,
-              userSelect: 'none',
-              pointerEvents: 'none',
-            }}
+          <div
+            className="mx-auto rounded-lg overflow-hidden select-none border-2 border-brand"
+            style={{ width: DISPLAY_W, height: DISPLAY_H, position: 'relative', cursor: crop?.dragging ? 'grabbing' : 'grab' }}
+            onPointerDown={onPointerDown}
+            onPointerMove={onPointerMove}
+            onPointerUp={onPointerUp}
+            onPointerCancel={onPointerUp}
+          >
+            {crop && (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={crop.src}
+                alt="crop"
+                draggable={false}
+                style={{
+                  position: 'absolute',
+                  width:    crop.naturalW * crop.scale,
+                  height:   crop.naturalH * crop.scale,
+                  maxWidth: 'none',
+                  left:     crop.x,
+                  top:      crop.y,
+                  userSelect: 'none',
+                  pointerEvents: 'none',
+                }}
+              />
+            )}
+          </div>
+
+          <input
+            type="range"
+            min={minScale}
+            max={Math.min(minScale * 4, 3)}
+            step={0.005}
+            value={crop?.scale ?? minScale}
+            onChange={onZoom}
+            className="w-full accent-brand"
           />
-        )}
-      </div>
 
-      <input
-        type="range"
-        min={minScale}
-        max={Math.min(minScale * 4, 3)}
-        step={0.005}
-        value={crop?.scale ?? minScale}
-        onChange={onZoom}
-        className="w-full accent-brand"
-      />
+          <div className="flex gap-2">
+            <button
+              type="button"
+              onClick={cancelar}
+              className="flex-1 py-2 rounded-lg bg-gray-100 text-gray-600 font-semibold text-xs uppercase tracking-wide hover:bg-gray-200"
+            >
+              Cancelar
+            </button>
+            <button
+              type="button"
+              onClick={confirmarCrop}
+              disabled={uploading}
+              className="flex-1 py-2 rounded-lg bg-brand hover:bg-brand-dark disabled:opacity-50 text-white font-bold text-xs uppercase tracking-wide"
+            >
+              {uploading ? 'Enviando…' : editToken ? 'Confirmar (1 crédito)' : 'Usar essa foto'}
+            </button>
+          </div>
 
-      <div className="flex gap-2">
-        <button
-          type="button"
-          onClick={cancelar}
-          className="flex-1 py-2 rounded-lg bg-gray-100 text-gray-600 font-semibold text-xs uppercase tracking-wide hover:bg-gray-200"
-        >
-          Cancelar
-        </button>
-        <button
-          type="button"
-          onClick={confirmarCrop}
-          disabled={uploading}
-          className="flex-1 py-2 rounded-lg bg-brand hover:bg-brand-dark disabled:opacity-50 text-white font-bold text-xs uppercase tracking-wide"
-        >
-          {uploading ? 'Enviando…' : editToken ? 'Confirmar (1 crédito)' : 'Usar essa foto'}
-        </button>
-      </div>
+          {msg && <p className="text-xs text-center text-red-500">{msg}</p>}
 
-      {msg && <p className="text-xs text-center text-red-500">{msg}</p>}
-
-      <canvas ref={cropCanvas} className="hidden" />
-    </div>
+          <canvas ref={cropCanvas} className="hidden" />
+        </div>
+      )}
+    </>
   )
 }
 
