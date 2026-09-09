@@ -38,7 +38,7 @@ export default function EventoClient({ evento, rsvps, parentRsvpId, criador, ses
 
   const base        = typeof window !== 'undefined' ? window.location.origin : 'https://vaikeuvou.app'
   const linkConvite = `${base}/e/${evento.slug}?ref=${meuRsvpId}`
-  const whatsappTxt = `Vou no "${evento.title}"! Vai você também? 👉 ${linkConvite}`
+  const whatsappTxt = `Eu vou no "${evento.title}"! Vamo aí? 👉 ${linkConvite}`
 
   const header = evento.bg_image_url
     ? { src: evento.bg_image_url, bg: '#f5f5f4' }
