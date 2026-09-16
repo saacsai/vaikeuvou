@@ -1,12 +1,58 @@
 # vaikeuvou.app — Status
 
-Última atualização: 2026-08-26
+Última atualização: 2026-09-16
 
-> Este arquivo ficou parado entre 2026-08-19 e 2026-08-26 — as sessões
-> desse período (logo final do Sandro, check-in "Eu fui", painel
-> `/admin`, campo de duração de evento) estão documentadas em
+> Este arquivo ficou parado entre 2026-08-19 e 2026-08-26, e de novo
+> entre 2026-08-26 e 2026-09-16 — as sessões desses períodos (logo
+> final do Sandro, check-in "Eu fui", painel `/admin`, campo de
+> duração de evento, monitor de saúde do WhatsApp, destaque do
+> check-in, fixes de upload de foto) estão documentadas em
 > `~/.claude/projects/-Users-lucianomaeda/memory/project_vaikeuvou.md`,
-> não aqui. Ver aquele arquivo pra esse intervalo.
+> não aqui. Ver aquele arquivo pra esses intervalos.
+
+## Sessão 2026-09-16 — botão embedável (`/embed/[slug]`), 1ª peça de 2 features em debate
+
+Duas features novas trazidas pelo Luciano, discutidas em profundidade
+antes de codar (pedido explícito dele: "antes de programar vamos
+ajustar o princípio e funcionalidade antes"). Resumo completo do
+debate em `project_vaikeuvou.md` — aqui só o que foi de fato
+construído.
+
+**Princípio fechado**: as duas features (widget embedável em
+sites/blogs + reconvite personalizado em cascata na árvore de
+convidados) são a mesma peça de dados — um "convite personalizado"
+(foto + mensagem) ancorado a um nó real da árvore (criador = raiz,
+cada RSVP = um nó) — só que com duas saídas diferentes: link
+compartilhável ou iframe embedável. Ainda não implementado; só o
+botão-base do embed foi construído como teste (peça isolada, sem a
+personalização em cascata ainda).
+
+**Construído**: `app/embed/[slug]/page.tsx` — página isolada (sem
+header/footer do site, pensada pra rodar dentro de `<iframe>`),
+renderiza só um botão no estilo BORA ("Confirme presença. Vamo aí?"),
+sem repetir título/data/local do evento (ficaria redundante com o
+texto do post onde for colado). Clique sempre abre `/e/[slug]` **em
+nova aba** — decisão deliberada de não tentar RSVP dentro do próprio
+iframe (cookie de terceiro quebra em Safari/Chrome hoje em dia). Já
+propaga `?ref=` (mesmo parâmetro que `/e/[slug]` já usa pra
+`parentRsvpId`), preparando terreno pra quando a personalização em
+cascata existir. Testado local com evento real (`show-do-deep-purple-
+C-Dmi`): build limpo, 404 correto pra slug inexistente, `ref`
+propagando certo. Commit `328a404`, push feito, deploy automático.
+
+**Pendências explícitas (não implementadas ainda, próxima sessão)**:
+- Personalização (foto + mensagem) por nó da árvore, oferecida
+  opcionalmente após confirmar presença ("Pular" sempre visível).
+- Cascata: cada nível da árvore mostra quem especificamente convidou
+  aquela pessoa (não a raiz/criador do evento).
+- Gerador de código de embed na UI (dashboard do criador e no link de
+  reconvite do convidado) — hoje o iframe precisa ser montado à mão.
+- Abrir "quem vai" de graça (tirar o paywall de 3 créditos) — decisão
+  de negócio pendente de validação com tração real antes de reverter.
+
+**Nota solta**: `vkv-prompt-test-grupo.jpg` continua sem uso/sem
+rastreamento no repo (resíduo de teste antigo de imagem por IA) —
+perguntar ao Luciano se apaga ou versiona.
 
 ## Sessão 2026-08-26 — imagens definitivas de cabeçalho (10 presets)
 
