@@ -76,39 +76,45 @@ export async function POST(req: NextRequest) {
 
   const valor = Number(evento.valor).toFixed(2)
 
-  const order = await getOrderClient(organizador.mp_access_token).create({
-    body: {
-      type: 'online',
-      processing_mode: 'manual', // fixo pro Checkout Pro — não é aprovação manual nossa
-      total_amount: valor,
-      external_reference: externalReference,
-      description: evento.title,
-      marketplace_fee: (Number(evento.valor) * (evento.comissao_percentual ?? 15) / 100).toFixed(2),
-      items: [{
-        title: evento.title,
-        unit_price: valor,
-        quantity: 1,
-      }],
-      config: {
-        online: {
-          success_url: `${base}/e/${evento.slug}?rsvp_ok=1`,
-          failure_url: `${base}/e/${evento.slug}`,
-          pending_url: `${base}/e/${evento.slug}`,
-          auto_return: 'approved',
-          callback_url: `${base}/api/webhooks/mercadopago`,
-        },
-        payment_method: {
-          max_installments: 12,
-          installments: {
-            interest_free: {
-              type: 'range',
-              values: [1, evento.max_parcelas || 3],
+  let order
+  try {
+    order = await getOrderClient(organizador.mp_access_token).create({
+      body: {
+        type: 'online',
+        processing_mode: 'manual', // fixo pro Checkout Pro — não é aprovação manual nossa
+        total_amount: valor,
+        external_reference: externalReference,
+        description: evento.title,
+        marketplace_fee: (Number(evento.valor) * (evento.comissao_percentual ?? 15) / 100).toFixed(2),
+        items: [{
+          title: evento.title,
+          unit_price: valor,
+          quantity: 1,
+        }],
+        config: {
+          online: {
+            success_url: `${base}/e/${evento.slug}?rsvp_ok=1`,
+            failure_url: `${base}/e/${evento.slug}`,
+            pending_url: `${base}/e/${evento.slug}`,
+            auto_return: 'approved',
+            callback_url: `${base}/api/webhooks/mercadopago`,
+          },
+          payment_method: {
+            max_installments: 12,
+            installments: {
+              interest_free: {
+                type: 'range',
+                values: [1, evento.max_parcelas || 3],
+              },
             },
           },
         },
       },
-    },
-  })
+    })
+  } catch (err) {
+    console.error('Erro ao criar order MP:', JSON.stringify(err, null, 2))
+    return NextResponse.json({ error: 'Erro ao abrir pagamento. Tente novamente.' }, { status: 500 })
+  }
 
   if (!order.checkout_url) {
     return NextResponse.json({ error: 'Erro ao abrir pagamento. Tente novamente.' }, { status: 500 })

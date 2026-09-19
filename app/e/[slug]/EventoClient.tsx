@@ -130,8 +130,8 @@ export default function EventoClient({ evento, rsvps, parentRsvpId, criador, con
       const res  = await fetch('/api/rsvp/checkout', {
         method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload),
       })
-      const json = await res.json()
-      if (!res.ok) { setErro(json.error ?? 'Erro ao abrir pagamento. Tente novamente.'); setSaving(false); return }
+      const json = await res.json().catch(() => null)
+      if (!res.ok || !json) { setErro(json?.error ?? 'Erro ao abrir pagamento. Tente novamente.'); setSaving(false); return }
       if (json.ja_confirmado) { setMeuRsvpId(json.rsvp_id); setEtapa('sucesso'); setSaving(false); return }
       // O telefone some do estado no reload pós-redirect do MP — guarda pra
       // retomar o polling do pagamento quando a pessoa voltar.
@@ -145,9 +145,9 @@ export default function EventoClient({ evento, rsvps, parentRsvpId, criador, con
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
     })
-    const json = await res.json()
+    const json = await res.json().catch(() => null)
 
-    if (!res.ok) { setErro(json.error ?? 'Erro ao confirmar. Tente novamente.'); setSaving(false); return }
+    if (!res.ok || !json) { setErro(json?.error ?? 'Erro ao confirmar. Tente novamente.'); setSaving(false); return }
 
     setMeuRsvpId(json.rsvp_id)
     setEtapa('sucesso')
