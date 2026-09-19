@@ -81,7 +81,6 @@ function toForm(evento: Event): EventFormFields {
     valor: evento.valor ?? '',
     descricao_pacote: evento.descricao_pacote ?? '',
     programacao: evento.programacao ?? '',
-    comissao_percentual: evento.comissao_percentual,
     max_parcelas: evento.max_parcelas,
   }
 }
@@ -259,7 +258,7 @@ export default function DashboardClient({ evento, rsvps, isNovo, userName, userA
         {isPago && (
           <div className="mb-10">
             <p className="text-xs font-bold text-gray-400 uppercase tracking-wide mb-3">Financeiro</p>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            <div className="grid grid-cols-3 gap-3">
               <div className="bg-white border border-gray-100 rounded-xl p-4 text-center shadow-sm">
                 <p className="text-2xl font-extrabold text-brand">{fmtBRL(vendido)}</p>
                 <p className="text-gray-500 text-xs mt-1">Total vendido</p>
@@ -267,10 +266,6 @@ export default function DashboardClient({ evento, rsvps, isNovo, userName, userA
               <div className="bg-white border border-gray-100 rounded-xl p-4 text-center shadow-sm">
                 <p className="text-2xl font-extrabold text-brand">{pagos.length}</p>
                 <p className="text-gray-500 text-xs mt-1">Pagos de {rsvps.length}</p>
-              </div>
-              <div className="bg-white border border-gray-100 rounded-xl p-4 text-center shadow-sm">
-                <p className="text-2xl font-extrabold text-gray-400">{fmtBRL(comissao)}</p>
-                <p className="text-gray-500 text-xs mt-1">Comissão vaikeuvou ({evento.comissao_percentual}%)</p>
               </div>
               <div className="bg-white border border-gray-100 rounded-xl p-4 text-center shadow-sm">
                 <p className="text-2xl font-extrabold text-green-600">{fmtBRL(liquido)}</p>
@@ -406,6 +401,17 @@ export default function DashboardClient({ evento, rsvps, isNovo, userName, userA
             {!!form.valor && (
               <>
                 <div>
+                  <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Parcelamento em até</label>
+                  <input
+                    value={form.max_parcelas}
+                    onChange={e => set('max_parcelas', Number(e.target.value))}
+                    type="number" min={1} max={12} step="1"
+                    className="w-32 bg-white border border-gray-300 rounded-xl px-4 py-3 text-gray-900 outline-none focus:border-brand text-sm"
+                  />
+                  <p className="text-[10px] text-gray-400 mt-0.5">Padrão 3x — usado no destaque de preço no convite.</p>
+                </div>
+
+                <div>
                   <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">O que está incluso (opcional)</label>
                   <textarea
                     value={form.descricao_pacote}
@@ -425,29 +431,6 @@ export default function DashboardClient({ evento, rsvps, isNovo, userName, userA
                     rows={3}
                     className="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 outline-none focus:border-brand text-sm resize-none"
                   />
-                </div>
-
-                <div className="flex gap-4">
-                  <div>
-                    <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Comissão vaikeuvou (%)</label>
-                    <input
-                      value={form.comissao_percentual}
-                      onChange={e => set('comissao_percentual', Number(e.target.value))}
-                      type="number" min={0} max={100} step="0.5"
-                      className="w-32 bg-white border border-gray-300 rounded-xl px-4 py-3 text-gray-900 outline-none focus:border-brand text-sm"
-                    />
-                    <p className="text-[10px] text-gray-400 mt-0.5">Padrão 15% — combinado direto com Luciano/Sandro.</p>
-                  </div>
-                  <div>
-                    <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Parcelamento em até</label>
-                    <input
-                      value={form.max_parcelas}
-                      onChange={e => set('max_parcelas', Number(e.target.value))}
-                      type="number" min={1} max={12} step="1"
-                      className="w-32 bg-white border border-gray-300 rounded-xl px-4 py-3 text-gray-900 outline-none focus:border-brand text-sm"
-                    />
-                    <p className="text-[10px] text-gray-400 mt-0.5">Padrão 3x — usado no destaque de preço.</p>
-                  </div>
                 </div>
               </>
             )}

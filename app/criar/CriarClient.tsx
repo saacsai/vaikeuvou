@@ -35,7 +35,7 @@ export default function CriarClient({ userName, userAvatar, userBio, userInstagr
     location: '', description: '', max_depth: 2,
     external_url: '', external_url_label: '', video_url: '',
     bg_image_url: '', cidade: '',
-    valor: '', descricao_pacote: '', programacao: '', comissao_percentual: 15, max_parcelas: 3,
+    valor: '', descricao_pacote: '', programacao: '', max_parcelas: 3,
   })
   const [multiDia, setMultiDia] = useState(false)
   const [saving, setSaving] = useState(false)
@@ -263,6 +263,17 @@ export default function CriarClient({ userName, userAvatar, userBio, userInstagr
 
             {!!form.valor && (
               <>
+                <div>
+                  <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Parcelamento em até</label>
+                  <input
+                    value={form.max_parcelas}
+                    onChange={e => set('max_parcelas', Number(e.target.value))}
+                    type="number" min={1} max={12} step="1"
+                    className="w-32 bg-white border border-gray-300 rounded-xl px-4 py-3 text-gray-900 outline-none focus:border-brand text-sm"
+                  />
+                  <p className="text-[10px] text-gray-400 mt-0.5">Padrão 3x — usado no destaque de preço no convite.</p>
+                </div>
+
                 <div>
                   <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">O que está incluso (opcional)</label>
                   <textarea

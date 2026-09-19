@@ -15,7 +15,6 @@ export type EventFormFields = {
   valor: number | ''
   descricao_pacote: string
   programacao: string
-  comissao_percentual: number
   max_parcelas: number
 }
 

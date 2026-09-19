@@ -11,7 +11,7 @@ export async function POST(req: NextRequest) {
   const {
     title, event_date, event_date_fim, duration_minutes, location, description, max_depth, bg_image_url,
     video_url, external_url, external_url_label, cidade,
-    valor, descricao_pacote, programacao, comissao_percentual, max_parcelas,
+    valor, descricao_pacote, programacao, max_parcelas,
   } = await req.json()
 
   if (!title || !event_date) {
@@ -20,6 +20,15 @@ export async function POST(req: NextRequest) {
 
   const phone = session.users.phone
   const sb    = getSupabaseAdmin()
+
+  // Comissão não é definida pelo organizador — é combinada por cliente no
+  // admin (app/admin/usuarios). Sem configuração, cobra o padrão de 15%.
+  const { data: usuario } = await sb
+    .from('users')
+    .select('comissao_percentual')
+    .eq('id', session.user_id)
+    .single()
+  const comissaoPercentual = usuario?.comissao_percentual ?? 15
 
   let slug      = generateSlug(title)
   let tentativas = 0
@@ -49,7 +58,7 @@ export async function POST(req: NextRequest) {
       valor:                valor || null,
       descricao_pacote:     descricao_pacote || null,
       programacao:          programacao || null,
-      comissao_percentual:  comissao_percentual || 15,
+      comissao_percentual:  comissaoPercentual,
       max_parcelas:         max_parcelas || 3,
       creator_phone: phone,
       user_id:       session.user_id,
