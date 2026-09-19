@@ -49,20 +49,22 @@ export default function EventoClient({ evento, rsvps, parentRsvpId, criador, con
   const searchParams = useSearchParams()
   const pago = !!evento.valor && evento.valor > 0
 
-  // Volta do Stripe Checkout — o webhook pode ainda não ter processado, faz
+  // Volta do Mercado Pago — o webhook pode ainda não ter processado, faz
   // polling curto até o RSVP aparecer (ver /api/rsvp/checkout + webhook).
   useEffect(() => {
-    const sessionId = searchParams.get('session_id')
-    if (!searchParams.get('rsvp_ok') || !sessionId) return
+    if (!searchParams.get('rsvp_ok')) return
+    const telefonePendente = sessionStorage.getItem('vkv_pending_telefone')
+    if (!telefonePendente) return
 
     setEtapa('aguardando_pagamento')
     let tentativas = 0
     const intervalo = setInterval(async () => {
       tentativas++
-      const res  = await fetch(`/api/rsvp/by-session?session_id=${sessionId}`)
+      const res  = await fetch(`/api/rsvp/by-payment?event_id=${evento.id}&telefone=${encodeURIComponent(telefonePendente)}`)
       const json = await res.json()
       if (json.rsvp_id) {
         clearInterval(intervalo)
+        sessionStorage.removeItem('vkv_pending_telefone')
         setMeuRsvpId(json.rsvp_id)
         setEtapa('sucesso')
       } else if (tentativas >= 10) {
@@ -122,7 +124,7 @@ export default function EventoClient({ evento, rsvps, parentRsvpId, criador, con
       parent_rsvp_id: parentRsvpId,
     }
 
-    // Evento pago: abre o checkout Stripe — o RSVP só é criado depois que o
+    // Evento pago: abre o checkout do Mercado Pago — o RSVP só é criado depois que o
     // pagamento for confirmado (ver /api/rsvp/checkout).
     if (pago) {
       const res  = await fetch('/api/rsvp/checkout', {
@@ -131,6 +133,9 @@ export default function EventoClient({ evento, rsvps, parentRsvpId, criador, con
       const json = await res.json()
       if (!res.ok) { setErro(json.error ?? 'Erro ao abrir pagamento. Tente novamente.'); setSaving(false); return }
       if (json.ja_confirmado) { setMeuRsvpId(json.rsvp_id); setEtapa('sucesso'); setSaving(false); return }
+      // O telefone some do estado no reload pós-redirect do MP — guarda pra
+      // retomar o polling do pagamento quando a pessoa voltar.
+      sessionStorage.setItem('vkv_pending_telefone', telefone)
       window.location.href = json.url
       return
     }
@@ -206,17 +211,22 @@ export default function EventoClient({ evento, rsvps, parentRsvpId, criador, con
               </div>
             )}
             {pago && (
-              <p className="flex items-center gap-1.5 flex-wrap">
-                <span>💳</span>
-                {evento.max_parcelas > 1 ? (
-                  <>
-                    <span className="font-semibold text-gray-700">em até {evento.max_parcelas}x de {fmtBRL(evento.valor! / evento.max_parcelas)}</span>
-                    <span className="text-gray-400">— {fmtBRL(evento.valor!)} à vista, por pessoa</span>
-                  </>
-                ) : (
-                  <span>{fmtBRL(evento.valor!)} por pessoa</span>
+              <div>
+                <p className="flex items-center gap-1.5 flex-wrap">
+                  <span>💳</span>
+                  {evento.max_parcelas > 1 ? (
+                    <>
+                      <span className="font-semibold text-gray-700">em até {evento.max_parcelas}x de {fmtBRL(evento.valor! / evento.max_parcelas)}</span>
+                      <span className="text-gray-400">— {fmtBRL(evento.valor!)} à vista, por pessoa</span>
+                    </>
+                  ) : (
+                    <span>{fmtBRL(evento.valor!)} por pessoa</span>
+                  )}
+                </p>
+                {evento.max_parcelas > 1 && evento.max_parcelas < 12 && (
+                  <p className="text-[11px] text-gray-400 mt-0.5">ou em até 12x com juros</p>
                 )}
-              </p>
+              </div>
             )}
           </div>
 

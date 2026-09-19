@@ -57,6 +57,7 @@ export default function ConfirmarPresencaModal({
                   <>
                     <p className="text-xl font-extrabold text-brand">em até {maxParcelas}x de {fmtBRL(valor / maxParcelas)}</p>
                     <p className="text-xs text-gray-400">ou {fmtBRL(valor)} à vista, por pessoa</p>
+                    {maxParcelas < 12 && <p className="text-[11px] text-gray-400">ou em até 12x com juros</p>}
                   </>
                 ) : (
                   <p className="text-xl font-extrabold text-brand">{fmtBRL(valor)} por pessoa</p>

@@ -10,13 +10,13 @@ const PAGE_SIZE = 15
 
 type Evento = { id: string; title: string; slug: string; event_date: string; edit_token: string; location: string | null }
 
-type Props = { searchParams: Promise<{ futuro?: string; passado?: string }> }
+type Props = { searchParams: Promise<{ futuro?: string; passado?: string; mp_conectado?: string; mp_erro?: string }> }
 
 export default async function MeusEventosPage({ searchParams }: Props) {
   const session = await getSession()
   if (!session) redirect('/login?next=/meus-convites')
 
-  const { futuro: futuroParam, passado: passadoParam } = await searchParams
+  const { futuro: futuroParam, passado: passadoParam, mp_conectado, mp_erro } = await searchParams
   const pageFuturo  = Math.max(1, parseInt(futuroParam ?? '1', 10) || 1)
   const pagePassado = Math.max(1, parseInt(passadoParam ?? '1', 10) || 1)
 

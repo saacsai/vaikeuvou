@@ -60,4 +60,5 @@ export type Rsvp = {
   valor_pago: number | null
   foto_url: string | null
   mensagem: string | null
+  mp_payment_id: string | null
 }

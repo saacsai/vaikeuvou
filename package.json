@@ -12,6 +12,7 @@
     "@ai-sdk/google": "^4.0.44",
     "@supabase/supabase-js": "^2.112.3",
     "ai": "^7.0.66",
+    "mercadopago": "^3.6.1",
     "nanoid": "^5.1.16",
     "next": "16.3.0",
     "react": "19.2.8",

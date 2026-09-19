@@ -39,6 +39,7 @@ type Props = {
   userAvatar: string | null
   userBio: string | null
   userInstagram: string | null
+  userMpConectado: boolean
 }
 
 function parseEventDate(iso: string): { date: string; time: string } {
@@ -85,7 +86,7 @@ function toForm(evento: Event): EventFormFields {
   }
 }
 
-export default function DashboardClient({ evento, rsvps, isNovo, userName, userAvatar, userBio, userInstagram }: Props) {
+export default function DashboardClient({ evento, rsvps, isNovo, userName, userAvatar, userBio, userInstagram, userMpConectado }: Props) {
   const [initial,   setInitial]   = useState<EventFormFields>(() => toForm(evento))
   const [form,      setForm]      = useState<EventFormFields>(() => toForm(evento))
   const [multiDia,  setMultiDia]  = useState(() => !!evento.event_date_fim)
@@ -253,6 +254,21 @@ export default function DashboardClient({ evento, rsvps, isNovo, userName, userA
             )}
           </div>
         </div>
+
+        {isPago && !userMpConectado && (
+          <div className="mb-10 bg-amber-50 border border-amber-200 rounded-xl p-4 flex flex-col sm:flex-row sm:items-center gap-3 justify-between">
+            <div>
+              <p className="text-amber-800 font-bold text-sm">Conecte sua conta Mercado Pago</p>
+              <p className="text-amber-700 text-xs mt-0.5">Sem isso, ninguém consegue pagar esse evento — o valor cai direto na sua conta, menos a comissão vaikeuvou.</p>
+            </div>
+            <a
+              href="/api/mp/conectar"
+              className="px-4 py-2 rounded-lg bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold uppercase tracking-wide whitespace-nowrap text-center"
+            >
+              Conectar Mercado Pago
+            </a>
+          </div>
+        )}
 
         {/* Painel financeiro — só aparece em eventos pagos */}
         {isPago && (
