@@ -103,8 +103,8 @@ export async function POST(req: NextRequest) {
             max_installments: 12,
             installments: {
               interest_free: {
-                type: 'range',
-                values: [1, evento.max_parcelas || 3],
+                type: 'list',
+                values: Array.from({ length: evento.max_parcelas || 3 }, (_, i) => i + 1),
               },
             },
           },
