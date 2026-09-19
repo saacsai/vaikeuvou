@@ -1,19 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { WebhookSignatureValidator, InvalidWebhookSignatureError } from 'mercadopago'
 import { getSupabaseAdmin } from '@/lib/supabase'
-import { getOrderClient } from '@/lib/mercadopago'
 
-type ExternalRef = {
-  event_id: string
-  user_name: string
-  user_phone: string
-  parent_rsvp_id: string | null
-}
-
-// Notificação do MP manda só o id do recurso — a gente busca os dados
-// completos depois (GET /v1/orders/{id}), nunca confia no corpo do POST.
+// O corpo da notificação já traz external_reference, user_id e o status
+// completo da order — não precisa fazer uma segunda chamada de GET.
 export async function POST(req: NextRequest) {
-  const dataId    = req.nextUrl.searchParams.get('data.id') ?? req.nextUrl.searchParams.get('id')
+  const dataId     = req.nextUrl.searchParams.get('data.id') ?? req.nextUrl.searchParams.get('id')
   const xSignature = req.headers.get('x-signature')
   const xRequestId = req.headers.get('x-request-id')
 
@@ -33,8 +25,16 @@ export async function POST(req: NextRequest) {
 
   const body = await req.json().catch(() => null)
   const topic = req.nextUrl.searchParams.get('topic') ?? body?.type
-  if (topic !== 'order' || !dataId) {
+  if (topic !== 'order' || !dataId || !body) {
     // Outros tópicos (split, etc.) — reconhece mas não processa ainda.
+    return NextResponse.json({ ok: true })
+  }
+
+  const status            = body.status ?? body.data?.status
+  const externalReference = body.external_reference ?? body.data?.external_reference
+  const totalPaidAmount   = body.total_paid_amount ?? body.data?.total_paid_amount
+
+  if (status !== 'processed' || !externalReference) {
     return NextResponse.json({ ok: true })
   }
 
@@ -44,37 +44,27 @@ export async function POST(req: NextRequest) {
   const { data: jaExiste } = await sb.from('rsvps').select('id').eq('mp_payment_id', dataId).single()
   if (jaExiste) return NextResponse.json({ ok: true })
 
-  const refBruto = body?.external_reference ?? null
-  if (!refBruto) return NextResponse.json({ ok: true })
+  const { data: pendente } = await sb
+    .from('rsvp_pendentes')
+    .select('event_id, user_name, user_phone, parent_rsvp_id')
+    .eq('id', externalReference)
+    .single()
 
-  let ref: ExternalRef
-  try {
-    ref = JSON.parse(Buffer.from(refBruto, 'base64').toString('utf-8'))
-  } catch {
-    return NextResponse.json({ ok: true })
-  }
-
-  // A order é escopada pro vendedor que a criou — busca o token do
-  // organizador no nosso próprio banco (nunca transita pelo MP).
-  const { data: evento } = await sb.from('events').select('user_id').eq('id', ref.event_id).single()
-  const { data: organizador } = evento?.user_id
-    ? await sb.from('users').select('mp_access_token').eq('id', evento.user_id).single()
-    : { data: null }
-  if (!organizador?.mp_access_token) return NextResponse.json({ ok: true })
-
-  const order = await getOrderClient(organizador.mp_access_token).get({ id: dataId })
-  if (order.status !== 'processed') return NextResponse.json({ ok: true })
+  if (!pendente) return NextResponse.json({ ok: true })
 
   const { error } = await sb.from('rsvps').insert({
-    event_id:       ref.event_id,
-    user_name:      ref.user_name,
-    user_phone:     ref.user_phone,
-    parent_rsvp_id: ref.parent_rsvp_id || null,
+    event_id:       pendente.event_id,
+    user_name:      pendente.user_name,
+    user_phone:     pendente.user_phone,
+    parent_rsvp_id: pendente.parent_rsvp_id,
     pago:           true,
-    valor_pago:     order.total_paid_amount ? Number(order.total_paid_amount) : null,
+    valor_pago:     totalPaidAmount ? Number(totalPaidAmount) : null,
     mp_payment_id:  dataId,
   })
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+
+  await sb.from('rsvp_pendentes').delete().eq('id', externalReference)
+
   return NextResponse.json({ ok: true })
 }

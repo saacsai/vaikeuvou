@@ -67,12 +67,22 @@ export async function POST(req: NextRequest) {
 
   const base = process.env.NEXT_PUBLIC_SITE_URL || 'https://live.vaikeuvou.app'
 
-  const externalReference = Buffer.from(JSON.stringify({
-    event_id,
-    user_name: user_name.trim(),
-    user_phone: phone,
-    parent_rsvp_id: parent_rsvp_id || null,
-  })).toString('base64')
+  // external_reference da MP tem limite de 64 caracteres — não cabe os dados
+  // do RSVP codificados, então guarda numa tabela-ponte e usa só o id.
+  const { data: pendente, error: erroPendente } = await sb
+    .from('rsvp_pendentes')
+    .insert({
+      event_id,
+      user_name: user_name.trim(),
+      user_phone: phone,
+      parent_rsvp_id: parent_rsvp_id || null,
+    })
+    .select('id')
+    .single()
+
+  if (erroPendente || !pendente) {
+    return NextResponse.json({ error: 'Erro ao abrir pagamento. Tente novamente.' }, { status: 500 })
+  }
 
   const valor = Number(evento.valor).toFixed(2)
 
@@ -83,7 +93,7 @@ export async function POST(req: NextRequest) {
         type: 'online',
         processing_mode: 'manual', // fixo pro Checkout Pro — não é aprovação manual nossa
         total_amount: valor,
-        external_reference: externalReference,
+        external_reference: pendente.id,
         description: evento.title,
         marketplace_fee: (Number(evento.valor) * (evento.comissao_percentual ?? 15) / 100).toFixed(2),
         items: [{
