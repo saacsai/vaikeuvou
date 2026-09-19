@@ -111,7 +111,8 @@ export default async function ConvidadosPage({ params }: Props) {
     byParent.get(key)!.push(r)
   }
   const raizes = byParent.get('root') ?? []
-  const isPast = new Date(evento.event_date).getTime() < Date.now()
+  const refFimEvento = evento.event_date_fim ? `${evento.event_date_fim}T23:59:59-03:00` : evento.event_date
+  const isPast = new Date(refFimEvento).getTime() < Date.now()
 
   return (
     <div className="min-h-screen bg-white text-gray-900 flex flex-col">

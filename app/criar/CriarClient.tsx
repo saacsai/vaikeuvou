@@ -31,12 +31,13 @@ type Props = {
 export default function CriarClient({ userName, userAvatar, userBio, userInstagram, termsAccepted }: Props) {
   const router = useRouter()
   const [form, setForm] = useState<Form>({
-    title: '', event_date: '', event_time: '', duration_minutes: '',
+    title: '', event_date: '', event_date_fim: '', event_time: '', duration_minutes: '',
     location: '', description: '', max_depth: 2,
     external_url: '', external_url_label: '', video_url: '',
     bg_image_url: '', cidade: '',
     valor: '', descricao_pacote: '', programacao: '', comissao_percentual: 15,
   })
+  const [multiDia, setMultiDia] = useState(false)
   const [saving, setSaving] = useState(false)
   const [erro,   setErro]   = useState('')
 
@@ -71,8 +72,13 @@ export default function CriarClient({ userName, userAvatar, userBio, userInstagr
   }
 
   async function criar() {
-    if (!form.title || !form.event_date || !form.event_time) {
-      setErro('Preencha pelo menos o título, a data e o horário.')
+    if (!form.title || !form.event_date || (multiDia ? !form.event_date_fim : !form.event_time)) {
+      setErro(multiDia ? 'Preencha o título, a data de início e a data de término.' : 'Preencha pelo menos o título, a data e o horário.')
+      return
+    }
+
+    if (multiDia && form.event_date_fim < form.event_date) {
+      setErro('A data de término precisa ser igual ou depois da data de início.')
       return
     }
 
@@ -99,14 +105,18 @@ export default function CriarClient({ userName, userAvatar, userBio, userInstagr
       })
     }
 
-    const event_date = `${form.event_date}T${form.event_time}:00-03:00`
+    const event_date = `${form.event_date}T${multiDia ? '00:00' : form.event_time}:00-03:00`
 
     // O convite nasce sem foto própria (blob: URL não faz sentido gravar) —
     // ela é enviada logo em seguida, já com o edit_token em mãos.
     const res = await fetch('/api/eventos', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ ...form, event_date, bg_image_url: pendingHeaderImage ? '' : form.bg_image_url }),
+      body: JSON.stringify({
+        ...form, event_date,
+        event_date_fim: multiDia ? form.event_date_fim : '',
+        bg_image_url: pendingHeaderImage ? '' : form.bg_image_url,
+      }),
     })
     const json = await res.json()
 
@@ -173,28 +183,51 @@ export default function CriarClient({ userName, userAvatar, userBio, userInstagr
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div className="min-w-0">
-                <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Data *</label>
+                <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">{multiDia ? 'Data de início *' : 'Data *'}</label>
                 <DatePicker value={form.event_date} onChange={v => set('event_date', v)} />
               </div>
-              <div className="min-w-0">
-                <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Horário *</label>
-                <TimePicker value={form.event_time} onChange={v => set('event_time', v)} />
-              </div>
+              {multiDia ? (
+                <div className="min-w-0">
+                  <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Data de término *</label>
+                  <DatePicker value={form.event_date_fim} onChange={v => set('event_date_fim', v)} />
+                </div>
+              ) : (
+                <div className="min-w-0">
+                  <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Horário *</label>
+                  <TimePicker value={form.event_time} onChange={v => set('event_time', v)} />
+                </div>
+              )}
             </div>
 
-            <div>
-              <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Duração</label>
-              <select
-                value={form.duration_minutes}
-                onChange={e => set('duration_minutes', e.target.value ? Number(e.target.value) : '')}
-                className="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-gray-900 outline-none focus:border-brand text-sm"
-              >
-                <option value="">Não informar</option>
-                {DURACAO_OPCOES.map((o, i) => (
-                  <option key={i} value={o.value}>{o.label}</option>
-                ))}
-              </select>
-            </div>
+            <label className="flex items-center gap-2 text-xs text-gray-500 -mt-2">
+              <input
+                type="checkbox"
+                checked={multiDia}
+                onChange={e => {
+                  const v = e.target.checked
+                  setMultiDia(v)
+                  if (!v) set('event_date_fim', '')
+                }}
+                className="rounded border-gray-300 text-brand focus:ring-brand"
+              />
+              Evento com mais de um dia (pacote/viagem)
+            </label>
+
+            {!multiDia && (
+              <div>
+                <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Duração</label>
+                <select
+                  value={form.duration_minutes}
+                  onChange={e => set('duration_minutes', e.target.value ? Number(e.target.value) : '')}
+                  className="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-gray-900 outline-none focus:border-brand text-sm"
+                >
+                  <option value="">Não informar</option>
+                  {DURACAO_OPCOES.map((o, i) => (
+                    <option key={i} value={o.value}>{o.label}</option>
+                  ))}
+                </select>
+              </div>
+            )}
 
             <div>
               <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Local</label>

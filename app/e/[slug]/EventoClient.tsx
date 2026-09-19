@@ -8,7 +8,7 @@ function fmtBRL(v: number): string {
   return v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
 }
 import type { Event, Rsvp } from '@/lib/supabase'
-import { fmtDate } from '@/lib/slug'
+import { fmtDate, fmtDateRange } from '@/lib/slug'
 
 function fmtHora(iso: string): string {
   return new Intl.DateTimeFormat('pt-BR', { hour: '2-digit', minute: '2-digit', timeZone: 'America/Sao_Paulo' }).format(new Date(iso))
@@ -87,7 +87,8 @@ export default function EventoClient({ evento, rsvps, parentRsvpId, criador, ses
   const embedUrl    = evento.video_url ? getVideoEmbed(evento.video_url) : null
   const linkLabel   = evento.external_url_label ?? 'Saiba mais'
   const podeConvidar = evento.max_depth > 1
-  const isPast       = new Date(evento.event_date).getTime() < Date.now()
+  const refFimEvento = evento.event_date_fim ? `${evento.event_date_fim}T23:59:59-03:00` : evento.event_date
+  const isPast       = new Date(refFimEvento).getTime() < Date.now()
   const fimIso        = evento.duration_minutes
     ? new Date(new Date(evento.event_date).getTime() + evento.duration_minutes * 60000).toISOString()
     : null
@@ -161,7 +162,7 @@ export default function EventoClient({ evento, rsvps, parentRsvpId, criador, ses
 
           {/* Detalhes */}
           <div className="space-y-3 text-sm text-gray-500 mb-[26px]">
-            <p>📅 {fmtDate(evento.event_date)}{fimIso && ` às ${fmtHora(fimIso)}`}</p>
+            <p>📅 {evento.event_date_fim ? fmtDateRange(evento.event_date, evento.event_date_fim) : fmtDate(evento.event_date)}{!evento.event_date_fim && fimIso && ` às ${fmtHora(fimIso)}`}</p>
             {evento.location && (
               <div className="flex items-center gap-1.5 w-fit">
                 <span>📍</span>

@@ -9,7 +9,7 @@ import { ProfilePopover, GridIcon } from '@/components/AppHeaderNav'
 import AppFooter from '@/components/AppFooter'
 import EventPreviewCard from '@/components/EventPreviewCard'
 import BgSelector from '@/components/BgSelector'
-import { fmtDate } from '@/lib/slug'
+import { fmtDate, fmtDateRange } from '@/lib/slug'
 import { DURACAO_OPCOES, type EventFormFields } from '@/lib/eventForm'
 
 const PRIVACIDADE = [
@@ -67,6 +67,7 @@ function toForm(evento: Event): EventFormFields {
   return {
     title: evento.title,
     event_date: date,
+    event_date_fim: evento.event_date_fim ?? '',
     event_time: time,
     duration_minutes: evento.duration_minutes ?? '',
     location: evento.location ?? '',
@@ -87,6 +88,7 @@ function toForm(evento: Event): EventFormFields {
 export default function DashboardClient({ evento, rsvps, isNovo, userName, userAvatar, userBio, userInstagram }: Props) {
   const [initial,   setInitial]   = useState<EventFormFields>(() => toForm(evento))
   const [form,      setForm]      = useState<EventFormFields>(() => toForm(evento))
+  const [multiDia,  setMultiDia]  = useState(() => !!evento.event_date_fim)
   const [copiado,   setCopiado]   = useState(false)
   const [saving,    setSaving]    = useState(false)
   const [msg,       setMsg]       = useState('')
@@ -104,7 +106,8 @@ export default function DashboardClient({ evento, rsvps, isNovo, userName, userA
   }
 
   const linkConvite = `https://live.vaikeuvou.app/e/${evento.slug}`
-  const isPast = new Date(evento.event_date).getTime() < Date.now()
+  const refFimEvento = evento.event_date_fim ? `${evento.event_date_fim}T23:59:59-03:00` : evento.event_date
+  const isPast = new Date(refFimEvento).getTime() < Date.now()
 
   const nivel1 = rsvps.filter(r => r.depth_level === 1)
   const nivel2 = rsvps.filter(r => r.depth_level === 2)
@@ -123,19 +126,26 @@ export default function DashboardClient({ evento, rsvps, isNovo, userName, userA
   }
 
   async function salvar() {
-    if (!form.title || !form.event_date || !form.event_time) {
-      setMsg('Preencha pelo menos o título, a data e o horário.')
+    if (!form.title || !form.event_date || (multiDia ? !form.event_date_fim : !form.event_time)) {
+      setMsg(multiDia ? 'Preencha pelo menos o título, a data de início e a data de término.' : 'Preencha pelo menos o título, a data e o horário.')
+      return
+    }
+    if (multiDia && form.event_date_fim < form.event_date) {
+      setMsg('A data de término precisa ser igual ou depois da data de início.')
       return
     }
     setSaving(true)
     setMsg('')
 
-    const event_date = `${form.event_date}T${form.event_time}:00-03:00`
+    const event_date = `${form.event_date}T${multiDia ? '00:00' : form.event_time}:00-03:00`
 
     const res = await fetch('/api/eventos/editar', {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ edit_token: evento.edit_token, ...form, event_date }),
+      body: JSON.stringify({
+        edit_token: evento.edit_token, ...form, event_date,
+        event_date_fim: multiDia ? form.event_date_fim : '',
+      }),
     })
     const json = await res.json()
 
@@ -208,7 +218,7 @@ export default function DashboardClient({ evento, rsvps, isNovo, userName, userA
             {isPast ? (
               <>
                 <p className="text-xs font-bold text-gray-400 uppercase tracking-wide">Convite encerrado</p>
-                <p className="text-gray-500 text-sm">Esse evento já aconteceu em {fmtDate(evento.event_date)} — não é mais possível compartilhar ou editar.</p>
+                <p className="text-gray-500 text-sm">Esse evento já aconteceu em {evento.event_date_fim ? fmtDateRange(evento.event_date, evento.event_date_fim) : fmtDate(evento.event_date)} — não é mais possível compartilhar ou editar.</p>
               </>
             ) : (
               <>
@@ -314,28 +324,51 @@ export default function DashboardClient({ evento, rsvps, isNovo, userName, userA
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div className="min-w-0">
-                <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Data *</label>
+                <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">{multiDia ? 'Data de início *' : 'Data *'}</label>
                 <DatePicker value={form.event_date} onChange={v => set('event_date', v)} />
               </div>
-              <div className="min-w-0">
-                <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Horário *</label>
-                <TimePicker value={form.event_time} onChange={v => set('event_time', v)} />
-              </div>
+              {multiDia ? (
+                <div className="min-w-0">
+                  <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Data de término *</label>
+                  <DatePicker value={form.event_date_fim} onChange={v => set('event_date_fim', v)} />
+                </div>
+              ) : (
+                <div className="min-w-0">
+                  <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Horário *</label>
+                  <TimePicker value={form.event_time} onChange={v => set('event_time', v)} />
+                </div>
+              )}
             </div>
 
-            <div>
-              <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Duração</label>
-              <select
-                value={form.duration_minutes}
-                onChange={e => set('duration_minutes', e.target.value ? Number(e.target.value) : '')}
-                className="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-gray-900 outline-none focus:border-brand text-sm"
-              >
-                <option value="">Não informar</option>
-                {DURACAO_OPCOES.map((o, i) => (
-                  <option key={i} value={o.value}>{o.label}</option>
-                ))}
-              </select>
-            </div>
+            <label className="flex items-center gap-2 text-xs text-gray-500 -mt-2">
+              <input
+                type="checkbox"
+                checked={multiDia}
+                onChange={e => {
+                  const v = e.target.checked
+                  setMultiDia(v)
+                  if (!v) set('event_date_fim', '')
+                }}
+                className="rounded border-gray-300 text-brand focus:ring-brand"
+              />
+              Evento com mais de um dia (pacote/viagem)
+            </label>
+
+            {!multiDia && (
+              <div>
+                <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Duração</label>
+                <select
+                  value={form.duration_minutes}
+                  onChange={e => set('duration_minutes', e.target.value ? Number(e.target.value) : '')}
+                  className="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-gray-900 outline-none focus:border-brand text-sm"
+                >
+                  <option value="">Não informar</option>
+                  {DURACAO_OPCOES.map((o, i) => (
+                    <option key={i} value={o.value}>{o.label}</option>
+                  ))}
+                </select>
+              </div>
+            )}
 
             <div>
               <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Local</label>

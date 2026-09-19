@@ -23,3 +23,12 @@ export function fmtDate(iso: string): string {
     hour: '2-digit', minute: '2-digit', timeZone: 'America/Sao_Paulo',
   })
 }
+
+// Evento com data_fim (multi-dia): sem hora, já que "horário" perde
+// sentido quando o evento cobre mais de um dia.
+export function fmtDateRange(inicioIso: string, fimDate: string): string {
+  const inicio = new Date(inicioIso)
+  const fim    = new Date(`${fimDate}T12:00:00-03:00`)
+  const opts: Intl.DateTimeFormatOptions = { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric', timeZone: 'America/Sao_Paulo' }
+  return `${inicio.toLocaleDateString('pt-BR', opts)} a ${fim.toLocaleDateString('pt-BR', opts)}`
+}

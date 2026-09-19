@@ -1,6 +1,7 @@
 export type EventFormFields = {
   title: string
   event_date: string
+  event_date_fim: string
   event_time: string
   duration_minutes: number | ''
   location: string
@@ -27,12 +28,21 @@ export const DURACAO_OPCOES = [
   { label: 'Dia inteiro (8 horas)',      value: 480 },
 ]
 
-export function fmtPreviewDate(date: string, time: string, durationMinutes?: number | ''): string {
-  if (!date) return ''
+const DIAS_ABREV = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb']
+const MESES_ABREV = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez']
+
+function fmtDiaMes(date: string): string {
   const [y, m, d] = date.split('-').map(Number)
   const obj = new Date(y, m - 1, d)
-  const days   = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb']
-  const months = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez']
+  return `${DIAS_ABREV[obj.getDay()]}, ${d} ${MESES_ABREV[m - 1]}`
+}
+
+export function fmtPreviewDate(date: string, time: string, durationMinutes?: number | '', dateFim?: string): string {
+  if (!date) return ''
+
+  if (dateFim && dateFim !== date) {
+    return `${fmtDiaMes(date)} a ${fmtDiaMes(dateFim)}`
+  }
 
   let horaLabel = time ? ` às ${time}` : ''
   if (time && durationMinutes) {
@@ -42,5 +52,5 @@ export function fmtPreviewDate(date: string, time: string, durationMinutes?: num
     horaLabel = ` das ${time} às ${fimStr}`
   }
 
-  return `${days[obj.getDay()]}, ${d} ${months[m - 1]}${horaLabel}`
+  return `${fmtDiaMes(date)}${horaLabel}`
 }
