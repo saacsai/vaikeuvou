@@ -136,7 +136,15 @@ export default function EventoClient({ evento, rsvps, parentRsvpId, criador, con
       // O telefone some do estado no reload pós-redirect do MP — guarda pra
       // retomar o polling do pagamento quando a pessoa voltar.
       sessionStorage.setItem('vkv_pending_telefone', telefone)
-      window.location.href = json.url
+      // Navegação via <a rel="noreferrer"> em vez de window.location.href —
+      // o checkout da MP se comporta diferente (botão de pagar não habilita)
+      // quando detecta o Referer vindo do vaikeuvou; sem referrer funciona
+      // igual a colar o link direto na barra de endereço.
+      const a = document.createElement('a')
+      a.href = json.url
+      a.rel  = 'noreferrer'
+      document.body.appendChild(a)
+      a.click()
       return
     }
 
