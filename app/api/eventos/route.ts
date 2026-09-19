@@ -11,6 +11,7 @@ export async function POST(req: NextRequest) {
   const {
     title, event_date, duration_minutes, location, description, max_depth, bg_image_url,
     video_url, external_url, external_url_label, cidade,
+    valor, descricao_pacote, programacao, comissao_percentual,
   } = await req.json()
 
   if (!title || !event_date) {
@@ -44,6 +45,10 @@ export async function POST(req: NextRequest) {
       external_url:         external_url || null,
       external_url_label:   external_url_label || null,
       cidade:               cidade || null,
+      valor:                valor || null,
+      descricao_pacote:     descricao_pacote || null,
+      programacao:          programacao || null,
+      comissao_percentual:  comissao_percentual || 15,
       creator_phone: phone,
       user_id:       session.user_id,
     })

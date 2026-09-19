@@ -28,7 +28,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
           <div className="flex items-center gap-x-2">
             <span className="text-brand font-bold text-[25px]">Admin</span>
           </div>
-          <a href="/" className="text-gray-400 text-sm hover:text-gray-600">← vaikeuvou.app</a>
+          <a href="/" className="text-gray-400 text-sm hover:text-gray-600">← live.vaikeuvou.app</a>
         </div>
 
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">

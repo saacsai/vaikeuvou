@@ -18,6 +18,10 @@ const PRIVACIDADE = [
   { value: 999, label: 'Aberto',           desc: 'Viralização ilimitada' },
 ]
 
+function fmtBRL(v: number): string {
+  return v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
+}
+
 function EditIcon({ className }: { className?: string }) {
   return (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
@@ -73,6 +77,10 @@ function toForm(evento: Event): EventFormFields {
     video_url: evento.video_url ?? '',
     bg_image_url: evento.bg_image_url ?? '',
     cidade: evento.cidade ?? '',
+    valor: evento.valor ?? '',
+    descricao_pacote: evento.descricao_pacote ?? '',
+    programacao: evento.programacao ?? '',
+    comissao_percentual: evento.comissao_percentual,
   }
 }
 
@@ -95,12 +103,18 @@ export default function DashboardClient({ evento, rsvps, isNovo, userName, userA
     setForm(p => ({ ...p, [k]: v }))
   }
 
-  const linkConvite = `https://vaikeuvou.app/e/${evento.slug}`
+  const linkConvite = `https://live.vaikeuvou.app/e/${evento.slug}`
   const isPast = new Date(evento.event_date).getTime() < Date.now()
 
   const nivel1 = rsvps.filter(r => r.depth_level === 1)
   const nivel2 = rsvps.filter(r => r.depth_level === 2)
   const nivel3 = rsvps.filter(r => r.depth_level >= 3)
+
+  const isPago = !!evento.valor && evento.valor > 0
+  const pagos = rsvps.filter(r => r.pago)
+  const vendido = pagos.reduce((sum, r) => sum + (r.valor_pago ?? 0), 0)
+  const comissao = vendido * (evento.comissao_percentual / 100)
+  const liquido = vendido - comissao
 
   function copiar(txt: string) {
     navigator.clipboard.writeText(txt)
@@ -219,7 +233,7 @@ export default function DashboardClient({ evento, rsvps, isNovo, userName, userA
                   Compartilhar no WhatsApp
                 </a>
                 <button
-                  onClick={() => copiar(`<iframe src="https://vaikeuvou.app/embed/${evento.slug}" width="320" height="70" frameborder="0"></iframe>`)}
+                  onClick={() => copiar(`<iframe src="https://live.vaikeuvou.app/embed/${evento.slug}" width="320" height="70" frameborder="0"></iframe>`)}
                   className="flex items-center justify-center gap-2 w-full py-2.5 rounded-lg border border-gray-200 text-gray-600 font-bold text-sm hover:bg-gray-50"
                 >
                   {copiado ? '✓ Código copiado' : 'Copiar código de incorporação'}
@@ -229,6 +243,32 @@ export default function DashboardClient({ evento, rsvps, isNovo, userName, userA
             )}
           </div>
         </div>
+
+        {/* Painel financeiro — só aparece em eventos pagos */}
+        {isPago && (
+          <div className="mb-10">
+            <p className="text-xs font-bold text-gray-400 uppercase tracking-wide mb-3">Financeiro</p>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+              <div className="bg-white border border-gray-100 rounded-xl p-4 text-center shadow-sm">
+                <p className="text-2xl font-extrabold text-brand">{fmtBRL(vendido)}</p>
+                <p className="text-gray-500 text-xs mt-1">Total vendido</p>
+              </div>
+              <div className="bg-white border border-gray-100 rounded-xl p-4 text-center shadow-sm">
+                <p className="text-2xl font-extrabold text-brand">{pagos.length}</p>
+                <p className="text-gray-500 text-xs mt-1">Pagos de {rsvps.length}</p>
+              </div>
+              <div className="bg-white border border-gray-100 rounded-xl p-4 text-center shadow-sm">
+                <p className="text-2xl font-extrabold text-gray-400">{fmtBRL(comissao)}</p>
+                <p className="text-gray-500 text-xs mt-1">Comissão vaikeuvou ({evento.comissao_percentual}%)</p>
+              </div>
+              <div className="bg-white border border-gray-100 rounded-xl p-4 text-center shadow-sm">
+                <p className="text-2xl font-extrabold text-green-600">{fmtBRL(liquido)}</p>
+                <p className="text-gray-500 text-xs mt-1">Líquido pra você</p>
+              </div>
+            </div>
+            <p className="text-[10px] text-gray-400 mt-2">Repasse combinado direto com o Luciano/Sandro — pagamento sai automático via cartão, o líquido é acertado à parte por enquanto.</p>
+          </div>
+        )}
 
         {/* Edição completa — mesma estrutura do /criar (eventos futuros); eventos
             passados mostram só o preview mascarado, sem editar nem compartilhar */}
@@ -316,6 +356,55 @@ export default function DashboardClient({ evento, rsvps, isNovo, userName, userA
                 className="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 outline-none focus:border-brand text-sm"
               />
             </div>
+
+            <div>
+              <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Valor por pessoa (opcional)</label>
+              <input
+                value={form.valor}
+                onChange={e => set('valor', e.target.value ? Number(e.target.value) : '')}
+                placeholder="Deixe em branco pra evento grátis"
+                type="number" min={0} step="0.01"
+                className="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 outline-none focus:border-brand text-sm"
+              />
+              <p className="text-[10px] text-gray-400 mt-0.5">Com valor definido, confirmar presença (BORA) exige pagamento.</p>
+            </div>
+
+            {!!form.valor && (
+              <>
+                <div>
+                  <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">O que está incluso (opcional)</label>
+                  <textarea
+                    value={form.descricao_pacote}
+                    onChange={e => set('descricao_pacote', e.target.value)}
+                    placeholder="Ex: churrasco completo + bebida, ida e volta de barco, welcome drink..."
+                    rows={3}
+                    className="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 outline-none focus:border-brand text-sm resize-none"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Programação detalhada (opcional)</label>
+                  <textarea
+                    value={form.programacao}
+                    onChange={e => set('programacao', e.target.value)}
+                    placeholder="Ex: 9h chegada, 10h saída do barco, 13h almoço, 17h volta..."
+                    rows={3}
+                    className="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 outline-none focus:border-brand text-sm resize-none"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Comissão vaikeuvou (%)</label>
+                  <input
+                    value={form.comissao_percentual}
+                    onChange={e => set('comissao_percentual', Number(e.target.value))}
+                    type="number" min={0} max={100} step="0.5"
+                    className="w-32 bg-white border border-gray-300 rounded-xl px-4 py-3 text-gray-900 outline-none focus:border-brand text-sm"
+                  />
+                  <p className="text-[10px] text-gray-400 mt-0.5">Padrão 15% — combinado direto com o Luciano/Sandro caso seja diferente.</p>
+                </div>
+              </>
+            )}
 
             <div>
               <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Link externo</label>

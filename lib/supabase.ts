@@ -36,6 +36,10 @@ export type Event = {
   lng: number | null
   checkin_reminder_sent_at: string | null
   cidade: string | null
+  valor: number | null
+  descricao_pacote: string | null
+  programacao: string | null
+  comissao_percentual: number
 }
 
 export type Rsvp = {
@@ -50,4 +54,6 @@ export type Rsvp = {
   checkin_lat: number | null
   checkin_lng: number | null
   checkin_verified: boolean
+  pago: boolean
+  valor_pago: number | null
 }

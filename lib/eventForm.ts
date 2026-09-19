@@ -11,6 +11,10 @@ export type EventFormFields = {
   video_url: string
   bg_image_url: string
   cidade: string
+  valor: number | ''
+  descricao_pacote: string
+  programacao: string
+  comissao_percentual: number
 }
 
 export const DURACAO_OPCOES = [

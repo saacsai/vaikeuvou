@@ -35,6 +35,7 @@ export default function CriarClient({ userName, userAvatar, userBio, userInstagr
     location: '', description: '', max_depth: 2,
     external_url: '', external_url_label: '', video_url: '',
     bg_image_url: '', cidade: '',
+    valor: '', descricao_pacote: '', programacao: '', comissao_percentual: 15,
   })
   const [saving, setSaving] = useState(false)
   const [erro,   setErro]   = useState('')
@@ -214,6 +215,44 @@ export default function CriarClient({ userName, userAvatar, userBio, userInstagr
                 className="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 outline-none focus:border-brand text-sm"
               />
             </div>
+
+            <div>
+              <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Valor por pessoa (opcional)</label>
+              <input
+                value={form.valor}
+                onChange={e => set('valor', e.target.value ? Number(e.target.value) : '')}
+                placeholder="Deixe em branco pra evento grátis"
+                type="number" min={0} step="0.01"
+                className="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 outline-none focus:border-brand text-sm"
+              />
+              <p className="text-[10px] text-gray-400 mt-0.5">Com valor definido, confirmar presença (BORA) exige pagamento — é rateio ou ticket, não só RSVP.</p>
+            </div>
+
+            {!!form.valor && (
+              <>
+                <div>
+                  <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">O que está incluso (opcional)</label>
+                  <textarea
+                    value={form.descricao_pacote}
+                    onChange={e => set('descricao_pacote', e.target.value)}
+                    placeholder="Ex: churrasco completo + bebida, ida e volta de barco, welcome drink..."
+                    rows={3}
+                    className="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 outline-none focus:border-brand text-sm resize-none"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Programação detalhada (opcional)</label>
+                  <textarea
+                    value={form.programacao}
+                    onChange={e => set('programacao', e.target.value)}
+                    placeholder="Ex: 9h chegada, 10h saída do barco, 13h almoço, 17h volta..."
+                    rows={3}
+                    className="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 outline-none focus:border-brand text-sm resize-none"
+                  />
+                </div>
+              </>
+            )}
 
             {/* Link externo */}
             <div>

@@ -13,7 +13,7 @@ export async function generateMetadata({ params, searchParams }: Props): Promise
   const { data } = await sb.from('events').select('title, event_date, location, bg_image_url').eq('slug', slug).single()
   if (!data) return { title: 'vaikeuvou.app' }
 
-  const base = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://vaikeuvou.app'
+  const base = process.env.NEXT_PUBLIC_SITE_URL || 'https://live.vaikeuvou.app'
 
   // Formato curto pro preview do WhatsApp — o espaço ali é bem limitado
   // (~2 linhas antes de truncar), então "quarta-feira, 28 de agosto..."

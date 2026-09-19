@@ -16,7 +16,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { data: evento } = await sb.from('events').select('title, bg_image_url').eq('id', rsvp.event_id).single()
   if (!evento) return { title: 'vaikeuvou.app' }
 
-  const base = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://vaikeuvou.app'
+  const base = process.env.NEXT_PUBLIC_SITE_URL || 'https://live.vaikeuvou.app'
   // Mesma foto do convite original, pra bater com o que a pessoa já viu.
   const headerSrc = evento.bg_image_url || titleToHeader(evento.title).src
   const imageUrl  = headerSrc.startsWith('http') ? headerSrc : `${base}${headerSrc}`

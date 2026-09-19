@@ -6,7 +6,7 @@ const COOLDOWN_MS = 24 * 60 * 60 * 1000
 
 const AUTOREPLY_TEXT =
   'Esse número é só pra enviar códigos de login do vaikeuvou.app — a gente ainda não consegue responder mensagens por aqui. ' +
-  'Se precisar de ajuda, fala com a gente por vaikeuvou.app/fale 🙂'
+  'Se precisar de ajuda, fala com a gente por live.vaikeuvou.app/fale 🙂'
 
 export async function POST(req: NextRequest) {
   const body = await req.json().catch(() => null)

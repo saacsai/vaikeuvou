@@ -46,7 +46,7 @@ export async function GET(req: NextRequest) {
       .is('checked_in_at', null)
 
     for (const rsvp of rsvps ?? []) {
-      const link = `https://vaikeuvou.app/checkin/${rsvp.id}`
+      const link = `https://live.vaikeuvou.app/checkin/${rsvp.id}`
       await enviarWhatsapp(rsvp.user_phone, `E aí, foi no "${evento.title}"? Confirma sua presença: ${link}`)
       totalEnviados++
     }

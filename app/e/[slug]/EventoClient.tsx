@@ -1,7 +1,12 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { useSearchParams } from 'next/navigation'
 import Image from 'next/image'
+
+function fmtBRL(v: number): string {
+  return v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
+}
 import type { Event, Rsvp } from '@/lib/supabase'
 import { fmtDate } from '@/lib/slug'
 
@@ -29,14 +34,43 @@ function getVideoEmbed(url: string): string | null {
 }
 
 export default function EventoClient({ evento, rsvps, parentRsvpId, criador, sessionUser }: Props) {
-  const [etapa,    setEtapa]    = useState<'convite' | 'form' | 'sucesso'>('convite')
+  const [etapa,    setEtapa]    = useState<'convite' | 'form' | 'aguardando_pagamento' | 'sucesso'>('convite')
   const [nome,     setNome]     = useState(sessionUser?.name ?? '')
   const [telefone, setTelefone] = useState(sessionUser?.phone ?? '')
   const [saving,   setSaving]   = useState(false)
   const [erro,     setErro]     = useState('')
   const [meuRsvpId, setMeuRsvpId] = useState('')
 
-  const base        = typeof window !== 'undefined' ? window.location.origin : 'https://vaikeuvou.app'
+  const searchParams = useSearchParams()
+  const pago = !!evento.valor && evento.valor > 0
+
+  // Volta do Stripe Checkout — o webhook pode ainda não ter processado, faz
+  // polling curto até o RSVP aparecer (ver /api/rsvp/checkout + webhook).
+  useEffect(() => {
+    const sessionId = searchParams.get('session_id')
+    if (!searchParams.get('rsvp_ok') || !sessionId) return
+
+    setEtapa('aguardando_pagamento')
+    let tentativas = 0
+    const intervalo = setInterval(async () => {
+      tentativas++
+      const res  = await fetch(`/api/rsvp/by-session?session_id=${sessionId}`)
+      const json = await res.json()
+      if (json.rsvp_id) {
+        clearInterval(intervalo)
+        setMeuRsvpId(json.rsvp_id)
+        setEtapa('sucesso')
+      } else if (tentativas >= 10) {
+        clearInterval(intervalo)
+        setErro('Pagamento recebido, mas a confirmação está demorando — atualize a página em instantes.')
+        setEtapa('convite')
+      }
+    }, 1500)
+    return () => clearInterval(intervalo)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  const base        = typeof window !== 'undefined' ? window.location.origin : 'https://live.vaikeuvou.app'
   const linkConvite = `${base}/e/${evento.slug}?ref=${meuRsvpId}`
   const whatsappTxt = `Eu vou no "${evento.title}"! Vamo aí? 👉 ${linkConvite}`
 
@@ -64,15 +98,30 @@ export default function EventoClient({ evento, rsvps, parentRsvpId, criador, ses
     setSaving(true)
     setErro('')
 
+    const payload = {
+      event_id:       evento.id,
+      user_name:      nome.trim(),
+      user_phone:     telefone,
+      parent_rsvp_id: parentRsvpId,
+    }
+
+    // Evento pago: abre o checkout Stripe — o RSVP só é criado depois que o
+    // pagamento for confirmado (ver /api/rsvp/checkout).
+    if (pago) {
+      const res  = await fetch('/api/rsvp/checkout', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload),
+      })
+      const json = await res.json()
+      if (!res.ok) { setErro(json.error ?? 'Erro ao abrir pagamento. Tente novamente.'); setSaving(false); return }
+      if (json.ja_confirmado) { setMeuRsvpId(json.rsvp_id); setEtapa('sucesso'); setSaving(false); return }
+      window.location.href = json.url
+      return
+    }
+
     const res = await fetch('/api/rsvp', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        event_id:       evento.id,
-        user_name:      nome.trim(),
-        user_phone:     telefone,
-        parent_rsvp_id: parentRsvpId,
-      }),
+      body: JSON.stringify(payload),
     })
     const json = await res.json()
 
@@ -139,7 +188,27 @@ export default function EventoClient({ evento, rsvps, parentRsvpId, criador, ses
                 </a>
               </div>
             )}
+            {pago && (
+              <p className="flex items-center gap-1.5"><span>💳</span> {fmtBRL(evento.valor!)} por pessoa</p>
+            )}
           </div>
+
+          {(evento.descricao_pacote || evento.programacao) && (
+            <div className="space-y-3 mb-[26px]">
+              {evento.descricao_pacote && (
+                <div>
+                  <p className="text-xs font-bold text-gray-400 uppercase tracking-wide mb-1">O que está incluso</p>
+                  <p className="text-sm text-gray-600 whitespace-pre-line">{evento.descricao_pacote}</p>
+                </div>
+              )}
+              {evento.programacao && (
+                <div>
+                  <p className="text-xs font-bold text-gray-400 uppercase tracking-wide mb-1">Programação</p>
+                  <p className="text-sm text-gray-600 whitespace-pre-line">{evento.programacao}</p>
+                </div>
+              )}
+            </div>
+          )}
 
           {/* Confirmados */}
           {rsvps.length > 0 && (
@@ -191,10 +260,10 @@ export default function EventoClient({ evento, rsvps, parentRsvpId, criador, ses
                 className="w-full py-4 rounded-lg bg-brand hover:bg-brand-dark disabled:opacity-50 transition-colors shadow-lg shadow-brand/20 flex items-center justify-center gap-[5px]"
               >
                 {saving ? (
-                  <span className="text-white font-bold text-2xl uppercase tracking-wide">Confirmando…</span>
+                  <span className="text-white font-bold text-2xl uppercase tracking-wide">{pago ? 'Abrindo pagamento…' : 'Confirmando…'}</span>
                 ) : (
                   <>
-                    <span className="text-white font-bold text-2xl uppercase tracking-wide">BORA</span>
+                    <span className="text-white font-bold text-2xl uppercase tracking-wide">{pago ? `BORA — ${fmtBRL(evento.valor!)}` : 'BORA'}</span>
                     <Image src="/icone_bora.png" alt="" width={474} height={537} className="h-8 w-auto" />
                   </>
                 )}
@@ -227,6 +296,11 @@ export default function EventoClient({ evento, rsvps, parentRsvpId, criador, ses
                 />
               </div>
               {erro && <p className="text-red-500 text-sm">{erro}</p>}
+              {pago && (
+                <p className="text-xs text-gray-500 bg-gray-50 rounded-lg px-3 py-2">
+                  💳 Confirmar abre o pagamento de {fmtBRL(evento.valor!)} — sua presença só fica garantida depois de pago.
+                </p>
+              )}
               <p className="text-[10px] text-gray-400 leading-relaxed">
                 Ao confirmar, você concorda com os{' '}
                 <a href="/termos" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Termos de Uso</a>
@@ -239,14 +313,14 @@ export default function EventoClient({ evento, rsvps, parentRsvpId, criador, ses
                 className="w-full py-4 rounded-lg bg-brand hover:bg-brand-dark disabled:opacity-50 text-white font-bold text-lg uppercase tracking-wide transition-colors flex items-center justify-center gap-2"
               >
                 {saving ? (
-                  'Confirmando…'
+                  pago ? 'Abrindo pagamento…' : 'Confirmando…'
                 ) : (
                   <>
                     <span className="flex items-center gap-[5px]">
                       <span className="text-[21.6px]">BORA</span>
                       <Image src="/icone_bora.png" alt="" width={474} height={537} className="h-7 w-auto" />
                     </span>
-                    Confirmar
+                    {pago ? `Pagar ${fmtBRL(evento.valor!)}` : 'Confirmar'}
                   </>
                 )}
               </button>
@@ -256,11 +330,19 @@ export default function EventoClient({ evento, rsvps, parentRsvpId, criador, ses
             </div>
           )}
 
+          {etapa === 'aguardando_pagamento' && (
+            <div className="text-center space-y-3 py-4">
+              <div className="text-4xl animate-pulse">⏳</div>
+              <p className="text-gray-700 font-semibold text-sm">Confirmando seu pagamento…</p>
+              <p className="text-gray-400 text-xs">Isso leva só alguns segundos.</p>
+            </div>
+          )}
+
           {etapa === 'sucesso' && (
             <div className="text-center space-y-5">
               <div className="text-5xl">🎉</div>
               <div>
-                <h2 className="text-xl font-bold text-gray-900 mb-1">BORA confirmado!</h2>
+                <h2 className="text-xl font-bold text-gray-900 mb-1">{pago ? 'Pagamento confirmado!' : 'BORA confirmado!'}</h2>
                 <p className="text-gray-500 text-sm">Você está na lista. Nos vemos lá!</p>
               </div>
 

@@ -22,7 +22,7 @@ export default async function EmbedPage({ params, searchParams }: Props) {
 
   if (!evento) notFound()
 
-  const base = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://vaikeuvou.app'
+  const base = process.env.NEXT_PUBLIC_SITE_URL || 'https://live.vaikeuvou.app'
   const href = ref ? `${base}/e/${evento.slug}?ref=${ref}` : `${base}/e/${evento.slug}`
 
   return (
