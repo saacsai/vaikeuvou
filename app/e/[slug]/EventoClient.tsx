@@ -15,6 +15,7 @@ function fmtHora(iso: string): string {
 }
 import { titleToHeader } from '@/lib/headers'
 import SucessoConviteModal from '@/components/SucessoConviteModal'
+import ConfirmarPresencaModal from '@/components/ConfirmarPresencaModal'
 
 type Criador = { name: string | null; avatar_url: string | null; bio: string | null; instagram: string | null }
 type Convidador = { user_name: string; foto_url: string | null; mensagem: string | null } | null
@@ -283,79 +284,32 @@ export default function EventoClient({ evento, rsvps, parentRsvpId, criador, con
             <div className="space-y-3">
               <p className="text-gray-900 font-semibold text-[23px]">Vamo aí?</p>
               <button
-                onClick={() => sessionUser?.name ? confirmar() : setEtapa('form')}
+                onClick={() => setEtapa('form')}
                 disabled={saving}
                 className="w-full py-4 rounded-lg bg-brand hover:bg-brand-dark disabled:opacity-50 transition-colors shadow-lg shadow-brand/20 flex items-center justify-center gap-[5px]"
               >
-                {saving ? (
-                  <span className="text-white font-bold text-2xl uppercase tracking-wide">{pago ? 'Abrindo pagamento…' : 'Confirmando…'}</span>
-                ) : (
-                  <>
-                    <span className="text-white font-bold text-2xl uppercase tracking-wide">{pago ? `BORA — ${fmtBRL(evento.valor!)}` : 'BORA'}</span>
-                    <Image src="/icone_bora.png" alt="" width={474} height={537} className="h-8 w-auto" />
-                  </>
-                )}
+                <span className="text-white font-bold text-2xl uppercase tracking-wide">BORA</span>
+                <Image src="/icone_bora.png" alt="" width={474} height={537} className="h-8 w-auto" />
               </button>
               {erro && <p className="text-red-500 text-sm">{erro}</p>}
             </div>
           )}
 
           {etapa === 'form' && (
-            <div className="space-y-4">
-              <h2 className="text-lg font-bold text-gray-900">Só mais dois campos 😄</h2>
-              <div>
-                <label className="block text-xs text-gray-500 mb-1.5 font-semibold uppercase tracking-wide">Seu nome</label>
-                <input
-                  value={nome}
-                  onChange={e => setNome(e.target.value)}
-                  placeholder="Como te chamam?"
-                  autoFocus
-                  className="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 outline-none focus:border-brand text-base"
-                />
-              </div>
-              <div>
-                <label className="block text-xs text-gray-500 mb-1.5 font-semibold uppercase tracking-wide">Seu WhatsApp</label>
-                <input
-                  type="tel"
-                  value={telefone}
-                  onChange={e => setTelefone(e.target.value)}
-                  placeholder="11 99999-0000"
-                  className="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 outline-none focus:border-brand text-base"
-                />
-              </div>
-              {erro && <p className="text-red-500 text-sm">{erro}</p>}
-              {pago && (
-                <p className="text-xs text-gray-500 bg-gray-50 rounded-lg px-3 py-2">
-                  💳 Confirmar abre o pagamento de {fmtBRL(evento.valor!)} — sua presença só fica garantida depois de pago.
-                </p>
-              )}
-              <p className="text-[10px] text-gray-400 leading-relaxed">
-                Ao confirmar, você concorda com os{' '}
-                <a href="/termos" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Termos de Uso</a>
-                {' '}e a{' '}
-                <a href="/privacidade" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">Política de Privacidade</a>.
-              </p>
-              <button
-                onClick={confirmar}
-                disabled={saving}
-                className="w-full py-4 rounded-lg bg-brand hover:bg-brand-dark disabled:opacity-50 text-white font-bold text-lg uppercase tracking-wide transition-colors flex items-center justify-center gap-2"
-              >
-                {saving ? (
-                  pago ? 'Abrindo pagamento…' : 'Confirmando…'
-                ) : (
-                  <>
-                    <span className="flex items-center gap-[5px]">
-                      <span className="text-[21.6px]">BORA</span>
-                      <Image src="/icone_bora.png" alt="" width={474} height={537} className="h-7 w-auto" />
-                    </span>
-                    {pago ? `Pagar ${fmtBRL(evento.valor!)}` : 'Confirmar'}
-                  </>
-                )}
-              </button>
-              <button onClick={() => setEtapa('convite')} className="w-full text-gray-400 text-sm py-2 uppercase tracking-wide">
-                Voltar
-              </button>
-            </div>
+            <ConfirmarPresencaModal
+              tituloEvento={evento.title}
+              pago={pago}
+              valor={evento.valor}
+              maxParcelas={evento.max_parcelas}
+              nome={nome}
+              telefone={telefone}
+              onNomeChange={setNome}
+              onTelefoneChange={setTelefone}
+              onConfirmar={confirmar}
+              onClose={() => setEtapa('convite')}
+              saving={saving}
+              erro={erro}
+            />
           )}
 
           {etapa === 'aguardando_pagamento' && (
