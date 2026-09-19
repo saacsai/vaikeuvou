@@ -114,13 +114,15 @@ export default function ConfirmarPresencaModal({
             >
               {saving ? (
                 pago ? 'Abrindo pagamento…' : 'Confirmando…'
+              ) : pago && valor ? (
+                'Efetuar pagamento'
               ) : (
                 <>
                   <span className="flex items-center gap-[5px]">
                     <span className="text-[21.6px]">BORA</span>
                     <Image src="/icone_bora.png" alt="" width={474} height={537} className="h-7 w-auto" />
                   </span>
-                  {pago && valor ? `Pagar ${fmtBRL(valor)}` : 'Confirmar'}
+                  Confirmar
                 </>
               )}
             </button>
