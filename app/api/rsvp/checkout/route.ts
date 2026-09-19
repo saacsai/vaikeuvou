@@ -112,7 +112,8 @@ export async function POST(req: NextRequest) {
       },
     })
   } catch (err) {
-    console.error('Erro ao criar order MP:', JSON.stringify(err, null, 2))
+    const e = err as { status?: number; message?: string; error?: string; causes?: unknown }
+    console.error('Erro ao criar order MP:', e.status, e.message, e.error, JSON.stringify(e.causes))
     return NextResponse.json({ error: 'Erro ao abrir pagamento. Tente novamente.' }, { status: 500 })
   }
 
