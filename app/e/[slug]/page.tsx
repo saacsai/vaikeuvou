@@ -76,12 +76,27 @@ export default async function EventoPage({ params, searchParams }: Props) {
     criador = user
   }
 
+  // Personalização em cascata: se veio de um reenvio (?ref=rsvp_id), quem
+  // recebeu deve ver a foto/mensagem de quem especificamente convidou —
+  // nunca a do criador raiz, senão perde o sentido ("quem é esse?").
+  let convidador = null
+  if (ref) {
+    const { data: rsvpRef } = await sb
+      .from('rsvps')
+      .select('user_name, foto_url, mensagem')
+      .eq('id', ref)
+      .eq('event_id', evento.id)
+      .single()
+    convidador = rsvpRef
+  }
+
   return (
     <EventoClient
       evento={evento}
       rsvps={rsvps ?? []}
       parentRsvpId={ref ?? null}
       criador={criador}
+      convidador={convidador}
       sessionUser={session ? { name: session.users.name ?? '', phone: session.users.phone } : null}
     />
   )

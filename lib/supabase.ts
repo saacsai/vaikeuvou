@@ -57,4 +57,6 @@ export type Rsvp = {
   checkin_verified: boolean
   pago: boolean
   valor_pago: number | null
+  foto_url: string | null
+  mensagem: string | null
 }

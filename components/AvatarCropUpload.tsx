@@ -22,9 +22,11 @@ type Props = {
   onUploaded: (url: string) => void
   fallbackInitials: string
   hint?: string
+  uploadUrl?: string
+  extraFields?: Record<string, string>
 }
 
-export default function AvatarCropUpload({ avatar, onUploaded, fallbackInitials, hint }: Props) {
+export default function AvatarCropUpload({ avatar, onUploaded, fallbackInitials, hint, uploadUrl = '/api/perfil/avatar', extraFields }: Props) {
   const [uploading, setUploading] = useState(false)
   const [msg,       setMsg]       = useState('')
   const [crop,      setCrop]      = useState<CropState | null>(null)
@@ -118,12 +120,13 @@ export default function AvatarCropUpload({ avatar, onUploaded, fallbackInitials,
 
     const form = new FormData()
     form.append('avatar', blob, 'avatar.jpg')
+    for (const [k, v] of Object.entries(extraFields ?? {})) form.append(k, v)
 
-    const res  = await fetch('/api/perfil/avatar', { method: 'POST', body: form })
+    const res  = await fetch(uploadUrl, { method: 'POST', body: form })
     const json = await res.json()
 
     if (res.ok) {
-      onUploaded(json.avatar_url + '?t=' + Date.now())
+      onUploaded((json.url ?? json.avatar_url) + '?t=' + Date.now())
       setCrop(null)
     } else {
       setMsg(json.error ?? 'Erro ao enviar foto.')

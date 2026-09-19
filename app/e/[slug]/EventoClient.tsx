@@ -14,14 +14,17 @@ function fmtHora(iso: string): string {
   return new Intl.DateTimeFormat('pt-BR', { hour: '2-digit', minute: '2-digit', timeZone: 'America/Sao_Paulo' }).format(new Date(iso))
 }
 import { titleToHeader } from '@/lib/headers'
+import PersonalizarConvite from '@/components/PersonalizarConvite'
 
 type Criador = { name: string | null; avatar_url: string | null; bio: string | null; instagram: string | null }
+type Convidador = { user_name: string; foto_url: string | null; mensagem: string | null } | null
 
 type Props = {
   evento: Event
   rsvps: Pick<Rsvp, 'id' | 'user_name' | 'depth_level' | 'created_at'>[]
   parentRsvpId: string | null
   criador: Criador | null
+  convidador: Convidador
   sessionUser: { name: string; phone: string } | null
 }
 
@@ -33,7 +36,7 @@ function getVideoEmbed(url: string): string | null {
   return null
 }
 
-export default function EventoClient({ evento, rsvps, parentRsvpId, criador, sessionUser }: Props) {
+export default function EventoClient({ evento, rsvps, parentRsvpId, criador, convidador, sessionUser }: Props) {
   const [etapa,    setEtapa]    = useState<'convite' | 'form' | 'aguardando_pagamento' | 'sucesso'>('convite')
   const [nome,     setNome]     = useState(sessionUser?.name ?? '')
   const [telefone, setTelefone] = useState(sessionUser?.phone ?? '')
@@ -83,6 +86,17 @@ export default function EventoClient({ evento, rsvps, parentRsvpId, criador, ses
   const criadorBio       = criador?.bio
   const criadorInstagram = criador?.instagram
   const criadorIniciais  = criadorNome.slice(0, 2).toUpperCase()
+
+  // Personalização em cascata: quem chegou via reenvio (?ref=) vê a foto e a
+  // mensagem de quem especificamente convidou, nunca a do criador raiz —
+  // sem foto/mensagem customizada, cai num cartão genérico (iniciais de quem
+  // convidou + frase padrão), nunca herda a foto do criador por engano.
+  const heroNome      = convidador ? convidador.user_name : criadorNome
+  const heroAvatar     = convidador ? convidador.foto_url : criadorAvatar
+  const heroIniciais   = heroNome.slice(0, 2).toUpperCase()
+  const heroMensagem   = convidador
+    ? (convidador.mensagem || `${convidador.user_name} te convidou! Vamo aí?`)
+    : null
 
   const embedUrl    = evento.video_url ? getVideoEmbed(evento.video_url) : null
   const linkLabel   = evento.external_url_label ?? 'Saiba mais'
@@ -232,18 +246,20 @@ export default function EventoClient({ evento, rsvps, parentRsvpId, criador, ses
             </div>
           )}
 
-          {/* Anfitrião + recado */}
+          {/* Anfitrião (ou, via reenvio, quem convidou) + recado */}
           <div className="flex items-center gap-3 mb-5">
-            {criadorAvatar ? (
-              <Image src={criadorAvatar} alt={criadorNome} width={100} height={100}
+            {heroAvatar ? (
+              <Image src={heroAvatar} alt={heroNome} width={100} height={100}
                 className="w-[100px] h-[100px] rounded-full object-cover flex-shrink-0" unoptimized />
             ) : (
               <div className="w-[100px] h-[100px] rounded-full bg-gray-200 flex items-center justify-center text-base font-bold text-gray-600 flex-shrink-0">
-                {criadorIniciais}
+                {heroIniciais}
               </div>
             )}
             <div className="min-w-0">
-              {evento.description ? (
+              {heroMensagem ? (
+                <p className="text-sm text-gray-700 italic">&ldquo;{heroMensagem}&rdquo;</p>
+              ) : evento.description ? (
                 <p className="text-sm text-gray-700 italic">&ldquo;{evento.description}&rdquo;</p>
               ) : (
                 <p className="text-sm text-gray-400">Organizado por {criadorNome}</p>
@@ -346,6 +362,12 @@ export default function EventoClient({ evento, rsvps, parentRsvpId, criador, ses
                 <h2 className="text-xl font-bold text-gray-900 mb-1">{pago ? 'Pagamento confirmado!' : 'BORA confirmado!'}</h2>
                 <p className="text-gray-500 text-sm">Você está na lista. Nos vemos lá!</p>
               </div>
+
+              {podeConvidar && meuRsvpId && (
+                <div className="text-left">
+                  <PersonalizarConvite rsvpId={meuRsvpId} nome={nome} />
+                </div>
+              )}
 
               {podeConvidar && (
                 <div className="bg-gray-50 rounded-2xl p-5 text-left space-y-3">
