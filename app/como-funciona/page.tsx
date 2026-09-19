@@ -1,12 +1,6 @@
-import Link from 'next/link'
 import { getSession } from '@/lib/auth'
 import InfoPageShell from '@/components/InfoPageShell'
-import { CREDIT_PACKAGES } from '@/lib/stripe'
 import { FAQ } from '@/lib/faq'
-
-function fmtBRL(cents: number) {
-  return (cents / 100).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
-}
 
 const PASSOS = [
   { n: 1, title: 'Crie o convite', desc: 'Título, data, local e um recado — em menos de um minuto o convite já está pronto.' },
@@ -17,37 +11,10 @@ const PASSOS = [
 const GRATIS = [
   'Criar convites ilimitados',
   'Editar tudo depois de criado — título, data, local, recado, privacidade, link externo',
-  'Escolher entre os temas de capa prontos',
-  'Ver o total de confirmados',
-  'Compartilhar no WhatsApp',
+  'Trocar a foto e o vídeo de cabeçalho quantas vezes quiser',
+  'Ver quem confirmou presença',
+  'Compartilhar no WhatsApp e incorporar o convite em outros sites',
   'Confirmar presença (pra quem é convidado, sempre grátis)',
-]
-
-const PAGO = [
-  {
-    emoji: '📹',
-    title: 'Vídeo do convite',
-    custo: '1 crédito',
-    desc: 'Cola o link do YouTube ou Vimeo e ele aparece embaixo do botão BORA. Cobra 1 crédito toda vez que você adiciona ou troca o vídeo — inclusive a primeira vez, já na criação.',
-  },
-  {
-    emoji: '🖼️',
-    title: 'Foto própria de cabeçalho',
-    custo: '1 crédito',
-    desc: 'Quer usar uma foto sua no lugar dos temas prontos? 1 crédito toda vez que você envia ou troca a foto — os temas prontos continuam grátis sempre.',
-  },
-  {
-    emoji: '👀',
-    title: 'Ver quem confirmou',
-    custo: '3 créditos',
-    desc: 'A lista completa de quem confirmou presença (nome, quando confirmou, quem convidou quem) custa 3 créditos — pago uma vez, fica desbloqueada pra sempre naquele convite.',
-  },
-  {
-    emoji: '✨',
-    title: 'Imagem gerada por IA',
-    custo: '3 créditos',
-    desc: 'Em breve: gere uma imagem de cabeçalho única pro seu convite com IA. 3 créditos a cada geração.',
-  },
 ]
 
 export default async function ComoFuncionaPage() {
@@ -58,7 +25,6 @@ export default async function ComoFuncionaPage() {
       title="Como funciona?"
       userName={session?.users.name ?? null}
       userAvatar={session?.users.avatar_url ?? null}
-      userCredits={session?.users.credits}
       heroImage="/como-funciona-hero.jpg"
     >
       <div className="max-w-2xl mx-auto space-y-12 pb-6">
@@ -67,9 +33,8 @@ export default async function ComoFuncionaPage() {
         <div className="text-center space-y-3">
           <p className="text-gray-600 text-sm leading-relaxed">
             vaikeuvou é a forma mais rápida de criar um convite bonito pra qualquer rolê
-            e saber, na hora, quem confirmou &ldquo;BORA&rdquo;. Criar e editar convite é
-            sempre grátis — só um punhado de recursos extras usa <strong className="text-gray-800">créditos pré-pagos</strong>,
-            sem assinatura, sem mensalidade.
+            e saber, na hora, quem confirmou &ldquo;BORA&rdquo;. <strong className="text-gray-800">Tudo é grátis</strong> —
+            sem crédito, sem assinatura, sem mensalidade.
           </p>
         </div>
 
@@ -102,53 +67,17 @@ export default async function ComoFuncionaPage() {
           </ul>
         </section>
 
-        {/* Pago */}
+        {/* Imagem por IA */}
         <section>
-          <h2 className="text-xs font-bold text-gray-400 uppercase tracking-wide mb-1">O que usa crédito</h2>
-          <p className="text-xs text-gray-400 mb-4">
-            Cobra sempre que você usa — sem &ldquo;primeira vez grátis&rdquo;, inclusive já na criação do convite.
-          </p>
-          <div className="space-y-3">
-            {PAGO.map(item => (
-              <div key={item.title} className="flex items-start gap-3 border border-amber-100 bg-amber-50 rounded-xl p-4">
-                <span className="text-2xl flex-shrink-0">{item.emoji}</span>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center justify-between gap-2 flex-wrap">
-                    <p className="font-bold text-gray-800 text-sm">{item.title}</p>
-                    <span className="px-2 py-0.5 rounded-full bg-amber-200 text-amber-800 text-[10px] font-bold uppercase tracking-wide whitespace-nowrap">
-                      {item.custo}
-                    </span>
-                  </div>
-                  <p className="text-xs text-gray-500 mt-1 leading-relaxed">{item.desc}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        {/* CTA */}
-        <div className="text-center">
-          <Link
-            href="/creditos"
-            className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-xl bg-brand hover:bg-brand-dark text-white font-bold text-base uppercase tracking-wide transition-colors shadow-lg shadow-brand/20"
-          >
-            Comprar créditos
-            <ArrowIcon className="w-4 h-4" />
-          </Link>
-        </div>
-
-        {/* Pacotes */}
-        <section>
-          <h2 className="text-xs font-bold text-gray-400 uppercase tracking-wide mb-4 text-center">Pacotes de créditos</h2>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-            {CREDIT_PACKAGES.map(pkg => (
-              <div key={pkg.credits} className="border border-gray-200 rounded-xl p-3 text-center">
-                <p className="text-lg font-extrabold text-gray-900">{pkg.credits}</p>
-                <p className="text-[10px] text-gray-400 uppercase tracking-wide mb-1">créditos</p>
-                <p className="text-sm font-semibold text-gray-700">{fmtBRL(pkg.price_cents)}</p>
-                <p className="text-[10px] text-gray-400">{fmtBRL(pkg.price_cents / pkg.credits)}/crédito</p>
-              </div>
-            ))}
+          <div className="flex items-start gap-3 border border-gray-100 bg-gray-50 rounded-xl p-4">
+            <span className="text-2xl flex-shrink-0">✨</span>
+            <div className="flex-1 min-w-0">
+              <p className="font-bold text-gray-800 text-sm">Imagem de cabeçalho gerada por IA</p>
+              <p className="text-xs text-gray-500 mt-1 leading-relaxed">
+                Cada convite tem direito a 1 geração grátis por IA — depois disso, continua podendo
+                usar os temas prontos ou enviar sua própria foto, sem limite.
+              </p>
+            </div>
           </div>
         </section>
 
@@ -171,28 +100,8 @@ export default async function ComoFuncionaPage() {
           </p>
         </section>
 
-        {/* CTA final */}
-        <div className="text-center pt-2">
-          <Link
-            href="/creditos"
-            className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-xl bg-brand hover:bg-brand-dark text-white font-bold text-base uppercase tracking-wide transition-colors shadow-lg shadow-brand/20"
-          >
-            Comprar créditos
-            <ArrowIcon className="w-4 h-4" />
-          </Link>
-        </div>
-
       </div>
     </InfoPageShell>
-  )
-}
-
-function ArrowIcon({ className }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
-      <path d="M5 12h14" />
-      <path d="M13 6l6 6-6 6" />
-    </svg>
   )
 }
 

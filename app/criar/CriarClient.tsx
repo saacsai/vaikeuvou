@@ -10,7 +10,6 @@ import AppFooter from '@/components/AppFooter'
 import EventPreviewCard from '@/components/EventPreviewCard'
 import BgSelector from '@/components/BgSelector'
 import AvatarCropUpload from '@/components/AvatarCropUpload'
-import CreditLockPanel from '@/components/CreditLockPanel'
 import { DURACAO_OPCOES, type EventFormFields } from '@/lib/eventForm'
 
 const PRIVACIDADE = [
@@ -26,25 +25,19 @@ type Props = {
   userAvatar: string | null
   userBio: string | null
   userInstagram: string | null
-  userCredits: number
   termsAccepted: boolean
 }
 
-export default function CriarClient({ userName, userAvatar, userBio, userInstagram, userCredits, termsAccepted }: Props) {
+export default function CriarClient({ userName, userAvatar, userBio, userInstagram, termsAccepted }: Props) {
   const router = useRouter()
   const [form, setForm] = useState<Form>({
     title: '', event_date: '', event_time: '', duration_minutes: '',
     location: '', description: '', max_depth: 2,
     external_url: '', external_url_label: '', video_url: '',
-    bg_image_url: '',
+    bg_image_url: '', cidade: '',
   })
   const [saving, setSaving] = useState(false)
   const [erro,   setErro]   = useState('')
-
-  // Imagem por IA cobra na hora da geração (custo real de API, não dá pra
-  // adiar pro momento de criar o convite como vídeo/foto) — precisa de
-  // saldo ao vivo aqui, diferente do resto do formulário.
-  const [creditsLeft, setCreditsLeft] = useState(userCredits)
 
   // Assinatura do convite — só pergunta o que ainda não está no perfil,
   // pra não obrigar a pessoa a sair daqui e ir preencher /perfil antes
@@ -55,14 +48,9 @@ export default function CriarClient({ userName, userAvatar, userBio, userInstagr
   const [profileInstagram,  setProfileInstagram]  = useState('')
 
   // Foto própria de cabeçalho: o convite ainda não existe, então o upload de
-  // verdade (e a cobrança de 1 crédito) só acontece depois de criar. Até lá,
-  // só guarda o recorte pronto e mostra o preview localmente.
+  // verdade só acontece depois de criar. Até lá, só guarda o recorte pronto
+  // e mostra o preview localmente.
   const [pendingHeaderImage, setPendingHeaderImage] = useState<Blob | null>(null)
-
-  // Vídeo custa 1 crédito, sempre — mesmo o primeiro. Fica travado até a
-  // pessoa reconhecer o aviso, pra ninguém digitar achando que é de graça.
-  const [videoStage, setVideoStage] = useState<'idle' | 'confirm' | 'unlocked'>('idle')
-  const videoUnlocked = videoStage === 'unlocked'
 
   // Aceite de Termos/Privacidade — só pergunta uma vez, na primeira criação.
   const [aceitouTermos, setAceitouTermos] = useState(false)
@@ -71,10 +59,9 @@ export default function CriarClient({ userName, userAvatar, userBio, userInstagr
     setForm(p => ({ ...p, [k]: v }))
   }
 
-  function onBgChange(v: string, cost?: number) {
+  function onBgChange(v: string) {
     setPendingHeaderImage(null)
     set('bg_image_url', v)
-    if (cost) setCreditsLeft(c => c - cost)
   }
 
   function onHeaderImageCropped(blob: Blob, previewUrl: string) {
@@ -91,16 +78,6 @@ export default function CriarClient({ userName, userAvatar, userBio, userInstagr
     if (!termsAccepted && !aceitouTermos) {
       setErro('Você precisa concordar com os Termos de Uso e a Política de Privacidade.')
       return
-    }
-
-    const querVideo  = videoUnlocked && form.video_url.trim() !== ''
-    const querImagem = !!pendingHeaderImage
-    const custoTotal = (querVideo ? 1 : 0) + (querImagem ? 1 : 0)
-
-    if (custoTotal > 0) {
-      const itens = [querVideo && 'vídeo', querImagem && 'foto'].filter(Boolean).join(' + ')
-      const msgConfirm = `Criar esse convite vai debitar ${custoTotal} crédito${custoTotal > 1 ? 's' : ''} do seu saldo (${itens}). Confirma?`
-      if (!window.confirm(msgConfirm)) return
     }
 
     setSaving(true)
@@ -123,41 +100,23 @@ export default function CriarClient({ userName, userAvatar, userBio, userInstagr
 
     const event_date = `${form.event_date}T${form.event_time}:00-03:00`
 
-    // O convite nasce sem vídeo e sem foto própria (blob: URL não faz
-    // sentido gravar) — os dois são cobrados e aplicados logo em seguida,
-    // já com o edit_token em mãos.
+    // O convite nasce sem foto própria (blob: URL não faz sentido gravar) —
+    // ela é enviada logo em seguida, já com o edit_token em mãos.
     const res = await fetch('/api/eventos', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ ...form, event_date, video_url: '', bg_image_url: pendingHeaderImage ? '' : form.bg_image_url }),
+      body: JSON.stringify({ ...form, event_date, bg_image_url: pendingHeaderImage ? '' : form.bg_image_url }),
     })
     const json = await res.json()
 
     if (!res.ok) { setErro(json.error ?? 'Erro ao criar convite.'); setSaving(false); return }
 
-    if (querVideo) {
-      const chargeRes = await fetch('/api/creditos/desbloquear-video', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ edit_token: json.edit_token }),
-      })
-      // Se cobrou com sucesso, salva o vídeo. Se falhou (raro — saldo mudou
-      // entre a confirmação e agora), o convite já existe, só sem vídeo.
-      if (chargeRes.ok) {
-        await fetch('/api/eventos/editar', {
-          method: 'PATCH',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ edit_token: json.edit_token, video_url: form.video_url }),
-        })
-      }
-    }
-
-    if (querImagem && pendingHeaderImage) {
+    if (pendingHeaderImage) {
       const imgForm = new FormData()
       imgForm.append('edit_token', json.edit_token)
       imgForm.append('imagem', pendingHeaderImage, 'header.jpg')
-      // Convite já existe — se falhar aqui (ex: saldo mudou), fica sem a
-      // foto, mas nada se perde, dá pra subir depois no painel.
+      // Convite já existe — se falhar aqui, fica sem a foto, mas nada se
+      // perde, dá pra subir depois no painel.
       await fetch('/api/eventos/imagem-cabecalho', { method: 'POST', body: imgForm })
     }
 
@@ -179,7 +138,7 @@ export default function CriarClient({ userName, userAvatar, userBio, userInstagr
               <Image src="/logo.png" alt="vaikeuvou" width={1161} height={201} className="h-[43px] md:h-[47px] w-auto" />
             </a>
             <div className="flex items-center gap-1 md:hidden">
-              <ProfilePopover userName={userName} userAvatar={userAvatar} userCredits={creditsLeft} />
+              <ProfilePopover userName={userName} userAvatar={userAvatar} />
             </div>
           </div>
 
@@ -191,7 +150,7 @@ export default function CriarClient({ userName, userAvatar, userBio, userInstagr
           </div>
 
           <div className="hidden md:flex items-center gap-1 flex-shrink-0">
-            <ProfilePopover userName={userName} userAvatar={userAvatar} userCredits={creditsLeft} />
+            <ProfilePopover userName={userName} userAvatar={userAvatar} />
           </div>
         </div>
 
@@ -242,6 +201,16 @@ export default function CriarClient({ userName, userAvatar, userBio, userInstagr
                 value={form.location}
                 onChange={e => set('location', e.target.value)}
                 placeholder="Endereço ou nome do lugar"
+                className="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 outline-none focus:border-brand text-sm"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Cidade (opcional)</label>
+              <input
+                value={form.cidade}
+                onChange={e => set('cidade', e.target.value)}
+                placeholder="Só pra eventos ligados a um QG/destino turístico"
                 className="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 outline-none focus:border-brand text-sm"
               />
             </div>
@@ -358,46 +327,21 @@ export default function CriarClient({ userName, userAvatar, userBio, userInstagr
 
             {/* BG selector — mobile (some antes do botão, no desktop fica junto ao preview) */}
             <div className="lg:hidden">
-              <BgSelector value={form.bg_image_url} onChange={onBgChange} title={form.title} onCropped={onHeaderImageCropped} credits={creditsLeft} hasAvatar={!!userAvatar} />
+              <BgSelector value={form.bg_image_url} onChange={onBgChange} title={form.title} onCropped={onHeaderImageCropped} hasAvatar={!!userAvatar} />
             </div>
 
-            {/* Vídeo — travado até a pessoa reconhecer o custo, pra ninguém
-                digitar o link achando que é de graça. */}
             <div>
               <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">
                 Vídeo do convite
               </label>
-              {videoStage === 'unlocked' && (
-                <>
-                  <input
-                    value={form.video_url}
-                    onChange={e => set('video_url', e.target.value)}
-                    placeholder="Cole o link do vídeo do YouTube/Vimeo"
-                    type="url"
-                    className="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 outline-none focus:border-brand text-sm"
-                  />
-                  <p className="text-[10px] text-gray-400 mt-1">Aparece abaixo do botão BORA na página do convite</p>
-                </>
-              )}
-              {videoStage === 'confirm' && (
-                <CreditLockPanel
-                  title="Adicionar vídeo custa 1 crédito"
-                  message={`Vai debitar 1 crédito do seu saldo (${creditsLeft} disponíveis) quando você criar o convite.`}
-                  credits={creditsLeft}
-                  onCancel={() => setVideoStage('idle')}
-                  onContinue={() => setVideoStage('unlocked')}
-                />
-              )}
-              {videoStage === 'idle' && (
-                <button
-                  type="button"
-                  onClick={() => setVideoStage('confirm')}
-                  className="w-full flex items-center justify-center gap-2 bg-amber-50 hover:bg-amber-100 border-2 border-dashed border-amber-300 rounded-xl px-4 py-3 text-amber-700 font-semibold text-sm transition-colors"
-                >
-                  <LockIcon className="w-4 h-4 text-amber-500" />
-                  Adicionar vídeo — 1 crédito
-                </button>
-              )}
+              <input
+                value={form.video_url}
+                onChange={e => set('video_url', e.target.value)}
+                placeholder="Cole o link do vídeo do YouTube/Vimeo"
+                type="url"
+                className="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 outline-none focus:border-brand text-sm"
+              />
+              <p className="text-[10px] text-gray-400 mt-1">Aparece abaixo do botão BORA na página do convite</p>
             </div>
 
             {!termsAccepted && (
@@ -433,7 +377,7 @@ export default function CriarClient({ userName, userAvatar, userBio, userInstagr
             <p className="text-xs text-gray-400 uppercase tracking-widest font-semibold mb-3 text-center">Preview</p>
             <div className="sticky top-6 space-y-3">
               <EventPreviewCard form={form} userName={previewName} userAvatar={avatarUrl} userBio={previewBio} userInstagram={previewInstagram} />
-              <BgSelector value={form.bg_image_url} onChange={onBgChange} title={form.title} onCropped={onHeaderImageCropped} credits={creditsLeft} hasAvatar={!!userAvatar} />
+              <BgSelector value={form.bg_image_url} onChange={onBgChange} title={form.title} onCropped={onHeaderImageCropped} hasAvatar={!!userAvatar} />
             </div>
           </div>
 
@@ -442,14 +386,5 @@ export default function CriarClient({ userName, userAvatar, userBio, userInstagr
 
       <AppFooter />
     </div>
-  )
-}
-
-function LockIcon({ className }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
-      <rect x="3" y="11" width="18" height="11" rx="2" />
-      <path d="M7 11V7a5 5 0 0 1 10 0v4" />
-    </svg>
   )
 }

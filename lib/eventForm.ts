@@ -10,6 +10,7 @@ export type EventFormFields = {
   external_url_label: string
   video_url: string
   bg_image_url: string
+  cidade: string
 }
 
 export const DURACAO_OPCOES = [

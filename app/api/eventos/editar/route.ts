@@ -2,8 +2,6 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getSupabaseAdmin } from '@/lib/supabase'
 import { geocodeAddress } from '@/lib/geocode'
 
-// Só o dia (calendário, fuso de São Paulo) conta pro gate de créditos —
-// trocar só o horário do mesmo dia é sempre livre.
 function saoPauloDateOnly(iso: string): string {
   return new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Sao_Paulo' }).format(new Date(iso))
 }
@@ -12,7 +10,7 @@ export async function PATCH(req: NextRequest) {
   const { edit_token, ...fields } = await req.json()
   if (!edit_token) return NextResponse.json({ error: 'edit_token obrigatório' }, { status: 400 })
 
-  const allowed = ['external_url', 'external_url_label', 'video_url', 'title', 'location', 'description', 'event_date', 'duration_minutes', 'bg_image_url', 'max_depth']
+  const allowed = ['external_url', 'external_url_label', 'video_url', 'title', 'location', 'description', 'event_date', 'duration_minutes', 'bg_image_url', 'max_depth', 'cidade']
   const updates: Record<string, unknown> = {}
   for (const key of allowed) {
     if (key in fields) updates[key] = fields[key] || null
@@ -21,9 +19,9 @@ export async function PATCH(req: NextRequest) {
 
   const sb = getSupabaseAdmin()
 
-  // Troca de data: primeira é grátis, da segunda em diante o crédito já foi
-  // debitado antes (via /api/creditos/desbloquear-data) — aqui só contamos.
-  // Só o dia conta — trocar o horário mantendo o mesmo dia não consome nada.
+  // Troca de data é livre, sem limite — só registramos a contagem por
+  // histórico. Só o dia conta — trocar o horário mantendo o mesmo dia não
+  // incrementa nada.
   if ('event_date' in updates) {
     const { data: evento } = await sb
       .from('events')

@@ -1,7 +1,6 @@
 'use client'
 
 import { useState, useRef, useCallback, useEffect } from 'react'
-import CreditLockPanel from '@/components/CreditLockPanel'
 
 type CropState = {
   src: string
@@ -24,19 +23,18 @@ const OUT_W = 1200
 const OUT_H = 500
 
 type Props = {
-  /** Presente só no painel — habilita upload imediato (sobe e debita na hora). */
+  /** Presente só no painel — habilita upload imediato. */
   editToken?: string
-  credits: number
   onUploaded?: (url: string) => void
   /** Presente no /criar — o convite ainda não existe, então não dá pra subir
-   * de verdade ainda. Só guarda o recorte pronto; o upload de verdade (e a
-   * cobrança) acontece só depois que o convite for criado. */
+   * de verdade ainda. Só guarda o recorte pronto; o upload de verdade
+   * acontece só depois que o convite for criado. */
   onCropped?: (blob: Blob, previewUrl: string) => void
 }
 
-type Stage = 'idle' | 'confirmTroca' | 'crop'
+type Stage = 'idle' | 'crop'
 
-export default function HeaderImageCropUpload({ editToken, credits, onUploaded, onCropped }: Props) {
+export default function HeaderImageCropUpload({ editToken, onUploaded, onCropped }: Props) {
   const [stage,     setStage]     = useState<Stage>('idle')
   const [uploading, setUploading] = useState(false)
   const [msg,       setMsg]       = useState('')
@@ -46,7 +44,6 @@ export default function HeaderImageCropUpload({ editToken, credits, onUploaded, 
   const cropCanvas = useRef<HTMLCanvasElement>(null)
 
   function abrirSeletor() {
-    if (credits < 1) return
     fileRef.current?.click()
   }
 
@@ -138,8 +135,8 @@ export default function HeaderImageCropUpload({ editToken, credits, onUploaded, 
     if (!blob) { setMsg('Erro ao processar imagem.'); return }
 
     if (onCropped) {
-      // /criar — convite ainda não existe, só guarda o recorte pronto. A
-      // cobrança de verdade acontece junto com a criação do convite.
+      // /criar — convite ainda não existe, só guarda o recorte pronto. O
+      // upload de verdade acontece junto com a criação do convite.
       onCropped(blob, URL.createObjectURL(blob))
       cancelar()
       return
@@ -168,52 +165,23 @@ export default function HeaderImageCropUpload({ editToken, credits, onUploaded, 
 
   const minScale = crop ? Math.max(DISPLAY_W / crop.naturalW, DISPLAY_H / crop.naturalH) : 1
 
-  // O input de arquivo precisa ficar SEMPRE no mesmo lugar da árvore (fora de qualquer branch
-  // condicional por stage) pra nunca ser desmontado pelo React entre o clique e o evento
-  // 'change'. Antes ele só existia dentro do branch 'idle'; quando abrirSeletor() rodava a
-  // partir do 'confirmTroca' (clicar Continuar), duas coisas quebravam em sequência:
-  // 1) fileRef.current ainda era nulo no instante do clique (o input do stage 'idle' só monta
-  //    depois do re-render, que ainda não tinha acontecido) — o .click() virava um no-op.
-  // 2) mesmo corrigindo isso montando o input também no 'confirmTroca', o setStage('idle') que
-  //    roda junto troca a árvore renderizada e o React desmonta aquele input (removendo-o do
-  //    DOM) enquanto o seletor nativo do SO ainda está aberto — quando o usuário finalmente
-  //    escolhe o arquivo, o evento 'change' dispara num elemento que não está mais na árvore,
-  //    então nunca chega no listener delegado do React e onFileChange nunca roda.
-  // Um input fixo, montado uma vez só, fora do switch de stage, resolve os dois problemas.
+  // O input de arquivo fica sempre no mesmo lugar da árvore (fora de
+  // qualquer branch condicional por stage) pra nunca ser desmontado pelo
+  // React entre o clique e o evento 'change'.
   return (
     <>
       <input ref={fileRef} type="file" accept="image/*" onChange={onFileChange} className="hidden" />
 
       {stage === 'idle' && (
-        // Estado ocioso: sempre travado — foto própria custa 1 crédito, mesmo a
-        // primeira vez (na criação do convite ou depois, editando).
         <button
           type="button"
-          onClick={() => setStage('confirmTroca')}
-          title="Enviar sua própria foto — 1 crédito"
-          className="aspect-square rounded-lg bg-amber-50 hover:bg-amber-100 border-2 border-dashed border-amber-300 flex flex-col items-center justify-center gap-1 transition-colors"
+          onClick={abrirSeletor}
+          title="Enviar sua própria foto"
+          className="aspect-square rounded-lg bg-gray-50 hover:bg-gray-100 border-2 border-dashed border-gray-300 flex flex-col items-center justify-center gap-1 transition-colors"
         >
-          <LockIcon className="w-5 h-5 text-amber-500" />
+          <UploadIcon className="w-5 h-5 text-gray-400" />
           <span className="text-[8px] font-bold text-gray-600 uppercase leading-tight text-center px-1">Enviar foto</span>
-          <span className="text-[7px] font-bold text-amber-600 uppercase">1 crédito</span>
         </button>
-      )}
-
-      {stage === 'confirmTroca' && (
-        // Aviso de custo — aparece ANTES de abrir o seletor de arquivo, não depois
-        // de já ter recortado a foto.
-        <CreditLockPanel
-          className="col-span-4"
-          title="Enviar foto própria custa 1 crédito"
-          message={
-            editToken
-              ? `Vai debitar 1 crédito do seu saldo (${credits} disponíveis) assim que você escolher a foto.`
-              : `Vai debitar 1 crédito do seu saldo (${credits} disponíveis) quando você criar o convite.`
-          }
-          credits={credits}
-          onCancel={() => setStage('idle')}
-          onContinue={abrirSeletor}
-        />
       )}
 
       {stage === 'crop' && (
@@ -272,7 +240,7 @@ export default function HeaderImageCropUpload({ editToken, credits, onUploaded, 
               disabled={uploading}
               className="flex-1 py-2 rounded-lg bg-brand hover:bg-brand-dark disabled:opacity-50 text-white font-bold text-xs uppercase tracking-wide"
             >
-              {uploading ? 'Enviando…' : editToken ? 'Confirmar (1 crédito)' : 'Usar essa foto'}
+              {uploading ? 'Enviando…' : editToken ? 'Confirmar' : 'Usar essa foto'}
             </button>
           </div>
 
@@ -285,11 +253,12 @@ export default function HeaderImageCropUpload({ editToken, credits, onUploaded, 
   )
 }
 
-function LockIcon({ className }: { className?: string }) {
+function UploadIcon({ className }: { className?: string }) {
   return (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
-      <rect x="3" y="11" width="18" height="11" rx="2" />
-      <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+      <polyline points="17 8 12 3 7 8" />
+      <line x1="12" y1="3" x2="12" y2="15" />
     </svg>
   )
 }

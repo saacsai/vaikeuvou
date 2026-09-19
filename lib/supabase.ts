@@ -35,6 +35,7 @@ export type Event = {
   lat: number | null
   lng: number | null
   checkin_reminder_sent_at: string | null
+  cidade: string | null
 }
 
 export type Rsvp = {

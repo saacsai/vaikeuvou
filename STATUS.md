@@ -1,6 +1,28 @@
 # vaikeuvou.app — Status
 
-Última atualização: 2026-09-16
+Última atualização: 2026-09-19
+
+## Sessão 2026-09-19 — PIVÔ TravelTech (QG receptivo Bertioga + turismo gamificado)
+
+⭐ Mudança de direção mais importante do produto até aqui. Detalhe completo do racional
+estratégico e pessoal em
+`~/.claude/projects/-Users-lucianomaeda/memory/project_vaikeuvou.md` — ler antes de mexer em
+monetização, blog ou eventos-experiência. Fonte original: `Vaikeuvou/pivotamento/
+VAIKEUVOU_2027.pdf` (fora do repo).
+
+Resumo do que foi decidido e implementado nesta sessão:
+- Software atual vira motor logístico de um novo braço de turismo receptivo/gamificado em
+  Bertioga (sócio Sandro), não mais o produto final sozinho.
+- Camada de curto prazo (QG = ponto de informação turística grátis + comissão de parceiros
+  locais) não precisa de nada novo no app — é operação humana. Camada gamificada (pacotes
+  pagos, Stripe Connect) fica pra depois, não implementada ainda.
+- `blog.vaikeuvou.app` (WordPress, mesmo padrão de subdomínio do `app.cooperliga.com.br`)
+  planejado pra posts em 1ª pessoa terminando no botão embedável (`/embed/[slug]`, já existia).
+- Campo `cidade` adicionado em `events` (estruturado, não inferido de `location`).
+- Botão de copiar código de incorporação no dashboard do evento.
+- **Sistema de créditos eliminado por completo**: troca de foto/vídeo livre; imagem por IA
+  virou 1 grátis por evento (sem cobrança, trava por contagem); `/creditos` e checkout Stripe de
+  crédito removidos.
 
 > Este arquivo ficou parado entre 2026-08-19 e 2026-08-26, e de novo
 > entre 2026-08-26 e 2026-09-16 — as sessões desses períodos (logo

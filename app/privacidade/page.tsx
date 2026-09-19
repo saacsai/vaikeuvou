@@ -8,7 +8,6 @@ export default async function PrivacidadePage() {
       title="Política de Privacidade"
       userName={session?.users.name ?? null}
       userAvatar={session?.users.avatar_url ?? null}
-      userCredits={session?.users.credits}
       heroImage="/privacidade-hero.jpg"
     >
       <div className="max-w-2xl mx-auto space-y-8 text-sm text-gray-600 leading-relaxed pb-6">
@@ -36,8 +35,7 @@ export default async function PrivacidadePage() {
           <ul className="list-disc list-inside space-y-1 ml-1">
             <li>Número de WhatsApp — pra login via código de verificação, sem senha;</li>
             <li>Nome, foto de perfil, bio e Instagram, se você preencher — aparecem na assinatura dos seus convites;</li>
-            <li>Dados dos convites que você cria (título, data, local, recado, imagens, vídeo);</li>
-            <li>Histórico de créditos comprados e usados.</li>
+            <li>Dados dos convites que você cria (título, data, local, recado, imagens, vídeo).</li>
           </ul>
           <p><strong className="text-gray-800">De quem confirma presença (convidado):</strong></p>
           <ul className="list-disc list-inside space-y-1 ml-1">
@@ -49,10 +47,6 @@ export default async function PrivacidadePage() {
           <ul className="list-disc list-inside space-y-1 ml-1">
             <li>Um cookie de sessão (<code className="text-xs bg-gray-100 px-1 py-0.5 rounded">vkv_session</code>), pra manter você conectado depois do login — não usamos cookies de rastreamento ou publicidade.</li>
           </ul>
-          <p>
-            Não pedimos nem armazenamos dados de cartão de crédito — o pagamento de créditos
-            é feito direto na Stripe.
-          </p>
         </section>
 
         <section className="space-y-2">
@@ -62,7 +56,6 @@ export default async function PrivacidadePage() {
             <li>Exibir a assinatura do anfitrião e a lista de confirmados nos convites;</li>
             <li>Evitar confirmações falsas ou duplicadas (mesmo telefone só confirma uma vez por convite);</li>
             <li>Sinalizar pro anfitrião quando a localização do check-in bate com o local do evento (selo de presença verificada);</li>
-            <li>Processar a compra e o débito de créditos;</li>
             <li>Enviar o código de verificação por WhatsApp — e, se você ativar no futuro, notificações de novas confirmações;</li>
             <li>Responder dúvidas enviadas pelo Fale conosco.</li>
           </ul>
@@ -76,7 +69,6 @@ export default async function PrivacidadePage() {
           <h2 className="text-xs font-bold text-gray-800 uppercase tracking-wide">4. Com quem compartilhamos</h2>
           <p>Usamos alguns prestadores de serviço pra operar o vaikeuvou, que têm acesso limitado aos dados necessários pra função deles:</p>
           <ul className="list-disc list-inside space-y-1 ml-1">
-            <li><strong className="text-gray-800">Stripe</strong> — processamento de pagamento dos pacotes de crédito;</li>
             <li><strong className="text-gray-800">Evolution API / WhatsApp</strong> — envio do código de login e de notificações;</li>
             <li><strong className="text-gray-800">Supabase e Vercel</strong> — hospedagem do banco de dados, arquivos (fotos) e da aplicação;</li>
             <li><strong className="text-gray-800">OpenStreetMap (Nominatim)</strong> — converte o endereço do evento em coordenadas, só pra comparar com a localização do check-in.</li>

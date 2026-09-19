@@ -8,7 +8,6 @@ export default async function TermosPage() {
       title="Termos de uso"
       userName={session?.users.name ?? null}
       userAvatar={session?.users.avatar_url ?? null}
-      userCredits={session?.users.credits}
       heroImage="/termos-hero.jpg"
     >
       <div className="max-w-2xl mx-auto space-y-8 text-sm text-gray-600 leading-relaxed pb-6">
@@ -60,14 +59,11 @@ export default async function TermosPage() {
         </section>
 
         <section className="space-y-2">
-          <h2 className="text-xs font-bold text-gray-800 uppercase tracking-wide">4. Créditos e pagamentos</h2>
+          <h2 className="text-xs font-bold text-gray-800 uppercase tracking-wide">4. Gratuidade</h2>
           <p>
-            Criar e editar convite é sempre gratuito. Alguns recursos (vídeo, foto própria
-            de cabeçalho, ver a lista completa de confirmados) usam créditos pré-pagos,
-            comprados em pacotes, sem mensalidade e sem validade. Pagamentos são processados
-            pelo Stripe — não temos acesso aos dados do seu cartão. Créditos já debitados
-            não são reembolsados automaticamente; casos excepcionais podem ser resolvidos
-            pelo <a href="/fale" className="text-brand font-semibold hover:underline">Fale conosco</a>. Detalhes de cada recurso pago estão em <a href="/como-funciona" className="text-brand font-semibold hover:underline">Como funciona?</a>.
+            Criar e editar convite, trocar foto e vídeo de cabeçalho e ver a lista de
+            confirmados são sempre gratuitos. A geração de imagem de cabeçalho por IA tem 1
+            uso grátis por convite. Detalhes em <a href="/como-funciona" className="text-brand font-semibold hover:underline">Como funciona?</a>.
           </p>
         </section>
 
@@ -77,7 +73,7 @@ export default async function TermosPage() {
           <ul className="list-disc list-inside space-y-1 ml-1">
             <li>Criar convites com conteúdo ilegal, discriminatório, violento ou que assedie terceiros;</li>
             <li>Usar o serviço pra enviar spam ou mensagens não solicitadas via WhatsApp;</li>
-            <li>Tentar burlar os limites de crédito, o sistema de convites em árvore ou a segurança da plataforma;</li>
+            <li>Tentar burlar o sistema de convites em árvore ou a segurança da plataforma;</li>
             <li>Se passar por outra pessoa ao confirmar presença ou criar um convite.</li>
           </ul>
           <p>
@@ -101,7 +97,6 @@ export default async function TermosPage() {
           <p>
             Você pode parar de usar o vaikeuvou quando quiser. Pra excluir sua conta e seus
             dados, ou apagar um convite específico, entre em contato pelo <a href="/fale" className="text-brand font-semibold hover:underline">Fale conosco</a>.
-            Créditos não usados não são convertidos em reembolso automático no cancelamento.
           </p>
         </section>
 

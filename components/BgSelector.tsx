@@ -5,23 +5,20 @@ import AiImageGenerate from '@/components/AiImageGenerate'
 
 type Props = {
   value: string
-  /** cost opcional — repassado pela geração por IA pra quem ouve poder
-   * atualizar o saldo exibido na hora (presets/crop-upload não usam). */
-  onChange: (v: string, cost?: number) => void
+  onChange: (v: string) => void
   title: string
-  /** Só definido no painel — habilita upload imediato (sobe e debita na hora). */
+  /** Só definido no painel — habilita upload imediato. */
   editToken?: string
-  credits?: number
   /** Se a pessoa tem avatar no perfil — habilita a opção de usar como
    * referência na geração por IA (vira ilustração estilo caricatura). */
   hasAvatar?: boolean
-  onUploaded?: (v: string, cost?: number) => void
+  onUploaded?: (v: string) => void
   /** Presente no /criar — convite ainda não existe, upload fica pendente até
-   * a criação ser confirmada (cobra 1 crédito junto com a criação). */
+   * a criação ser confirmada. */
   onCropped?: (blob: Blob, previewUrl: string) => void
 }
 
-export default function BgSelector({ value, onChange, title, editToken, credits, hasAvatar, onUploaded, onCropped }: Props) {
+export default function BgSelector({ value, onChange, title, editToken, hasAvatar, onUploaded, onCropped }: Props) {
   const auto = titleToHeader(title.trim() || 'vaikeuvou')
   return (
     <div className="rounded-2xl bg-white border border-gray-100 p-4 space-y-3">
@@ -51,7 +48,6 @@ export default function BgSelector({ value, onChange, title, editToken, credits,
         <AiImageGenerate
           editToken={editToken}
           title={title}
-          credits={credits ?? 0}
           hasAvatar={hasAvatar}
           onUploaded={onUploaded ?? onChange}
         />
@@ -59,7 +55,6 @@ export default function BgSelector({ value, onChange, title, editToken, credits,
         {(editToken || onCropped) && (
           <HeaderImageCropUpload
             editToken={editToken}
-            credits={credits ?? 0}
             onUploaded={onUploaded ?? onChange}
             onCropped={onCropped}
           />

@@ -9,7 +9,6 @@ import { ProfilePopover, GridIcon } from '@/components/AppHeaderNav'
 import AppFooter from '@/components/AppFooter'
 import EventPreviewCard from '@/components/EventPreviewCard'
 import BgSelector from '@/components/BgSelector'
-import CreditLockPanel from '@/components/CreditLockPanel'
 import { fmtDate } from '@/lib/slug'
 import { DURACAO_OPCOES, type EventFormFields } from '@/lib/eventForm'
 
@@ -36,12 +35,7 @@ type Props = {
   userAvatar: string | null
   userBio: string | null
   userInstagram: string | null
-  userCredits: number
-  isOwner: boolean
 }
-
-const UNLOCK_COST = 3
-const DATE_UNLOCK_COST = 2
 
 function parseEventDate(iso: string): { date: string; time: string } {
   const d = new Date(iso)
@@ -64,12 +58,6 @@ function parseEventDate(iso: string): { date: string; time: string } {
   }
 }
 
-function fmtData(date: string): string {
-  if (!date) return ''
-  const [y, m, d] = date.split('-')
-  return `${d}/${m}/${y}`
-}
-
 function toForm(evento: Event): EventFormFields {
   const { date, time } = parseEventDate(evento.event_date)
   return {
@@ -84,82 +72,21 @@ function toForm(evento: Event): EventFormFields {
     external_url_label: evento.external_url_label ?? '',
     video_url: evento.video_url ?? '',
     bg_image_url: evento.bg_image_url ?? '',
+    cidade: evento.cidade ?? '',
   }
 }
 
-export default function DashboardClient({ evento, rsvps, isNovo, userName, userAvatar, userBio, userInstagram, userCredits, isOwner }: Props) {
+export default function DashboardClient({ evento, rsvps, isNovo, userName, userAvatar, userBio, userInstagram }: Props) {
   const [initial,   setInitial]   = useState<EventFormFields>(() => toForm(evento))
   const [form,      setForm]      = useState<EventFormFields>(() => toForm(evento))
   const [copiado,   setCopiado]   = useState(false)
   const [saving,    setSaving]    = useState(false)
   const [msg,       setMsg]       = useState('')
   const [editando,  setEditando]  = useState(false)
-  const [unlocked,  setUnlocked]  = useState(!!evento.guest_list_unlocked_at)
-  const [unlocking, setUnlocking] = useState(false)
-  const [unlockErro, setUnlockErro] = useState('')
-  const [creditsLeft, setCreditsLeft] = useState(userCredits)
 
-  const [videoStage,     setVideoStage]     = useState<'idle' | 'confirm' | 'unlocked'>('idle')
-  const [videoUnlocking, setVideoUnlocking] = useState(false)
-  const [videoErro,      setVideoErro]      = useState('')
-
-  // Troca de data: primeira é grátis, da segunda em diante trava e cobra
-  // DATE_UNLOCK_COST a cada troca — nunca volta a ser grátis.
-  const [dateChangesCount, setDateChangesCount] = useState(evento.date_changes_count)
-  const [dateStage,        setDateStage]        = useState<'idle' | 'confirm' | 'unlocked'>('idle')
-  const [dateUnlocking,    setDateUnlocking]    = useState(false)
-  const [dateErro,         setDateErro]         = useState('')
-
-  async function desbloquearData() {
-    setDateUnlocking(true)
-    setDateErro('')
-    const res = await fetch('/api/creditos/desbloquear-data', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ edit_token: evento.edit_token }),
-    })
-    const json = await res.json()
-    if (!res.ok) { setDateErro(json.error ?? 'Erro ao desbloquear.'); setDateUnlocking(false); return }
-    setDateStage('unlocked')
-    setCreditsLeft(c => c - DATE_UNLOCK_COST)
-    setDateUnlocking(false)
-  }
-
-  async function desbloquearVideo() {
-    setVideoUnlocking(true)
-    setVideoErro('')
-    const res = await fetch('/api/creditos/desbloquear-video', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ edit_token: evento.edit_token }),
-    })
-    const json = await res.json()
-    if (!res.ok) { setVideoErro(json.error ?? 'Erro ao desbloquear.'); setVideoUnlocking(false); return }
-    setVideoStage('unlocked')
-    setCreditsLeft(c => c - 1)
-    setVideoUnlocking(false)
-  }
-
-  function onHeaderImageUploaded(url: string, cost = 1) {
+  function onHeaderImageUploaded(url: string) {
     setForm(p => ({ ...p, bg_image_url: url }))
     setInitial(p => ({ ...p, bg_image_url: url }))
-    setCreditsLeft(c => c - cost)
-  }
-
-  async function desbloquear() {
-    if (!window.confirm(`Desbloquear vai debitar ${UNLOCK_COST} créditos do seu saldo. Confirma?`)) return
-    setUnlocking(true)
-    setUnlockErro('')
-    const res = await fetch('/api/creditos/desbloquear', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ edit_token: evento.edit_token }),
-    })
-    const json = await res.json()
-    if (!res.ok) { setUnlockErro(json.error ?? 'Erro ao desbloquear.'); setUnlocking(false); return }
-    setCreditsLeft(c => c - UNLOCK_COST)
-    setUnlocked(true)
-    setUnlocking(false)
   }
 
   const dirty = JSON.stringify(form) !== JSON.stringify(initial)
@@ -200,13 +127,6 @@ export default function DashboardClient({ evento, rsvps, isNovo, userName, userA
 
     if (!res.ok) { setMsg(json.error ?? 'Erro ao salvar.'); setSaving(false); return }
 
-    // Só o dia conta pro gate — trocar o horário do mesmo dia é sempre livre.
-    const dataMudou = form.event_date !== initial.event_date
-    if (dataMudou) {
-      if (dateChangesCount === 0) setDateChangesCount(1)
-      setDateStage('idle')
-    }
-
     setInitial(form)
     setMsg('Salvo!')
     setSaving(false)
@@ -225,7 +145,7 @@ export default function DashboardClient({ evento, rsvps, isNovo, userName, userA
               <Image src="/logo.png" alt="vaikeuvou" width={1161} height={201} className="h-[43px] md:h-[47px] w-auto" />
             </a>
             <div className="flex items-center gap-1 md:hidden">
-              <ProfilePopover userName={userName} userAvatar={userAvatar} userCredits={creditsLeft} />
+              <ProfilePopover userName={userName} userAvatar={userAvatar} />
             </div>
           </div>
 
@@ -237,7 +157,7 @@ export default function DashboardClient({ evento, rsvps, isNovo, userName, userA
           </div>
 
           <div className="hidden md:flex items-center gap-1 flex-shrink-0">
-            <ProfilePopover userName={userName} userAvatar={userAvatar} userCredits={creditsLeft} />
+            <ProfilePopover userName={userName} userAvatar={userAvatar} />
           </div>
         </div>
 
@@ -254,19 +174,9 @@ export default function DashboardClient({ evento, rsvps, isNovo, userName, userA
               <p className="text-2xl font-extrabold text-brand">{rsvps.length}</p>
               <p className="text-gray-500 text-xs mt-1">Total</p>
               {rsvps.length > 0 && (
-                unlocked ? (
-                  <a href={`/dashboard/${evento.edit_token}/convidados`} className="text-[10px] font-semibold text-brand mt-1">
-                    Ver quem vai
-                  </a>
-                ) : isOwner ? (
-                  <button
-                    onClick={desbloquear}
-                    disabled={unlocking}
-                    className="text-[10px] font-semibold text-brand mt-1 disabled:opacity-50"
-                  >
-                    🔒 {unlocking ? 'Desbloqueando…' : `Desbloquear (${UNLOCK_COST} créditos)`}
-                  </button>
-                ) : null
+                <a href={`/dashboard/${evento.edit_token}/convidados`} className="text-[10px] font-semibold text-brand mt-1">
+                  Ver quem vai
+                </a>
               )}
             </div>
             {[
@@ -308,21 +218,17 @@ export default function DashboardClient({ evento, rsvps, isNovo, userName, userA
                 >
                   Compartilhar no WhatsApp
                 </a>
+                <button
+                  onClick={() => copiar(`<iframe src="https://vaikeuvou.app/embed/${evento.slug}" width="320" height="70" frameborder="0"></iframe>`)}
+                  className="flex items-center justify-center gap-2 w-full py-2.5 rounded-lg border border-gray-200 text-gray-600 font-bold text-sm hover:bg-gray-50"
+                >
+                  {copiado ? '✓ Código copiado' : 'Copiar código de incorporação'}
+                </button>
+                <p className="text-[10px] text-gray-400 text-center">Cole no seu site/blog — abre este convite quando alguém clicar.</p>
               </>
             )}
           </div>
         </div>
-
-        {unlockErro && (
-          <div className="bg-red-50 border border-red-200 rounded-xl p-4 mb-6 flex items-center justify-between gap-3 flex-wrap">
-            <p className="text-red-600 text-sm">{unlockErro}</p>
-            {unlockErro.includes('insuficientes') && (
-              <a href="/creditos" className="text-xs font-bold text-brand hover:text-brand-dark whitespace-nowrap">
-                Comprar créditos →
-              </a>
-            )}
-          </div>
-        )}
 
         {/* Edição completa — mesma estrutura do /criar (eventos futuros); eventos
             passados mostram só o preview mascarado, sem editar nem compartilhar */}
@@ -369,38 +275,7 @@ export default function DashboardClient({ evento, rsvps, isNovo, userName, userA
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div className="min-w-0">
                 <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Data *</label>
-                {dateChangesCount === 0 || dateStage === 'unlocked' ? (
-                  <>
-                    <DatePicker value={form.event_date} onChange={v => set('event_date', v)} />
-                    {dateChangesCount === 0 && (
-                      <p className="text-[10px] text-gray-400 mt-1.5">
-                        Você pode alterar a data 1 vez de graça — depois disso, cada troca custa {DATE_UNLOCK_COST} créditos.
-                      </p>
-                    )}
-                  </>
-                ) : dateStage === 'confirm' ? (
-                  <CreditLockPanel
-                    title={`Trocar a data custa ${DATE_UNLOCK_COST} créditos`}
-                    message={`Vai debitar ${DATE_UNLOCK_COST} créditos do seu saldo (${creditsLeft} disponíveis) assim que você confirmar.`}
-                    credits={creditsLeft}
-                    cost={DATE_UNLOCK_COST}
-                    onCancel={() => setDateStage('idle')}
-                    onContinue={desbloquearData}
-                    continuing={dateUnlocking}
-                    erro={dateErro}
-                  />
-                ) : (
-                  <div className="bg-gray-50 border border-gray-200 rounded-xl p-3 space-y-2">
-                    <p className="text-sm text-gray-500">{fmtData(form.event_date)}</p>
-                    <button
-                      type="button"
-                      onClick={() => setDateStage('confirm')}
-                      className="px-3 py-1.5 rounded-lg bg-white border border-gray-200 hover:border-brand text-xs font-semibold uppercase tracking-wide text-gray-700 transition-colors"
-                    >
-                      🔒 Trocar data ({DATE_UNLOCK_COST} créditos)
-                    </button>
-                  </div>
-                )}
+                <DatePicker value={form.event_date} onChange={v => set('event_date', v)} />
               </div>
               <div className="min-w-0">
                 <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Horário *</label>
@@ -428,6 +303,16 @@ export default function DashboardClient({ evento, rsvps, isNovo, userName, userA
                 value={form.location}
                 onChange={e => set('location', e.target.value)}
                 placeholder="Endereço ou nome do lugar"
+                className="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 outline-none focus:border-brand text-sm"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Cidade (opcional)</label>
+              <input
+                value={form.cidade}
+                onChange={e => set('cidade', e.target.value)}
+                placeholder="Só pra eventos ligados a um QG/destino turístico"
                 className="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 outline-none focus:border-brand text-sm"
               />
             </div>
@@ -499,7 +384,6 @@ export default function DashboardClient({ evento, rsvps, isNovo, userName, userA
                 onChange={v => set('bg_image_url', v)}
                 title={form.title}
                 editToken={evento.edit_token}
-                credits={creditsLeft}
                 hasAvatar={!!userAvatar}
                 onUploaded={onHeaderImageUploaded}
               />
@@ -507,51 +391,13 @@ export default function DashboardClient({ evento, rsvps, isNovo, userName, userA
 
             <div>
               <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Vídeo do convite</label>
-              {videoStage === 'unlocked' && (
-                <>
-                  <input
-                    value={form.video_url}
-                    onChange={e => set('video_url', e.target.value)}
-                    placeholder="Cole o link do vídeo do YouTube/Vimeo"
-                    type="url"
-                    className="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 outline-none focus:border-brand text-sm"
-                  />
-                  <p className="text-[10px] text-gray-400 mt-1">Aparece abaixo do botão BORA na página do convite</p>
-                </>
-              )}
-              {videoStage === 'confirm' && (
-                <CreditLockPanel
-                  title={evento.video_url ? 'Trocar o vídeo custa 1 crédito' : 'Adicionar vídeo custa 1 crédito'}
-                  message={`Vai debitar 1 crédito do seu saldo (${creditsLeft} disponíveis) assim que você confirmar.`}
-                  credits={creditsLeft}
-                  onCancel={() => setVideoStage('idle')}
-                  onContinue={desbloquearVideo}
-                  continuing={videoUnlocking}
-                  erro={videoErro}
-                />
-              )}
-              {videoStage === 'idle' && (
-                evento.video_url ? (
-                  <div className="bg-gray-50 border border-gray-200 rounded-xl p-3 space-y-2">
-                    <p className="text-sm text-gray-500 truncate">{evento.video_url}</p>
-                    <button
-                      type="button"
-                      onClick={() => setVideoStage('confirm')}
-                      className="px-3 py-1.5 rounded-lg bg-white border border-gray-200 hover:border-brand text-xs font-semibold uppercase tracking-wide text-gray-700 transition-colors"
-                    >
-                      🔒 Trocar (1 crédito)
-                    </button>
-                  </div>
-                ) : (
-                  <button
-                    type="button"
-                    onClick={() => setVideoStage('confirm')}
-                    className="w-full flex items-center justify-center gap-2 bg-amber-50 hover:bg-amber-100 border-2 border-dashed border-amber-300 rounded-xl px-4 py-3 text-amber-700 font-semibold text-sm transition-colors"
-                  >
-                    🔒 Adicionar vídeo — 1 crédito
-                  </button>
-                )
-              )}
+              <input
+                value={form.video_url}
+                onChange={e => set('video_url', e.target.value)}
+                placeholder="Cole o link do vídeo do YouTube/Vimeo"
+                type="url"
+                className="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 outline-none focus:border-brand text-sm"
+              />
               <p className="text-[10px] text-gray-400 mt-1">Aparece abaixo do botão BORA na página do convite</p>
             </div>
 
@@ -581,7 +427,6 @@ export default function DashboardClient({ evento, rsvps, isNovo, userName, userA
                 onChange={v => set('bg_image_url', v)}
                 title={form.title}
                 editToken={evento.edit_token}
-                credits={creditsLeft}
                 hasAvatar={!!userAvatar}
                 onUploaded={onHeaderImageUploaded}
               />
@@ -593,7 +438,6 @@ export default function DashboardClient({ evento, rsvps, isNovo, userName, userA
 
         {/* Confirmados */}
         {rsvps.length > 0 && (
-          unlocked ? (
             <div className="bg-white border border-gray-100 rounded-xl p-4 shadow-sm">
               <div className="flex items-center justify-between mb-3">
                 <p className="text-xs font-bold text-gray-400 uppercase tracking-wide">Confirmados</p>
@@ -651,20 +495,6 @@ export default function DashboardClient({ evento, rsvps, isNovo, userName, userA
                 ))}
               </div>
             </div>
-          ) : isOwner ? (
-            <div className="bg-white border border-gray-100 rounded-xl p-8 shadow-sm text-center">
-              <p className="text-3xl mb-2">🔒</p>
-              <p className="text-gray-700 text-sm font-semibold">{rsvps.length} confirmados</p>
-              <p className="text-gray-400 text-xs mt-1 mb-4">Desbloqueie os nomes por {UNLOCK_COST} créditos — vale pra sempre nesse convite.</p>
-              <button
-                onClick={desbloquear}
-                disabled={unlocking}
-                className="px-6 py-2.5 rounded-lg bg-brand hover:bg-brand-dark disabled:opacity-50 text-white font-bold text-sm uppercase tracking-wide transition-colors"
-              >
-                {unlocking ? 'Desbloqueando…' : `Desbloquear (${UNLOCK_COST} créditos)`}
-              </button>
-            </div>
-          ) : null
         )}
 
       </div>

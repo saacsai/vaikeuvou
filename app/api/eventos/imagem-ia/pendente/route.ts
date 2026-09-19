@@ -5,7 +5,7 @@ import { getSession } from '@/lib/auth'
 // Se uma geração ficou pendente sem a pessoa aprovar/recusar (ex: saiu da
 // tela achando que travou, mas a geração terminou depois), esse endpoint
 // deixa o componente recuperar ela ao carregar de novo — em vez de perder
-// o crédito já cobrado sem nenhuma forma de resolver.
+// a única geração grátis do evento sem nenhuma forma de resolver.
 export async function GET(req: NextRequest) {
   const session = await getSession()
   if (!session) return NextResponse.json({ pending: null })

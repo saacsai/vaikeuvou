@@ -41,15 +41,6 @@ function PlusIcon({ className }: { className?: string }) {
   )
 }
 
-function TicketIcon({ className }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
-      <path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z" />
-      <path d="M13 5v2m0 10v2m0-14v2m0 2v2m0-2v2" />
-    </svg>
-  )
-}
-
 function MessageIcon({ className }: { className?: string }) {
   return (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
@@ -61,10 +52,9 @@ function MessageIcon({ className }: { className?: string }) {
 type ProfileProps = {
   userName: string | null
   userAvatar: string | null
-  userCredits?: number
 }
 
-export function ProfilePopover({ userName, userAvatar, userCredits = 0 }: ProfileProps) {
+export function ProfilePopover({ userName, userAvatar }: ProfileProps) {
   const router = useRouter()
   const nome = userName ?? 'Você'
   const iniciais = nome.slice(0, 2).toUpperCase()
@@ -106,23 +96,7 @@ export function ProfilePopover({ userName, userAvatar, userCredits = 0 }: Profil
           </a>
         </div>
 
-        {/* Créditos */}
-        <div className="py-3 border-b border-gray-100 space-y-2">
-          <div className="bg-brand/5 border border-brand/10 rounded-lg px-3 py-2.5 space-y-2">
-            <div className="flex items-center justify-between">
-              <span className="flex items-center gap-1.5 text-sm text-gray-600">
-                <TicketIcon className="w-4 h-4 text-brand" />
-                Créditos disponíveis
-              </span>
-              <span className="text-sm font-bold text-brand">{userCredits}</span>
-            </div>
-            <a
-              href="/creditos"
-              className="w-full flex items-center justify-center gap-1.5 py-2 rounded-lg bg-white border border-gray-200 hover:border-brand text-xs font-semibold uppercase tracking-wide text-gray-700 transition-colors"
-            >
-              Comprar créditos
-            </a>
-          </div>
+        <div className="py-3 border-b border-gray-100">
           <a href="/como-funciona" className="block text-center text-xs text-gray-400 hover:text-gray-600">
             Como funciona?
           </a>

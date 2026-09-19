@@ -11,7 +11,6 @@ type Usuario = {
   avatar_url: string | null
   bio: string | null
   instagram: string | null
-  credits: number
   created_at: string
 }
 
@@ -24,7 +23,7 @@ export default async function AdminUsuariosPage({ searchParams }: Props) {
 
   let query = sb
     .from('users')
-    .select('id, name, phone, avatar_url, bio, instagram, credits, created_at', { count: 'exact' })
+    .select('id, name, phone, avatar_url, bio, instagram, created_at', { count: 'exact' })
 
   if (q?.trim()) {
     const termo = q.trim()
@@ -38,18 +37,6 @@ export default async function AdminUsuariosPage({ searchParams }: Props) {
   const usuarios = (data ?? []) as Usuario[]
   const total = count ?? 0
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE))
-
-  // Quem comprou de verdade — stripe_session_id só é preenchido pelo
-  // webhook da Stripe, nunca por concessão manual/cortesia.
-  const compradoresSet = new Set<string>()
-  if (usuarios.length > 0) {
-    const { data: compras } = await sb
-      .from('credit_transactions')
-      .select('user_id')
-      .in('user_id', usuarios.map(u => u.id))
-      .not('stripe_session_id', 'is', null)
-    for (const c of compras ?? []) compradoresSet.add(c.user_id)
-  }
 
   const qParam = q?.trim() ? `&q=${encodeURIComponent(q.trim())}` : ''
 
@@ -66,18 +53,16 @@ export default async function AdminUsuariosPage({ searchParams }: Props) {
             <tr className="border-b border-gray-100 text-left text-xs text-gray-400 uppercase tracking-wide">
               <th className="px-4 py-3">Usuário</th>
               <th className="px-4 py-3">Perfil</th>
-              <th className="px-4 py-3">Créditos</th>
-              <th className="px-4 py-3">Comprou?</th>
               <th className="px-4 py-3">Criado em</th>
               <th className="px-4 py-3" />
             </tr>
           </thead>
           <tbody>
             {usuarios.map(u => (
-              <UsuarioRow key={u.id} usuario={u} comprou={compradoresSet.has(u.id)} />
+              <UsuarioRow key={u.id} usuario={u} />
             ))}
             {usuarios.length === 0 && (
-              <tr><td colSpan={6} className="px-4 py-8 text-center text-gray-400">Nenhum usuário encontrado.</td></tr>
+              <tr><td colSpan={4} className="px-4 py-8 text-center text-gray-400">Nenhum usuário encontrado.</td></tr>
             )}
           </tbody>
         </table>

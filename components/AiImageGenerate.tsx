@@ -2,20 +2,16 @@
 
 import { useState, useEffect } from 'react'
 import Image from 'next/image'
-import CreditLockPanel from '@/components/CreditLockPanel'
-
-const COST = 3
 
 type Props = {
   /** Presente no painel (convite já existe) — ausente em /criar. */
   editToken?: string
   title: string
-  credits: number
   hasAvatar?: boolean
-  onUploaded: (url: string, cost?: number) => void
+  onUploaded: (url: string) => void
 }
 
-type Stage = 'idle' | 'confirm' | 'prompt' | 'preview'
+type Stage = 'idle' | 'prompt' | 'preview'
 type RefMode = 'none' | 'avatar' | 'upload'
 
 function fileToDataUrl(file: File): Promise<string> {
@@ -27,7 +23,7 @@ function fileToDataUrl(file: File): Promise<string> {
   })
 }
 
-export default function AiImageGenerate({ editToken, title, credits, hasAvatar, onUploaded }: Props) {
+export default function AiImageGenerate({ editToken, title, hasAvatar, onUploaded }: Props) {
   const [stage,         setStage]         = useState<Stage>('idle')
   const [prompt,        setPrompt]        = useState('')
   const [refMode,       setRefMode]       = useState<RefMode>('none')
@@ -45,9 +41,8 @@ export default function AiImageGenerate({ editToken, title, credits, hasAvatar, 
   }
 
   // Se uma geração anterior ficou pendente (a pessoa saiu da tela achando
-  // que tinha travado, mas a geração terminou depois — já cobrou o
-  // crédito), recupera ela aqui em vez de deixar sumir sem forma de
-  // aprovar/recusar.
+  // que tinha travado, mas a geração terminou depois), recupera ela aqui em
+  // vez de deixar sumir sem forma de aprovar/recusar.
   useEffect(() => {
     const qs = editToken ? `?edit_token=${editToken}` : ''
     fetch(`/api/eventos/imagem-ia/pendente${qs}`)
@@ -91,7 +86,9 @@ export default function AiImageGenerate({ editToken, title, credits, hasAvatar, 
       setGenerationId(json.generationId)
       setStage('preview')
     } else {
-      setMsg(json.error ?? 'Erro ao gerar imagem.')
+      setMsg(res.status === 402
+        ? 'Esse convite já usou a geração grátis de imagem por IA.'
+        : (json.error ?? 'Erro ao gerar imagem.'))
     }
     setGenerating(false)
   }
@@ -111,7 +108,7 @@ export default function AiImageGenerate({ editToken, title, credits, hasAvatar, 
       const json = await res.json()
       if (!res.ok) { setMsg(json.error ?? 'Erro ao aprovar.'); setResolving(false); return }
     }
-    onUploaded(previewUrl, COST)
+    onUploaded(previewUrl)
     setStage('idle')
     setPrompt('')
     setRefMode('none')
@@ -141,29 +138,14 @@ export default function AiImageGenerate({ editToken, title, credits, hasAvatar, 
     return (
       <button
         type="button"
-        onClick={() => setStage('confirm')}
-        title="Gerar imagem com IA — 3 créditos"
-        className="aspect-square rounded-lg bg-amber-50 hover:bg-amber-100 border-2 border-dashed border-amber-300 flex flex-col items-center justify-center gap-1 transition-colors"
+        onClick={() => setStage('prompt')}
+        title="Gerar imagem com IA — 1 grátis por convite"
+        className="aspect-square rounded-lg bg-gray-50 hover:bg-gray-100 border-2 border-dashed border-gray-300 flex flex-col items-center justify-center gap-1 transition-colors"
       >
         <span className="text-base">✨</span>
         <span className="text-[8px] font-bold text-gray-600 uppercase leading-tight text-center px-1">Imagem por IA</span>
-        <span className="text-[7px] font-bold text-amber-600 uppercase">3 créditos</span>
+        <span className="text-[7px] font-bold text-gray-400 uppercase">1 grátis</span>
       </button>
-    )
-  }
-
-  if (stage === 'confirm') {
-    return (
-      <CreditLockPanel
-        className="col-span-4"
-        title="Gerar imagem por IA custa 3 créditos"
-        message={`Vai debitar 3 créditos do seu saldo (${credits} disponíveis). Se não aprovar o resultado, devolvemos na hora.`}
-        credits={credits}
-        cost={COST}
-        onCancel={() => setStage('idle')}
-        onContinue={() => setStage('prompt')}
-        continueLabel="Continuar"
-      />
     )
   }
 
@@ -193,7 +175,7 @@ export default function AiImageGenerate({ editToken, title, credits, hasAvatar, 
             {resolving ? 'Aguarde…' : 'Usar essa imagem'}
           </button>
         </div>
-        <p className="text-[10px] text-gray-400">Recusar devolve os 3 créditos dessa tentativa — gerar de novo cobra outra vez.</p>
+        <p className="text-[10px] text-gray-400">Recusar não consome a geração grátis — pode tentar de novo.</p>
       </div>
     )
   }
@@ -299,7 +281,7 @@ export default function AiImageGenerate({ editToken, title, credits, hasAvatar, 
         >
           {generating
             ? 'Gerando… (~25s)'
-            : refMode === 'upload' ? `Transformar (${COST} créditos)` : `Gerar (${COST} créditos)`}
+            : refMode === 'upload' ? 'Transformar' : 'Gerar'}
         </button>
       </div>
     </div>

@@ -2,8 +2,6 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getSupabaseAdmin } from '@/lib/supabase'
 import { getSession } from '@/lib/auth'
 
-const COST = 3
-
 export async function POST(req: NextRequest) {
   const session = await getSession()
   if (!session) return NextResponse.json({ error: 'Não autenticado.' }, { status: 401 })
@@ -26,14 +24,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Essa geração já foi resolvida.' }, { status: 409 })
   }
 
-  await sb.rpc('increment_user_credits', { p_user_id: session.user_id, p_amount: COST })
-  await sb.from('credit_transactions').insert({
-    user_id: session.user_id,
-    amount: COST,
-    type: 'refund',
-    reason: 'Imagem por IA recusada',
-    event_id: generation.event_id,
-  })
   await sb.from('ai_image_generations').update({ status: 'rejected' }).eq('id', generation_id)
   await sb.storage.from('event-headers').remove([generation.storage_path])
 

@@ -4,7 +4,10 @@ import { google } from '@ai-sdk/google'
 import { getSupabaseAdmin } from '@/lib/supabase'
 import { getSession } from '@/lib/auth'
 
-const COST = 3
+// 1 geração grátis por evento — sem crédito, trava por contagem (é o único
+// custo real de API do produto, ~US$0,035/imagem; limite simples em vez de
+// cobrança, já que dar crédito de graça não fazia ninguém testar mesmo).
+const LIMITE_POR_EVENTO = 1
 
 // Geração real leva 15-25s — garante margem contra o limite padrão da
 // função serverless (visto travar no meio antes disso).
@@ -44,12 +47,18 @@ export async function POST(req: NextRequest) {
     eventTitle = evento.title
   }
 
-  const { data: debited } = await sb.rpc('debit_user_credits', {
-    p_user_id: session.user_id,
-    p_amount: COST,
-  })
-  if (!debited) {
-    return NextResponse.json({ error: 'Créditos insuficientes.' }, { status: 402 })
+  // Recusada não conta pro limite — só quem ficou pending/approved ocupou a
+  // única geração grátis do evento de verdade.
+  let contagem = sb
+    .from('ai_image_generations')
+    .select('id', { count: 'exact', head: true })
+    .eq('user_id', session.user_id)
+    .neq('status', 'rejected')
+  contagem = eventId ? contagem.eq('event_id', eventId) : contagem.is('event_id', null)
+  const { count } = await contagem
+
+  if ((count ?? 0) >= LIMITE_POR_EVENTO) {
+    return NextResponse.json({ error: 'Limite de imagem por IA atingido pra esse convite (1 por evento).' }, { status: 402 })
   }
 
   try {
@@ -133,18 +142,8 @@ O resultado deve parecer óbvio e imediatamente uma ilustração pintada, nunca 
 
     if (genErr || !generation) throw new Error(genErr?.message ?? 'Erro ao registrar geração.')
 
-    await sb.from('credit_transactions').insert({
-      user_id: session.user_id,
-      amount: -COST,
-      type: 'debit',
-      reason: `Imagem por IA — ${eventTitle}`,
-      event_id: eventId,
-    })
-
     return NextResponse.json({ ok: true, url: publicUrl, generationId: generation.id })
   } catch (err) {
-    // Gerou erro na IA ou no upload — devolve o crédito, não cobra por falha.
-    await sb.rpc('increment_user_credits', { p_user_id: session.user_id, p_amount: COST })
     const message = err instanceof Error ? err.message : 'Erro ao gerar imagem.'
     return NextResponse.json({ error: message }, { status: 500 })
   }

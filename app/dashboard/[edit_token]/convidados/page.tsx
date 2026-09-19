@@ -4,7 +4,6 @@ import { getSupabaseAdmin } from '@/lib/supabase'
 import { getSession } from '@/lib/auth'
 import { ProfilePopover } from '@/components/AppHeaderNav'
 import AppFooter from '@/components/AppFooter'
-import DesbloquearButton from './DesbloquearButton'
 import type { Rsvp } from '@/lib/supabase'
 
 type Props = { params: Promise<{ edit_token: string }> }
@@ -86,8 +85,6 @@ export default async function ConvidadosPage({ params }: Props) {
 
   if (!evento) notFound()
 
-  const isOwner = !!session && session.user_id === evento.user_id
-
   const { data: rsvpsData } = await sb
     .from('rsvps')
     .select('*')
@@ -127,7 +124,7 @@ export default async function ConvidadosPage({ params }: Props) {
               <Image src="/logo.png" alt="vaikeuvou" width={1161} height={201} className="h-[43px] md:h-[47px] w-auto" />
             </a>
             <div className="flex items-center gap-1 md:hidden">
-              <ProfilePopover userName={session?.users.name ?? null} userAvatar={session?.users.avatar_url ?? null} userCredits={session?.users.credits ?? 0} />
+              <ProfilePopover userName={session?.users.name ?? null} userAvatar={session?.users.avatar_url ?? null} />
             </div>
           </div>
 
@@ -141,13 +138,13 @@ export default async function ConvidadosPage({ params }: Props) {
           </div>
 
           <div className="hidden md:flex items-center gap-1 flex-shrink-0">
-            <ProfilePopover userName={session?.users.name ?? null} userAvatar={session?.users.avatar_url ?? null} userCredits={session?.users.credits ?? 0} />
+            <ProfilePopover userName={session?.users.name ?? null} userAvatar={session?.users.avatar_url ?? null} />
           </div>
         </div>
 
         <p className="text-gray-400 text-sm mb-6">
           {rsvps.length} {rsvps.length === 1 ? 'pessoa confirmou' : 'pessoas confirmaram'} — veja a cadeia de quem convidou quem.
-          {isPast && evento.guest_list_unlocked_at && (
+          {isPast && (
             <>
               {' '}
               <span className="text-green-600 font-bold">{rsvps.filter(r => r.checked_in_at).length}</span> foram de verdade.
@@ -159,13 +156,6 @@ export default async function ConvidadosPage({ params }: Props) {
           <div className="bg-white border border-gray-100 rounded-xl p-8 text-center">
             <p className="text-3xl mb-2">👀</p>
             <p className="text-gray-500 text-sm">Nenhuma confirmação ainda.</p>
-          </div>
-        ) : !evento.guest_list_unlocked_at ? (
-          <div className="bg-white border border-gray-100 rounded-xl p-8 text-center">
-            <p className="text-3xl mb-2">🔒</p>
-            <p className="text-gray-700 text-sm font-semibold mb-1">Conteúdo bloqueado</p>
-            <p className="text-gray-400 text-xs mb-5">Desbloqueie por 3 créditos — vale pra sempre nesse convite.</p>
-            {isOwner && <DesbloquearButton editToken={edit_token} />}
           </div>
         ) : (
           <div className="bg-white border border-gray-100 rounded-xl p-5 shadow-sm overflow-x-auto">
