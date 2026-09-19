@@ -16,6 +16,7 @@ export type EventFormFields = {
   descricao_pacote: string
   programacao: string
   comissao_percentual: number
+  max_parcelas: number
 }
 
 export const DURACAO_OPCOES = [

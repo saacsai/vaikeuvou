@@ -14,7 +14,7 @@ function fmtHora(iso: string): string {
   return new Intl.DateTimeFormat('pt-BR', { hour: '2-digit', minute: '2-digit', timeZone: 'America/Sao_Paulo' }).format(new Date(iso))
 }
 import { titleToHeader } from '@/lib/headers'
-import PersonalizarConvite from '@/components/PersonalizarConvite'
+import SucessoConviteModal from '@/components/SucessoConviteModal'
 
 type Criador = { name: string | null; avatar_url: string | null; bio: string | null; instagram: string | null }
 type Convidador = { user_name: string; foto_url: string | null; mensagem: string | null } | null
@@ -43,6 +43,7 @@ export default function EventoClient({ evento, rsvps, parentRsvpId, criador, con
   const [saving,   setSaving]   = useState(false)
   const [erro,     setErro]     = useState('')
   const [meuRsvpId, setMeuRsvpId] = useState('')
+  const [modalAberto, setModalAberto] = useState(true)
 
   const searchParams = useSearchParams()
   const pago = !!evento.valor && evento.valor > 0
@@ -204,7 +205,17 @@ export default function EventoClient({ evento, rsvps, parentRsvpId, criador, con
               </div>
             )}
             {pago && (
-              <p className="flex items-center gap-1.5"><span>💳</span> {fmtBRL(evento.valor!)} por pessoa</p>
+              <p className="flex items-center gap-1.5 flex-wrap">
+                <span>💳</span>
+                {evento.max_parcelas > 1 ? (
+                  <>
+                    <span className="font-semibold text-gray-700">em até {evento.max_parcelas}x de {fmtBRL(evento.valor! / evento.max_parcelas)}</span>
+                    <span className="text-gray-400">— {fmtBRL(evento.valor!)} à vista, por pessoa</span>
+                  </>
+                ) : (
+                  <span>{fmtBRL(evento.valor!)} por pessoa</span>
+                )}
+              </p>
             )}
           </div>
 
@@ -362,40 +373,18 @@ export default function EventoClient({ evento, rsvps, parentRsvpId, criador, con
                 <h2 className="text-xl font-bold text-gray-900 mb-1">{pago ? 'Pagamento confirmado!' : 'BORA confirmado!'}</h2>
                 <p className="text-gray-500 text-sm">Você está na lista. Nos vemos lá!</p>
               </div>
-
-              {podeConvidar && meuRsvpId && (
-                <div className="text-left">
-                  <PersonalizarConvite rsvpId={meuRsvpId} nome={nome} />
-                </div>
-              )}
-
-              {podeConvidar && (
-                <div className="bg-gray-50 rounded-2xl p-5 text-left space-y-3">
-                  <p className="font-bold text-gray-900 text-sm">Convide seus amigos e contatos também 👇</p>
-                  <div className="flex gap-2">
-                    <input
-                      readOnly
-                      value={linkConvite}
-                      className="flex-1 bg-white border border-gray-200 rounded-xl px-3 py-2 text-xs text-gray-500 font-mono outline-none"
-                    />
-                    <button
-                      onClick={() => navigator.clipboard.writeText(linkConvite)}
-                      className="px-3 py-2 rounded-xl bg-gray-200 text-xs text-gray-700 font-semibold uppercase tracking-wide whitespace-nowrap hover:bg-gray-300"
-                    >
-                      Copiar
-                    </button>
-                  </div>
-                  <a
-                    href={`https://wa.me/?text=${encodeURIComponent(whatsappTxt)}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center justify-center gap-2 w-full py-3 rounded-xl bg-[#25D366] text-white font-bold text-sm"
-                  >
-                    Enviar no WhatsApp
-                  </a>
-                </div>
-              )}
             </div>
+          )}
+
+          {etapa === 'sucesso' && podeConvidar && meuRsvpId && modalAberto && (
+            <SucessoConviteModal
+              rsvpId={meuRsvpId}
+              nome={nome}
+              pago={pago}
+              linkConvite={linkConvite}
+              whatsappTxt={whatsappTxt}
+              onClose={() => setModalAberto(false)}
+            />
           )}
 
           {/* Vídeo embed */}

@@ -35,7 +35,7 @@ export default function CriarClient({ userName, userAvatar, userBio, userInstagr
     location: '', description: '', max_depth: 2,
     external_url: '', external_url_label: '', video_url: '',
     bg_image_url: '', cidade: '',
-    valor: '', descricao_pacote: '', programacao: '', comissao_percentual: 15,
+    valor: '', descricao_pacote: '', programacao: '', comissao_percentual: 15, max_parcelas: 3,
   })
   const [multiDia, setMultiDia] = useState(false)
   const [saving, setSaving] = useState(false)

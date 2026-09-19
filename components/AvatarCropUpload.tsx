@@ -24,15 +24,24 @@ type Props = {
   hint?: string
   uploadUrl?: string
   extraFields?: Record<string, string>
+  onCropStateChange?: (cropping: boolean) => void
 }
 
-export default function AvatarCropUpload({ avatar, onUploaded, fallbackInitials, hint, uploadUrl = '/api/perfil/avatar', extraFields }: Props) {
+export default function AvatarCropUpload({ avatar, onUploaded, fallbackInitials, hint, uploadUrl = '/api/perfil/avatar', extraFields, onCropStateChange }: Props) {
   const [uploading, setUploading] = useState(false)
   const [msg,       setMsg]       = useState('')
   const [crop,      setCrop]      = useState<CropState | null>(null)
 
   const fileRef    = useRef<HTMLInputElement>(null)
   const cropCanvas = useRef<HTMLCanvasElement>(null)
+
+  // Avisa o pai quando entra/sai do modo de recorte — usado por telas que
+  // têm outro botão "Salvar" logo abaixo, pra evitar salvar sem ter
+  // confirmado o recorte primeiro (foto fica pendente e ninguém percebe).
+  useEffect(() => {
+    onCropStateChange?.(!!crop)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [!!crop])
 
   function onFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]

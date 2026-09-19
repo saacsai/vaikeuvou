@@ -41,6 +41,7 @@ export type Event = {
   descricao_pacote: string | null
   programacao: string | null
   comissao_percentual: number
+  max_parcelas: number
 }
 
 export type Rsvp = {
