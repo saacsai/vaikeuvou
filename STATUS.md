@@ -24,6 +24,12 @@ Resumo do que foi decidido e implementado nesta sessão:
   virou 1 grátis por evento (sem cobrança, trava por contagem); `/creditos` e checkout Stripe de
   crédito removidos.
 
+**Tudo commitado e deployado** — commit `17c89a0`, confirmado em produção (`npm run build`
+limpo, `/creditos` → 404, `/criar` e `/embed/[slug]` respondendo). **Pendente**: rodar
+`supabase_cidade.sql` no SQL Editor do Supabase (não consigo rodar migration sozinho, só tenho
+chaves REST) — sem isso o campo `cidade` não persiste de verdade. Nada disso foi testado ao vivo
+por Luciano ainda.
+
 > Este arquivo ficou parado entre 2026-08-19 e 2026-08-26, e de novo
 > entre 2026-08-26 e 2026-09-16 — as sessões desses períodos (logo
 > final do Sandro, check-in "Eu fui", painel `/admin`, campo de
