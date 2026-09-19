@@ -11,14 +11,20 @@ export async function GET(req: NextRequest) {
     return NextResponse.redirect(`${base}/meus-convites?mp_erro=1`)
   }
 
-  const oauth = await getOAuth().create({
-    body: {
-      client_id:     process.env.MP_CLIENT_ID!,
-      client_secret: process.env.MP_CLIENT_SECRET!,
-      code,
-      redirect_uri:  `${base}/api/mp/callback`,
-    },
-  })
+  let oauth
+  try {
+    oauth = await getOAuth().create({
+      body: {
+        client_id:     process.env.MP_CLIENT_ID!,
+        client_secret: process.env.MP_CLIENT_SECRET!,
+        code,
+        redirect_uri:  `${base}/api/mp/callback`,
+      },
+    })
+  } catch (err) {
+    console.error('Erro ao trocar code por token MP:', err)
+    return NextResponse.redirect(`${base}/meus-convites?mp_erro=1`)
+  }
 
   if (!oauth.access_token) {
     return NextResponse.redirect(`${base}/meus-convites?mp_erro=1`)
