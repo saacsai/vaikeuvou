@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createHmac, timingSafeEqual } from 'crypto'
 import { getSupabaseAdmin } from '@/lib/supabase'
+import { enviarWhatsapp } from '@/lib/evolution'
+import { fmtDate } from '@/lib/slug'
 
 // Validação manual da assinatura — o WebhookSignatureValidator oficial do SDK
 // não converte o id pra minúsculo antes de montar o manifest, e a Mercado
@@ -86,6 +88,23 @@ export async function POST(req: NextRequest) {
   }
 
   await sb.from('rsvp_pendentes').delete().eq('id', externalReference)
+
+  // A MP não manda comprovante por e-mail no Checkout Pro — confirma a
+  // presença pelo mesmo canal que o resto do vaikeuvou usa (WhatsApp),
+  // só quando o insert realmente criou o RSVP (não no caso 23505).
+  if (!error) {
+    const { data: evento } = await sb
+      .from('events')
+      .select('title, event_date, slug, location')
+      .eq('id', pendente.event_id)
+      .single()
+
+    if (evento) {
+      const valorTxt = totalPaidAmount ? ` (R$ ${Number(totalPaidAmount).toFixed(2).replace('.', ',')})` : ''
+      const texto = `🎉 Pagamento confirmado!\n\nVocê está na lista pra *${evento.title}*${valorTxt}, dia ${fmtDate(evento.event_date)}${evento.location ? ` em ${evento.location}` : ''}.\n\nNos vemos lá!`
+      await enviarWhatsapp(pendente.user_phone, texto)
+    }
+  }
 
   return NextResponse.json({ ok: true })
 }
