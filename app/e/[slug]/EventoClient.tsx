@@ -240,7 +240,7 @@ export default function EventoClient({ evento, rsvps, parentRsvpId, criador, con
                 </div>
               )}
               {evento.programacao && (
-                <div className="mt-[42px]">
+                <div className="mt-[30px]">
                   <p className="text-xs font-bold text-gray-400 uppercase tracking-wide mb-1">Programação</p>
                   <p className="text-sm text-gray-600 whitespace-pre-line">{evento.programacao}</p>
                 </div>
