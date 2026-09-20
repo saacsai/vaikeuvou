@@ -45,6 +45,8 @@ export async function POST(req: NextRequest) {
   const status            = body?.status ?? body?.data?.status
   const externalReference = body?.external_reference ?? body?.data?.external_reference
   const totalPaidAmount   = body?.total_paid_amount ?? body?.data?.total_paid_amount
+  const transactions      = body?.transactions ?? body?.data?.transactions
+  const pagamento         = transactions?.payments?.[0]?.payment_method as { id?: string; type?: string; installments?: number } | undefined
 
   const sb = getSupabaseAdmin()
 
@@ -100,8 +102,17 @@ export async function POST(req: NextRequest) {
       .single()
 
     if (evento) {
-      const valorTxt = totalPaidAmount ? ` (R$ ${Number(totalPaidAmount).toFixed(2).replace('.', ',')})` : ''
-      const texto = `🎉 Pagamento confirmado!\n\nVocê está na lista pra *${evento.title}*${valorTxt}, dia ${fmtDate(evento.event_date)}${evento.location ? ` em ${evento.location}` : ''}.\n\nNos vemos lá!`
+      const valorTxt = totalPaidAmount ? `R$ ${Number(totalPaidAmount).toFixed(2).replace('.', ',')}` : ''
+
+      let meioTxt = ''
+      if (pagamento?.type === 'bank_transfer') meioTxt = 'no Pix'
+      else if (pagamento?.type === 'ticket') meioTxt = 'no boleto'
+      else if (pagamento?.type === 'credit_card' || pagamento?.type === 'debit_card') {
+        meioTxt = 'no cartão'
+        if (pagamento.installments && pagamento.installments > 1) meioTxt += ` em ${pagamento.installments}x`
+      }
+
+      const texto = `🎉 Pagamento confirmado! (${valorTxt}${meioTxt ? ` ${meioTxt}` : ''})\n\nSua presença está confirmada em *${evento.title}*, dia ${fmtDate(evento.event_date)}${evento.location ? ` no local ${evento.location}` : ''}.\n\nDúvidas entre em contato através do e-mail fale@vaikeuvou.app\n\nNos vemos lá!`
       await enviarWhatsapp(pendente.user_phone, texto)
     }
   }
