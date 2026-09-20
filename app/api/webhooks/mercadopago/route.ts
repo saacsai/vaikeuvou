@@ -25,14 +25,18 @@ export async function POST(req: NextRequest) {
 
   const body = await req.json().catch(() => null)
   const topic = req.nextUrl.searchParams.get('topic') ?? body?.type
+
+  const status            = body?.status ?? body?.data?.status
+  const externalReference = body?.external_reference ?? body?.data?.external_reference
+  const totalPaidAmount   = body?.total_paid_amount ?? body?.data?.total_paid_amount
+
+  // DEBUG temporário — remover depois de confirmar o formato real do Pix.
+  console.log('Webhook MP recebido:', JSON.stringify({ topic, dataId, status, externalReference, totalPaidAmount, body }))
+
   if (topic !== 'order' || !dataId || !body) {
     // Outros tópicos (split, etc.) — reconhece mas não processa ainda.
     return NextResponse.json({ ok: true })
   }
-
-  const status            = body.status ?? body.data?.status
-  const externalReference = body.external_reference ?? body.data?.external_reference
-  const totalPaidAmount   = body.total_paid_amount ?? body.data?.total_paid_amount
 
   if (status !== 'processed' || !externalReference) {
     return NextResponse.json({ ok: true })
