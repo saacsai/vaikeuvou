@@ -46,11 +46,6 @@ export async function POST(req: NextRequest) {
 
   const sb = getSupabaseAdmin()
 
-  // DEBUG temporário — remover depois de confirmar o formato real do Pix.
-  await sb.from('webhook_debug').insert({
-    payload: { topic, dataId, status, externalReference, totalPaidAmount, query: Object.fromEntries(req.nextUrl.searchParams), body },
-  })
-
   if (topic !== 'order' || !dataId || !body) {
     // Outros tópicos (split, etc.) — reconhece mas não processa ainda.
     return NextResponse.json({ ok: true })
@@ -82,7 +77,13 @@ export async function POST(req: NextRequest) {
     mp_payment_id:  dataId,
   })
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+  // 23505 = viola a constraint única (event_id, user_phone) — dois checkouts
+  // pro mesmo telefone foram iniciados antes do primeiro confirmar. Não é
+  // erro nosso pra retornar 500 (a MP ficaria reenviando à toa); o pagamento
+  // duplicado, se acontecer, precisa ser estornado manualmente pelo organizador.
+  if (error && error.code !== '23505') {
+    return NextResponse.json({ error: error.message }, { status: 500 })
+  }
 
   await sb.from('rsvp_pendentes').delete().eq('id', externalReference)
 

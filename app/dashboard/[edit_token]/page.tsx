@@ -25,6 +25,13 @@ export default async function DashboardPage({ params, searchParams }: Props) {
     .eq('event_id', evento.id)
     .order('created_at', { ascending: true })
 
+  // Comissão sempre lida da conta do organizador no momento de exibir (não
+  // do valor travado no evento) — sempre a do dono do evento, não de quem
+  // eventualmente estiver vendo o link do dashboard.
+  const { data: organizador } = evento.user_id
+    ? await sb.from('users').select('mp_access_token, comissao_percentual').eq('id', evento.user_id).single()
+    : { data: null }
+
   return (
     <DashboardClient
       evento={evento}
@@ -34,7 +41,8 @@ export default async function DashboardPage({ params, searchParams }: Props) {
       userAvatar={session?.users.avatar_url ?? null}
       userBio={session?.users.bio ?? null}
       userInstagram={session?.users.instagram ?? null}
-      userMpConectado={!!session?.users.mp_access_token}
+      userMpConectado={!!organizador?.mp_access_token}
+      comissaoPercentual={organizador?.comissao_percentual ?? 15}
     />
   )
 }

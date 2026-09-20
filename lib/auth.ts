@@ -25,7 +25,7 @@ export async function getSession() {
     .update({ expires_at: new Date(Date.now() + SLIDING_MS).toISOString() })
     .eq('token', token)
 
-  return session as { id: string; token: string; user_id: string; users: { id: string; phone: string; name: string | null; email: string | null; avatar_url: string | null; bio: string | null; vibe: string | null; instagram: string | null; credits: number; terms_accepted_at: string | null; mp_access_token: string | null; mp_refresh_token: string | null; mp_user_id: string | null } }
+  return session as { id: string; token: string; user_id: string; users: { id: string; phone: string; name: string | null; email: string | null; avatar_url: string | null; bio: string | null; vibe: string | null; instagram: string | null; credits: number; terms_accepted_at: string | null; mp_access_token: string | null; mp_refresh_token: string | null; mp_user_id: string | null; comissao_percentual: number | null } }
 }
 
 export function normalizePhone(raw: string): string {

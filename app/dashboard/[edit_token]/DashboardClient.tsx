@@ -40,6 +40,7 @@ type Props = {
   userBio: string | null
   userInstagram: string | null
   userMpConectado: boolean
+  comissaoPercentual: number
 }
 
 function parseEventDate(iso: string): { date: string; time: string } {
@@ -86,7 +87,7 @@ function toForm(evento: Event): EventFormFields {
   }
 }
 
-export default function DashboardClient({ evento, rsvps, isNovo, userName, userAvatar, userBio, userInstagram, userMpConectado }: Props) {
+export default function DashboardClient({ evento, rsvps, isNovo, userName, userAvatar, userBio, userInstagram, userMpConectado, comissaoPercentual }: Props) {
   const [initial,   setInitial]   = useState<EventFormFields>(() => toForm(evento))
   const [form,      setForm]      = useState<EventFormFields>(() => toForm(evento))
   const [multiDia,  setMultiDia]  = useState(() => !!evento.event_date_fim)
@@ -117,7 +118,7 @@ export default function DashboardClient({ evento, rsvps, isNovo, userName, userA
   const isPago = !!evento.valor && evento.valor > 0
   const pagos = rsvps.filter(r => r.pago)
   const vendido = pagos.reduce((sum, r) => sum + (r.valor_pago ?? 0), 0)
-  const comissao = vendido * (evento.comissao_percentual / 100)
+  const comissao = vendido * (comissaoPercentual / 100)
   const liquido = vendido - comissao
 
   function copiar(txt: string) {

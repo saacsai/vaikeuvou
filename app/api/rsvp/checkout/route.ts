@@ -25,7 +25,7 @@ export async function POST(req: NextRequest) {
 
   const { data: evento } = await sb
     .from('events')
-    .select('id, slug, title, max_depth, valor, max_parcelas, comissao_percentual, user_id')
+    .select('id, slug, title, max_depth, valor, max_parcelas, user_id')
     .eq('id', event_id)
     .single()
 
@@ -34,8 +34,11 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Esse evento não tem valor definido' }, { status: 400 })
   }
 
+  // Comissão sempre lida da conta do organizador no momento da venda (não
+  // trava no valor de quando o evento foi criado) — admin pode ajustar em
+  // /admin/usuarios e isso vale pra próxima venda na hora, não só eventos novos.
   const { data: organizador } = evento.user_id
-    ? await sb.from('users').select('mp_access_token').eq('id', evento.user_id).single()
+    ? await sb.from('users').select('mp_access_token, comissao_percentual').eq('id', evento.user_id).single()
     : { data: null }
 
   if (!organizador?.mp_access_token) {
@@ -110,7 +113,7 @@ export async function POST(req: NextRequest) {
         total_amount: valor,
         external_reference: pendente.id,
         description: evento.title,
-        marketplace_fee: (Number(evento.valor) * (evento.comissao_percentual ?? 15) / 100).toFixed(2),
+        marketplace_fee: (Number(evento.valor) * (organizador.comissao_percentual ?? 15) / 100).toFixed(2),
         items: [{
           title: evento.title,
           unit_price: valor,
