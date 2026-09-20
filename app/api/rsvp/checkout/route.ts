@@ -86,6 +86,21 @@ export async function POST(req: NextRequest) {
 
   const valor = Number(evento.valor).toFixed(2)
 
+  // "Parcelamento sem juros de 1x" não existe pra MP (1x é só pagamento à
+  // vista) — só manda o bloco de installments quando fizer sentido de verdade.
+  const maxParcelas = evento.max_parcelas || 1
+  const paymentMethod = maxParcelas > 1
+    ? {
+        max_installments: 12,
+        installments: {
+          interest_free: {
+            type: 'list' as const,
+            values: Array.from({ length: maxParcelas }, (_, i) => i + 1),
+          },
+        },
+      }
+    : { max_installments: 1 }
+
   let order
   try {
     order = await getOrderClient(organizador.mp_access_token).create({
@@ -109,15 +124,7 @@ export async function POST(req: NextRequest) {
             auto_return: 'approved',
             callback_url: `${base}/api/webhooks/mercadopago`,
           },
-          payment_method: {
-            max_installments: 12,
-            installments: {
-              interest_free: {
-                type: 'list',
-                values: Array.from({ length: evento.max_parcelas || 3 }, (_, i) => i + 1),
-              },
-            },
-          },
+          payment_method: paymentMethod,
         },
       },
     })
