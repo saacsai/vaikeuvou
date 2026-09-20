@@ -1,6 +1,30 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { WebhookSignatureValidator, InvalidWebhookSignatureError } from 'mercadopago'
+import { createHmac, timingSafeEqual } from 'crypto'
 import { getSupabaseAdmin } from '@/lib/supabase'
+
+// Validação manual da assinatura — o WebhookSignatureValidator oficial do SDK
+// não converte o id pra minúsculo antes de montar o manifest, e a Mercado
+// Pago exige isso (o id de uma order tem letras maiúsculas, tipo
+// "ORD01M2ZB6..." — sem lowercase o hash nunca bate, sempre dá 401).
+function assinaturaValida(xSignature: string | null, xRequestId: string | null, dataId: string | null, secret: string): boolean {
+  if (!xSignature || !dataId) return false
+
+  const partes: Record<string, string> = {}
+  for (const par of xSignature.split(',')) {
+    const [k, v] = par.split('=')
+    if (k && v) partes[k.trim()] = v.trim()
+  }
+  const ts = partes.ts
+  const hash = partes.v1
+  if (!ts || !hash) return false
+
+  const manifest = `id:${dataId.toLowerCase()};${xRequestId ? `request-id:${xRequestId};` : ''}ts:${ts};`
+  const esperado = createHmac('sha256', secret).update(manifest).digest('hex')
+
+  const a = Buffer.from(hash)
+  const b = Buffer.from(esperado)
+  return a.length === b.length && timingSafeEqual(a, b)
+}
 
 // O corpo da notificação já traz external_reference, user_id e o status
 // completo da order — não precisa fazer uma segunda chamada de GET.
@@ -9,18 +33,8 @@ export async function POST(req: NextRequest) {
   const xSignature = req.headers.get('x-signature')
   const xRequestId = req.headers.get('x-request-id')
 
-  try {
-    WebhookSignatureValidator.validate({
-      xSignature,
-      xRequestId,
-      dataId,
-      secret: process.env.MP_WEBHOOK_SECRET!,
-    })
-  } catch (err) {
-    if (err instanceof InvalidWebhookSignatureError) {
-      return NextResponse.json({ error: 'Assinatura inválida.' }, { status: 401 })
-    }
-    throw err
+  if (!assinaturaValida(xSignature, xRequestId, dataId, process.env.MP_WEBHOOK_SECRET!)) {
+    return NextResponse.json({ error: 'Assinatura inválida.' }, { status: 401 })
   }
 
   const body = await req.json().catch(() => null)
