@@ -30,8 +30,12 @@ export async function POST(req: NextRequest) {
   const externalReference = body?.external_reference ?? body?.data?.external_reference
   const totalPaidAmount   = body?.total_paid_amount ?? body?.data?.total_paid_amount
 
+  const sb = getSupabaseAdmin()
+
   // DEBUG temporário — remover depois de confirmar o formato real do Pix.
-  console.error('Webhook MP recebido:', JSON.stringify({ topic, dataId, status, externalReference, totalPaidAmount, body }))
+  await sb.from('webhook_debug').insert({
+    payload: { topic, dataId, status, externalReference, totalPaidAmount, query: Object.fromEntries(req.nextUrl.searchParams), body },
+  })
 
   if (topic !== 'order' || !dataId || !body) {
     // Outros tópicos (split, etc.) — reconhece mas não processa ainda.
@@ -41,8 +45,6 @@ export async function POST(req: NextRequest) {
   if (status !== 'processed' || !externalReference) {
     return NextResponse.json({ ok: true })
   }
-
-  const sb = getSupabaseAdmin()
 
   // Idempotência: se já processamos esse pagamento, não duplica.
   const { data: jaExiste } = await sb.from('rsvps').select('id').eq('mp_payment_id', dataId).single()
