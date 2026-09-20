@@ -120,6 +120,7 @@ export async function POST(req: NextRequest) {
           quantity: 1,
         }],
         config: {
+          statement_descriptor: 'VAIKEUVOU',
           online: {
             success_url: `${base}/e/${evento.slug}?rsvp_ok=1`,
             failure_url: `${base}/e/${evento.slug}`,
