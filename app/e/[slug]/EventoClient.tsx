@@ -225,7 +225,7 @@ export default function EventoClient({ evento, rsvps, parentRsvpId, criador, con
                   <span className="font-semibold text-gray-700">{fmtBRL(evento.valor!)} por pessoa</span>
                 </p>
                 {evento.max_parcelas > 1 && (
-                  <p className="text-[11px] text-gray-400 mt-0.5">parcelamento disponível no pagamento</p>
+                  <p className="text-[11px] text-gray-400 mt-0.5">Parcelamento em até 12x, consulte condições no pagamento</p>
                 )}
               </div>
             )}
