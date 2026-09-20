@@ -55,7 +55,7 @@ export default function ConfirmarPresencaModal({
               <div className="bg-gray-50 rounded-xl p-4 space-y-1">
                 <p className="text-xl font-extrabold text-brand">{fmtBRL(valor)} por pessoa</p>
                 {maxParcelas > 1 && (
-                  <p className="text-xs text-gray-400">Parcelamento em até 12x, consulte condições no pagamento</p>
+                  <p className="text-xs text-gray-400">Parcelamento em até 12x no cartão de crédito, consulte condições no pagamento</p>
                 )}
               </div>
             )}
