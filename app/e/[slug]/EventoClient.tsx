@@ -222,17 +222,10 @@ export default function EventoClient({ evento, rsvps, parentRsvpId, criador, con
               <div>
                 <p className="flex items-center gap-1.5 flex-wrap">
                   <span>💳</span>
-                  {evento.max_parcelas > 1 ? (
-                    <>
-                      <span className="font-semibold text-gray-700">em até {evento.max_parcelas}x de {fmtBRL(evento.valor! / evento.max_parcelas)}</span>
-                      <span className="text-gray-400">— {fmtBRL(evento.valor!)} à vista, por pessoa</span>
-                    </>
-                  ) : (
-                    <span>{fmtBRL(evento.valor!)} por pessoa</span>
-                  )}
+                  <span className="font-semibold text-gray-700">{fmtBRL(evento.valor!)} por pessoa</span>
                 </p>
-                {evento.max_parcelas > 1 && evento.max_parcelas < 12 && (
-                  <p className="text-[11px] text-gray-400 mt-0.5">ou em até 12x com juros</p>
+                {evento.max_parcelas > 1 && (
+                  <p className="text-[11px] text-gray-400 mt-0.5">parcelamento disponível no pagamento</p>
                 )}
               </div>
             )}

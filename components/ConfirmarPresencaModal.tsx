@@ -53,14 +53,9 @@ export default function ConfirmarPresencaModal({
             </div>
             {pago && valor && (
               <div className="bg-gray-50 rounded-xl p-4 space-y-1">
-                {maxParcelas > 1 ? (
-                  <>
-                    <p className="text-xl font-extrabold text-brand">em até {maxParcelas}x de {fmtBRL(valor / maxParcelas)}</p>
-                    <p className="text-xs text-gray-400">ou {fmtBRL(valor)} à vista, por pessoa</p>
-                    {maxParcelas < 12 && <p className="text-[11px] text-gray-400">ou em até 12x com juros</p>}
-                  </>
-                ) : (
-                  <p className="text-xl font-extrabold text-brand">{fmtBRL(valor)} por pessoa</p>
+                <p className="text-xl font-extrabold text-brand">{fmtBRL(valor)} por pessoa</p>
+                {maxParcelas > 1 && (
+                  <p className="text-xs text-gray-400">parcelamento disponível no pagamento</p>
                 )}
               </div>
             )}
