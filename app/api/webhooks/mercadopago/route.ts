@@ -31,7 +31,7 @@ export async function POST(req: NextRequest) {
   const totalPaidAmount   = body?.total_paid_amount ?? body?.data?.total_paid_amount
 
   // DEBUG temporário — remover depois de confirmar o formato real do Pix.
-  console.log('Webhook MP recebido:', JSON.stringify({ topic, dataId, status, externalReference, totalPaidAmount, body }))
+  console.error('Webhook MP recebido:', JSON.stringify({ topic, dataId, status, externalReference, totalPaidAmount, body }))
 
   if (topic !== 'order' || !dataId || !body) {
     // Outros tópicos (split, etc.) — reconhece mas não processa ainda.
