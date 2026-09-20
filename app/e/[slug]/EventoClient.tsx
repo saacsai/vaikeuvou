@@ -232,7 +232,7 @@ export default function EventoClient({ evento, rsvps, parentRsvpId, criador, con
           </div>
 
           {(evento.descricao_pacote || evento.programacao) && (
-            <div className="space-y-3 mb-[26px]">
+            <div className="mb-[26px]">
               {evento.descricao_pacote && (
                 <div>
                   <p className="text-xs font-bold text-gray-400 uppercase tracking-wide mb-1">O que está incluso</p>
@@ -240,7 +240,7 @@ export default function EventoClient({ evento, rsvps, parentRsvpId, criador, con
                 </div>
               )}
               {evento.programacao && (
-                <div className="mt-[10px]">
+                <div className="mt-[22px]">
                   <p className="text-xs font-bold text-gray-400 uppercase tracking-wide mb-1">Programação</p>
                   <p className="text-sm text-gray-600 whitespace-pre-line">{evento.programacao}</p>
                 </div>
