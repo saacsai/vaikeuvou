@@ -20,7 +20,7 @@ export default function InfoPageShell({ title, userName, userAvatar, heroImage, 
         {heroImage ? (
           <>
             <div className="flex items-center justify-between mb-6">
-              <a href="/" className="flex-shrink-0">
+              <a href="https://vaikeuvou.app" className="flex-shrink-0">
                 <Image src="/logo.png" alt="vaikeuvou" width={1161} height={201} className="h-[43px] md:h-[47px] w-auto" />
               </a>
               <ProfilePopover userName={userName} userAvatar={userAvatar} />
@@ -35,7 +35,7 @@ export default function InfoPageShell({ title, userName, userAvatar, heroImage, 
         ) : (
           <div className="flex flex-col md:flex-row md:items-center gap-x-2 gap-y-1 mb-8">
             <div className="flex items-center justify-between md:contents">
-              <a href="/" className="flex-shrink-0">
+              <a href="https://vaikeuvou.app" className="flex-shrink-0">
                 <Image src="/logo.png" alt="vaikeuvou" width={1161} height={201} className="h-[43px] md:h-[47px] w-auto" />
               </a>
               <div className="flex items-center gap-1 md:hidden">
