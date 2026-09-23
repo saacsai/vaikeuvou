@@ -38,10 +38,14 @@ export default async function EmbedPerfilPage() {
 
   if (!session) {
     return (
-      <div className="p-3 flex flex-col items-center text-center gap-3">
-        <Image src="/logo.png" alt="vaikeuvou" width={1161} height={201} className="h-6 w-auto" />
-        <p className="text-gray-500 text-xs leading-snug">
-          Convide. Confirme quem vai. Veja quem foi.
+      <div className="p-4 flex flex-col items-center text-center gap-4">
+        <Image src="/logo-vertical.png" alt="vaikeuvou — Vamo aí?" width={911} height={670} className="w-[150px] h-auto" />
+        <p className="text-gray-400 text-[13px] leading-snug">
+          Evento vazio. Sem chance.
+          <br />
+          Não saber quem vai. Piorou.
+          <br />
+          Eu vou. Bora?
         </p>
         <a
           href="https://live.vaikeuvou.app/criar"
