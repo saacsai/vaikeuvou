@@ -26,7 +26,7 @@ export default function EventPreviewCard({ form, userName, userAvatar, userBio, 
       </div>
 
       <div className="px-5 pt-5 pb-6 bg-gradient-to-b from-white to-[#fcede1]">
-        <Image src="/logo.png" alt="vaikeuvou" width={1161} height={201} className="h-7 w-auto mb-0.5" />
+        <Image src="/logo.png" alt="vaikeuvou" width={1557} height={354} className="h-7 w-auto mb-0.5" />
         <h1 className={`text-xl font-bold leading-tight mb-3 ${hasTitle ? 'text-gray-900' : 'text-gray-300'}`}>
           {hasTitle ? form.title : 'Nome do evento'}
         </h1>

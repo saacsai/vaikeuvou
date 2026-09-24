@@ -39,7 +39,7 @@ export default async function EmbedPerfilPage() {
   if (!session) {
     return (
       <div className="p-4 flex flex-col items-center text-center gap-4">
-        <Image src="/logo-vertical.png" alt="vaikeuvou — Vamo aí?" width={911} height={670} className="w-[150px] h-auto" />
+        <Image src="/logo-vertical.png" alt="vaikeuvou — Vamo aí?" width={1220} height={907} className="w-[150px] h-auto" />
         <p className="text-gray-400 text-[13px] leading-snug">
           Evento vazio. Sem chance.
           <br />

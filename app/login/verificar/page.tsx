@@ -68,7 +68,7 @@ function VerificarForm() {
           <div className="w-full md:w-1/2 md:flex md:flex-col md:justify-center md:bg-white md:p-10 space-y-6">
             <div className="text-center">
               <a href="https://vaikeuvou.app" className="inline-block mb-5">
-                <Image src="/logo.png" alt="vaikeuvou" width={1161} height={201} className="h-[43px] w-auto mx-auto" />
+                <Image src="/logo.png" alt="vaikeuvou" width={1557} height={354} className="h-[43px] w-auto mx-auto" />
               </a>
               <h1 className="text-2xl font-extrabold text-gray-900">Código enviado!</h1>
               <p className="text-gray-400 text-sm mt-1">

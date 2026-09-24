@@ -184,7 +184,7 @@ export default function EventoClient({ evento, rsvps, parentRsvpId, criador, con
         <div className="px-6 pt-6 pb-8 bg-gradient-to-b from-white to-[#fcede1]">
 
           {/* Marca */}
-          <Image src="/logo.png" alt="vaikeuvou" width={1161} height={201} className="w-[250px] max-w-full h-auto mb-4" />
+          <Image src="/logo.png" alt="vaikeuvou" width={1557} height={354} className="w-[250px] max-w-full h-auto mb-4" />
 
           {/* Título — continua a frase do wordmark: "vai que eu vou" + título */}
           <h1 className="text-3xl font-bold leading-tight text-gray-900 mb-3">{evento.title}</h1>
