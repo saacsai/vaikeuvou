@@ -36,9 +36,10 @@ function LoginForm() {
       <div className="flex-1 flex flex-col items-center justify-center px-4 py-8 md:px-8">
         <div className="w-full max-w-sm md:max-w-4xl md:flex md:rounded-2xl md:shadow-xl md:overflow-hidden">
 
-          {/* Foto natural, sem filtro — só desktop, mobile fica igual ao de sempre */}
+          {/* Foto + véu preto 80% — a área clara da foto "vazava" sem isso */}
           <div className="hidden md:block md:w-1/2 relative">
             <Image src="/como-funciona-hero.jpg" alt="" fill className="object-cover" />
+            <div className="absolute inset-0 bg-black/80" />
           </div>
 
           <div className="w-full md:w-1/2 md:flex md:flex-col md:justify-center md:bg-white md:p-10 space-y-6">
