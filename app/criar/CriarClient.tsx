@@ -146,7 +146,7 @@ export default function CriarClient({ userName, userAvatar, userBio, userInstagr
         <div className="flex flex-col md:flex-row md:items-center gap-x-2 gap-y-1 mb-8">
           <div className="flex items-center justify-between md:contents">
             <a href="https://vaikeuvou.app" className="flex-shrink-0">
-              <Image src="/logo.png" alt="vaikeuvou" width={1557} height={354} className="h-[43px] md:h-[47px] w-auto -mt-[5px]" />
+              <Image src="/logo.png" alt="vaikeuvou" width={1557} height={354} className="h-[43px] md:h-[47px] w-auto -mt-[15px]" />
             </a>
             <div className="flex items-center gap-1 md:hidden">
               <ProfilePopover userName={userName} userAvatar={userAvatar} />
