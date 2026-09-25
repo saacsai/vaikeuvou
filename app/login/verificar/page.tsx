@@ -59,10 +59,9 @@ function VerificarForm() {
       <div className="flex-1 flex flex-col items-center justify-center px-4 py-8 md:px-8">
         <div className="w-full max-w-sm md:max-w-4xl md:flex md:rounded-2xl md:shadow-xl md:overflow-hidden">
 
-          {/* Foto com filtro laranja — só desktop, mobile fica igual ao de sempre */}
+          {/* Foto natural, sem filtro — só desktop, mobile fica igual ao de sempre */}
           <div className="hidden md:block md:w-1/2 relative">
-            <Image src="/como-funciona-hero.jpg" alt="" fill className="object-cover grayscale" />
-            <div className="absolute inset-0 bg-brand mix-blend-multiply" />
+            <Image src="/login-hero.jpg" alt="" fill className="object-cover" />
           </div>
 
           <div className="w-full md:w-1/2 md:flex md:flex-col md:justify-center md:bg-white md:p-10 space-y-6">
