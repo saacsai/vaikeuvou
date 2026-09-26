@@ -2,6 +2,18 @@
 
 Última atualização: 2026-09-26
 
+## Sessão 2026-09-26 (parte 6) — 10 imagens de cabeçalho do evento sem filtro laranja
+
+As fotos-preset de `lib/headers.ts` (Show/Futebol/Aventura/Reunião/Amigos/Confraternização/
+Bem-estar/Praia/Surf/Corrida) tinham duotone laranja da entrega antiga do Sandro. Trocadas por
+fotos limpas, mapeadas por conteúdo real de cada uma (não por ordem numérica), com cor pastel de
+fundo recalculada a partir da própria foto nova. Exceção: **"Corrida" continua com o filtro
+laranja** — não havia original limpo disponível, pendência conhecida pra trocar quando tiver a
+foto certa. Commit `07aab04`, confirmado no ar.
+
+Detalhe técnico completo em
+`~/.claude/projects/-Users-lucianomaeda/memory/project_vaikeuvou.md`.
+
 ## Sessão 2026-09-26 (parte 5) — início da automação editorial do blog
 
 Comentei o `Manual de GEO e AEO — vaikeuvou.app.md` do Luciano (achados: tag `#VamoAí?` sem
