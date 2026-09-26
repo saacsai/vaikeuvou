@@ -2,6 +2,29 @@
 
 Última atualização: 2026-09-26
 
+## Sessão 2026-09-26 (parte 5) — início da automação editorial do blog
+
+Comentei o `Manual de GEO e AEO — vaikeuvou.app.md` do Luciano (achados: tag `#VamoAí?` sem
+nenhum post, Schema.org estruturado inexistente, `llms.txt` inexistente) e isso virou o início de
+uma frente de automação de geração de posts nos 4 pilares editoriais.
+
+**Feito**:
+- `PERFIL_CRIADOR.md` (raiz do repo) — as 18 regras de voz do Luciano + os 4 pilares editoriais,
+  formalizados num arquivo versionado (antes só em memória). É o insumo central de qualquer
+  geração futura.
+- `events.divulgar_blog` — opt-in "Autorizo divulgar esse evento no blog vaikeuvou", visível em
+  `/criar` e no painel só quando o evento é "Aberto" (`max_depth = 999`, a definição de evento
+  público do vaikeuvou). Migration `supabase_divulgar_blog.sql` revelada no Finder, ainda não
+  rodada.
+
+**Ainda não construído**: o pipeline de geração de verdade (pesquisa na web + IA usando
+`PERFIL_CRIADOR.md` + rascunho automático no WordPress via REST API) pro `#VamoAí?`; o mecanismo
+de brief manual (título + descritivo) pros outros 3 pilares; Schema.org estruturado por tipo de
+post.
+
+Detalhe técnico completo em
+`~/.claude/projects/-Users-lucianomaeda/memory/project_vaikeuvou.md`.
+
 ## Sessão 2026-09-26 (parte 4) — ponte de identidade nos comentários do blog
 
 Quem está logado no `live.vaikeuvou.app` agora comenta reconhecido no blog WordPress — sem
