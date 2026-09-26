@@ -2,6 +2,35 @@
 
 Última atualização: 2026-09-26
 
+## Sessão 2026-09-26 (parte 8) — fila editorial `blog_briefs`
+
+Continuação da parte 5: em vez de um pipeline automático com IA/pesquisa web, decisão do Luciano
+foi por uma fila simples de captura — sem Gemini/web-search envolvido no app por enquanto.
+
+**Feito**:
+- Tabela `blog_briefs` (`tipo`, `titulo`, `ideias_centrais`, `status` pendente/gerado, `event_id`
+  opcional) — migration `supabase_blog_briefs.sql` revelada no Finder, **ainda não rodada** no
+  Supabase.
+- `/admin/pautas` (`app/admin/pautas/`) — tela admin-only com formulário de captura rápida
+  (tipo/título/ideias centrais) pros 3 pilares manuais (#VaikeuFui/#Tendeu/#ProntoFalei) + tabelas
+  de pendentes/já geradas.
+- Entrada automática do `#VamoAí?`: quando `divulgar_blog` vira `true` (na criação em
+  `app/api/eventos/route.ts` ou na edição em `app/api/eventos/editar/route.ts`), insere sozinho
+  uma pauta com brief composto a partir dos dados do evento (`lib/blogBrief.ts`,
+  `composeVamoAiBrief`) — sem IA, só texto. Na edição só insere na transição false→true, pra não
+  duplicar a cada salvamento do form.
+- Coluna `divulgar_blog` (pendência da parte 5) confirmada rodada em produção.
+
+**Processamento** (não é código, é workflow): quando o Luciano abrir o Claude Code e pedir, a IA
+lê `blog_briefs` com `status=pendente`, usa `PERFIL_CRIADOR.md` como referência de voz, escreve
+cada post e cria como RASCUNHO no WordPress (nunca publica sozinha), marcando `status=gerado`.
+Frequência esperada: a cada ~2 dias.
+
+Commit `977b883`, build/deploy verificados.
+
+Detalhe técnico completo em
+`~/.claude/projects/-Users-lucianomaeda/memory/project_vaikeuvou.md`.
+
 ## Sessão 2026-09-26 (parte 7) — fix: imagem por IA "grudava" em eventos novos
 
 Bug real: gerar imagem por IA em `/criar` nunca marcava a geração como resolvida no banco (só
@@ -38,8 +67,8 @@ uma frente de automação de geração de posts nos 4 pilares editoriais.
   geração futura.
 - `events.divulgar_blog` — opt-in "Autorizo divulgar esse evento no blog vaikeuvou", visível em
   `/criar` e no painel só quando o evento é "Aberto" (`max_depth = 999`, a definição de evento
-  público do vaikeuvou). Migration `supabase_divulgar_blog.sql` revelada no Finder, ainda não
-  rodada.
+  público do vaikeuvou). Migration `supabase_divulgar_blog.sql` rodada (coluna confirmada em
+  produção na parte 8).
 
 **Ainda não construído**: o pipeline de geração de verdade (pesquisa na web + IA usando
 `PERFIL_CRIADOR.md` + rascunho automático no WordPress via REST API) pro `#VamoAí?`; o mecanismo
