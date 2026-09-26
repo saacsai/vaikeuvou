@@ -43,6 +43,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
         <div className="flex gap-2 border-b border-gray-100">
           <a href="/admin/usuarios" className="px-4 py-2 text-sm font-semibold text-gray-700 hover:text-brand">Usuários</a>
           <a href="/admin/eventos" className="px-4 py-2 text-sm font-semibold text-gray-700 hover:text-brand">Eventos</a>
+          <a href="/admin/pautas" className="px-4 py-2 text-sm font-semibold text-gray-700 hover:text-brand">Pautas</a>
         </div>
 
         {children}

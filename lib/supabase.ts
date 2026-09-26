@@ -45,6 +45,19 @@ export type Event = {
   divulgar_blog: boolean
 }
 
+export type BlogBriefTipo = 'VaikeuFui' | 'Tendeu' | 'ProntoFalei' | 'VamoAi'
+export type BlogBriefStatus = 'pendente' | 'gerado'
+
+export type BlogBrief = {
+  id: string
+  tipo: BlogBriefTipo
+  titulo: string
+  ideias_centrais: string
+  status: BlogBriefStatus
+  event_id: string | null
+  created_at: string
+}
+
 export type Rsvp = {
   id: string
   event_id: string

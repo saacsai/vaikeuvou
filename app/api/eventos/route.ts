@@ -3,6 +3,7 @@ import { getSupabaseAdmin } from '@/lib/supabase'
 import { generateSlug } from '@/lib/slug'
 import { getSession } from '@/lib/auth'
 import { geocodeAddress } from '@/lib/geocode'
+import { composeVamoAiBrief } from '@/lib/blogBrief'
 
 export async function POST(req: NextRequest) {
   const session = await getSession()
@@ -39,6 +40,10 @@ export async function POST(req: NextRequest) {
     tentativas++
   }
 
+  // Opt-in de divulgação no blog só faz sentido pra evento "Aberto"
+  // (max_depth 999) — ignora silenciosamente se vier true sem isso.
+  const divulgarBlogFinal = (max_depth ?? 2) === 999 ? !!divulgar_blog : false
+
   const { data, error } = await sb
     .from('events')
     .insert({
@@ -60,9 +65,7 @@ export async function POST(req: NextRequest) {
       programacao:          programacao || null,
       comissao_percentual:  comissaoPercentual,
       max_parcelas:         max_parcelas || 3,
-      // Opt-in de divulgação no blog só faz sentido pra evento "Aberto"
-      // (max_depth 999) — ignora silenciosamente se vier true sem isso.
-      divulgar_blog:        (max_depth ?? 2) === 999 ? !!divulgar_blog : false,
+      divulgar_blog:        divulgarBlogFinal,
       creator_phone: phone,
       user_id:       session.user_id,
     })
@@ -71,6 +74,19 @@ export async function POST(req: NextRequest) {
 
   if (error || !data) {
     return NextResponse.json({ error: error?.message ?? 'Erro ao criar evento' }, { status: 500 })
+  }
+
+  // Entra na fila editorial pra virar post #VamoAí? — sem IA nenhuma aqui,
+  // só compõe o brief a partir dos dados do evento (ver PERFIL_CRIADOR.md e
+  // app/admin/pautas). O processamento de verdade é manual, via Claude Code.
+  if (divulgarBlogFinal) {
+    await sb.from('blog_briefs').insert({
+      tipo: 'VamoAi',
+      titulo: title,
+      ideias_centrais: composeVamoAiBrief({ event_date, location, description, cidade, valor, slug: data.slug }),
+      status: 'pendente',
+      event_id: data.id,
+    })
   }
 
   // Fecha qualquer geração de imagem por IA feita em /criar antes do evento
