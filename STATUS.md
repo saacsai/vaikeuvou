@@ -2,6 +2,31 @@
 
 Última atualização: 2026-09-26
 
+## Sessão 2026-09-26 (parte 3) — página "Buscar Eventos" no blog WordPress
+
+No ar: `https://vaikeuvou.app/buscar/`. Busca por palavra-chave + filtro por Cidade (categoria) e
+Tema (tag), 100% funcional, filtrando no cliente contra os posts reais carregados via `WP_Query`
+no template `newsblogger/page-templates/buscar.php`.
+
+**Preparação (mesma sessão)**: migração de taxonomia — "Trilhas" era subcategoria de "Bertioga"
+(não escala pra 80 cidades, duplicaria por cidade); virou tag compartilhada, junto com Passeios/
+Praias/Restaurantes. Os 8 posts existentes foram revisados e marcados com essas tags novas.
+Categorias hoje são só "Bertioga" e "Troca de ideias", ambas raiz — cidade nova = categoria nova
+sem hierarquia, decisão deliberada de não antecipar a estrutura Estado→Cidade até ter uma segunda
+cidade fora de SP.
+
+**Fluxo de design**: protótipo interativo publicado como Artifact antes de codar (dados mockados,
+filtro já funcionando em JS) — aprovado antes de portar pra PHP real.
+
+**Cidade/Tema dinâmicos**: nada hardcoded — puxa direto de `get_categories()`/`get_tags()`, então
+cidade nova aparece no filtro sem tocar em código. Corpus pequeno hoje, filtro 100% client-side
+(sem AJAX) — revisar se o volume de posts crescer bastante.
+
+Removido o widget de busca por palavra-chave da sidebar (substituído por link pra `/buscar/`).
+
+Detalhe técnico completo em
+`~/.claude/projects/-Users-lucianomaeda/memory/project_vaikeuvou.md`.
+
 ## Sessão 2026-09-26 (parte 2) — coerência WordPress↔Next.js: rodapé, páginas legais, ícone, nomenclatura
 
 4 ajustes pontuais pedidos pelo Luciano, commit `275fa13` no `vaikeuvou` (Next.js) + edições no
