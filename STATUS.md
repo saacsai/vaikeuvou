@@ -2,6 +2,34 @@
 
 Última atualização: 2026-09-26
 
+## Sessão 2026-09-26 (parte 9) — link "Criar post", tipo "Revisar" e editores na fila
+
+Três pedidos encadeados sobre a fila `blog_briefs` (parte 8):
+
+1. **Link "Criar post"** no menu de perfil (ícone de bolinhas), ao lado de "Criar evento", pra
+   quem tem acesso à fila (`canAccessPautas`) — abre `/admin/pautas` direto.
+2. **Tipo "Revisar"**: 4ª opção no formulário, pra revisar um post JÁ publicado — título vira
+   "título exato do post no WordPress" (é assim que ele é localizado), ideias centrais vira "o
+   que revisar". `PERFIL_CRIADOR.md` documenta que o processamento tem que ler o post original
+   antes de reformular. Migration `supabase_blog_briefs_revisar.sql` amplia o check constraint.
+3. **Multiusuário**: decisão de que outras pessoas (ex: Sandro) podem alimentar a fila, mas com
+   a MESMA voz do blog (não uma voz por pessoa — simplifica e evita o problema de não ter
+   histórico de edição pra calibrar voz de gente nova). `lib/auth.ts` ganhou `canAccessPautas()`
+   — admin sempre pode, mais uma lista fixa em `EDITOR_PHONES` (env, ainda vazia — adicionar o
+   telefone do Sandro lá quando for a hora). Nova coluna `blog_briefs.criado_por` (migration
+   `supabase_blog_briefs_criado_por.sql`) grava quem mandou cada pauta manual: **admin vê a fila
+   inteira** (com coluna "Criado por"), **editor só vê as próprias**. Entradas automáticas do
+   #VamoAí? (`criado_por` nulo, vêm de evento de qualquer usuário do app) só aparecem pro admin.
+   `/admin/usuarios` e `/admin/eventos` ganharam gate próprio (antes só dependiam da navegação do
+   layout) pra um editor não conseguir ver essas telas digitando a URL direto.
+
+Commits `75af595`, `087413a`. Falta rodar as duas migrations novas no Supabase (reveladas no
+Finder) e, quando o Sandro (ou outra pessoa) for começar a usar, adicionar o telefone dele em
+`EDITOR_PHONES` no Vercel.
+
+Detalhe técnico completo em
+`~/.claude/projects/-Users-lucianomaeda/memory/project_vaikeuvou.md`.
+
 ## Sessão 2026-09-26 (parte 8) — fila editorial `blog_briefs`
 
 Continuação da parte 5: em vez de um pipeline automático com IA/pesquisa web, decisão do Luciano
