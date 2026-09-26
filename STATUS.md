@@ -1,6 +1,42 @@
 # vaikeuvou.app — Status
 
-Última atualização: 2026-09-19
+Última atualização: 2026-09-25
+
+## Sessão 2026-09-25 — painel de conta sumia no tablet/mobile (WordPress)
+
+Achado pelo Luciano: no menu mobile/tablet do blog WordPress (tema NewsBlogger/NewsCrunch), só
+apareciam "Home / Como funciona? / Criar evento" — sem nenhum caminho pra ver avatar, "Meus
+convites", "Editar perfil" ou "Sair" quando logado. No desktop existia um segundo ícone (separado
+do hambúrguer) que abria uma sidebar com o painel de conta completo (via
+`<iframe src="https://live.vaikeuvou.app/embed/perfil">`, página que já existia desde antes,
+feita sem header/rodapé de propósito pra rodar em iframe) — esse ícone/painel secundário some em
+algum breakpoint responsivo que não foi possível localizar apesar de busca exaustiva em todo
+CSS/JS do tema (pai e filho).
+
+**Registrado nesta sessão**: acesso SSH da Hostinger que hospeda o WordPress (perdido entre
+sessões por nunca ter sido salvo) — ver
+`~/.claude/projects/-Users-lucianomaeda/memory/vaikeuvou_hostinger_ssh.md`.
+
+**Resolvido definitivamente**: em vez de seguir caçando a causa do sumiço, o iframe do painel de
+conta foi embutido direto dentro do drawer do **menu principal** (o que sempre abre pelo
+hambúrguer comum, confirmado como robusto em qualquer largura desde o início) — logo no topo,
+antes de "Home". Editado em `wp-content/themes/newsblogger/partials/header/main-header.php`
+(override de tema filho — não mexe no tema pai `newscrunch`, sobrevive a atualização). Testado e
+confirmado funcionando pelo Luciano.
+
+**Achados técnicos ao longo da correção** (detalhe completo em
+`~/.claude/projects/-Users-lucianomaeda/memory/project_vaikeuvou.md`):
+- O tema tem vários templates de header alternativos escolhidos pelo theme mod `header_layout`
+  (`'9'` → `header-nav.php`, `'2'` → `default-header.php`, `'10'` → `woo-header.php`, qualquer
+  outro valor, incluindo o valor real deste site `'full'` → `main-header.php`) — sempre conferir
+  `wp theme mod get header_layout` antes de editar "o" header de um tema assim.
+- O CSS do tema filho (`style.css`) é enfileirado pelo tema pai sem versão explícita
+  (`get_stylesheet_uri()` sem `$ver`), então o WP usa a versão do core como query string —
+  igual pra todo asset do site, não muda quando só o CSS muda. Resultado: a Cloudflare (que fica
+  na frente do site, cache de 7 dias pra estáticos) servia a cópia antiga indefinidamente mesmo
+  com o arquivo já corrigido na origem. Corrigido de vez com um hook em `wp_enqueue_scripts`
+  (prioridade 20, depois do tema pai) que reenfileira `newscrunch-style` com versão =
+  `filemtime()` do `style.css` — toda edição futura já sai com URL nova automaticamente.
 
 ## Sessão 2026-09-19 — PIVÔ TravelTech (QG receptivo Bertioga + turismo gamificado)
 
