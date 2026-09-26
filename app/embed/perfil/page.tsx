@@ -1,5 +1,5 @@
 import Image from 'next/image'
-import { getSession } from '@/lib/auth'
+import { getSession, canAccessPautas } from '@/lib/auth'
 import SairButton from './SairButton'
 
 function EditIcon({ className }: { className?: string }) {
@@ -25,6 +25,17 @@ function PlusIcon({ className }: { className?: string }) {
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
       <line x1="12" y1="5" x2="12" y2="19" />
       <line x1="5" y1="12" x2="19" y2="12" />
+    </svg>
+  )
+}
+
+function DocIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z" />
+      <path d="M14 2v6h6" />
+      <path d="M9 13h6" />
+      <path d="M9 17h6" />
     </svg>
   )
 }
@@ -68,6 +79,7 @@ export default async function EmbedPerfilPage({ searchParams }: Props) {
   const nome = session.users.name ?? 'Você'
   const iniciais = nome.slice(0, 2).toUpperCase()
   const avatar = session.users.avatar_url
+  const podeCriarPost = canAccessPautas(session.users.phone)
 
   return (
     <div className="p-3">
@@ -101,6 +113,17 @@ export default async function EmbedPerfilPage({ searchParams }: Props) {
           Criar evento
           <PlusIcon className="w-4 h-4 text-gray-400" />
         </a>
+        {podeCriarPost && (
+          <a
+            href="https://live.vaikeuvou.app/admin/pautas"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center justify-between px-1 py-2.5 rounded-lg hover:bg-gray-50 text-sm font-semibold uppercase tracking-wide text-gray-700"
+          >
+            Criar post
+            <DocIcon className="w-4 h-4 text-gray-400" />
+          </a>
+        )}
       </div>
 
       <a
