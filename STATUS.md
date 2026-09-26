@@ -2,6 +2,37 @@
 
 Última atualização: 2026-09-26
 
+## Sessão 2026-09-26 (parte 2) — coerência WordPress↔Next.js: rodapé, páginas legais, ícone, nomenclatura
+
+4 ajustes pontuais pedidos pelo Luciano, commit `275fa13` no `vaikeuvou` (Next.js) + edições no
+tema WordPress via SSH:
+
+1. **Rodapé do `live.vaikeuvou.app`**: removido o link "18 anos depois" (conteúdo já vive no
+   blog WordPress); mantém só Termos de uso / Política de Privacidade.
+2. **Páginas legais duplicadas removidas**: `/termos` e `/privacidade` do Next.js deletados
+   (confirmado 404 em produção). Todos os links (rodapé, `/criar`, `/login`,
+   `ConfirmarPresencaModal`) agora apontam pra `vaikeuvou.app/termos-de-uso/` e
+   `/politica-de-privacidade/` no WordPress.
+3. **Ícone do painel de conta**: trocado no WordPress de `fa-circle-user` pro mesmo SVG de 9
+   pontinhos (`GridIcon`) já usado no header do Next.js — pixel-idêntico, não só parecido.
+   Editado em `main-header.php` (override de tema filho).
+4. **Convite(s) → Evento(s)** em toda a UI visível do Next.js (títulos, breadcrumbs, botões,
+   placeholders, mensagens de erro de API) — ~14 arquivos, pra bater com a CTA "Criar Evento" já
+   usada no WordPress. Mantido "convite" só no sentido de convidar alguém (verbo) — rotas internas
+   (`/meus-convites`) não mudaram, só o texto visível.
+
+**Ajustes finos, mesma sessão**: (a) ícone dos pontinhos no desktop alinhado verticalmente com o
+texto do menu (`transform: translateY(10px)`, só `@media (min-width: 1101px)`); (b) achado
+importante — o ícone separado (`.spnc-widget-toggle`) nunca renderizou de forma confiável no
+mobile/tablet (mesmo mistério nunca resolvido da sessão anterior). Em vez de insistir nele, o
+ícone do PRÓPRIO botão hambúrguer (`.spnc-menu-open`, comprovadamente mobile-only) foi trocado
+pros mesmos pontinhos — mobile/tablet passa a abrir o painel de conta (já embutido no drawer
+principal) por um botão com ícone de pontinhos, sem depender do elemento que nunca funcionou
+direito em tela estreita.
+
+Detalhe técnico completo em
+`~/.claude/projects/-Users-lucianomaeda/memory/project_vaikeuvou.md`.
+
 ## Sessão 2026-09-26 — regressão no desktop após fix de mobile (WordPress)
 
 A correção de 2026-09-25 (ver seção abaixo) embutiu o iframe do painel de conta dentro do
