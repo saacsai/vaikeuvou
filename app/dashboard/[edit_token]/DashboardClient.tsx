@@ -522,7 +522,7 @@ export default function DashboardClient({ evento, rsvps, isNovo, userName, userA
                   />
                   <span className="text-xs text-gray-600">
                     <strong className="text-gray-900">Autorizo divulgar esse evento no blog vaikeuvou.</strong>
-                    {' '}Vira matéria no blog (tag #VamoAí?) — você revisa antes de publicar.
+                    {' '}Vira matéria no blog (tag #VamoAí?) — a equipe vaikeuvou revisa antes de publicar.
                   </span>
                 </label>
               )}
