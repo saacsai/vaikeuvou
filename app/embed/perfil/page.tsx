@@ -29,23 +29,29 @@ function PlusIcon({ className }: { className?: string }) {
   )
 }
 
+type Props = { searchParams: Promise<{ nologo?: string }> }
+
 // Feito pra rodar dentro de um <iframe> num widget do vaikeuvou.app (WordPress) —
 // não tem header/rodapé próprio, só o painel. Todo link sai em nova aba
 // (mesmo padrão já usado no botão "Criar evento" do header do WordPress), pra
 // não prender quem clicou dentro do iframe pequeno da sidebar.
-export default async function EmbedPerfilPage() {
+//
+// `?nologo=1`: usado pela sidebar mobile/tablet do WordPress, que já mostra o
+// logo dela mesma logo acima do iframe — sem isso o logo apareceria duplicado.
+// A sidebar desktop (widget separado) não passa esse parâmetro.
+export default async function EmbedPerfilPage({ searchParams }: Props) {
   const session = await getSession()
+  const { nologo } = await searchParams
 
   if (!session) {
     return (
       <div className="p-4 flex flex-col items-center text-center gap-4">
-        <Image src="/logo-vertical.png" alt="vaikeuvou — Vamo aí?" width={1220} height={907} className="w-[150px] h-auto" />
-        <p className="text-gray-400 text-[13px] leading-snug">
-          Evento vazio. Sem chance.
-          <br />
-          Não saber quem vai. Piorou.
-          <br />
-          Eu vou. Bora?
+        {!nologo && (
+          <Image src="/logo.png" alt="vaikeuvou" width={1557} height={354} className="h-10 w-auto" />
+        )}
+        <p className="text-gray-400 text-[13px] leading-relaxed">
+          Organize seus eventos e compartilhe com seus contatos de forma gratuita. Experimente
+          (Crie quantos eventos quiser, sem tempo limitado de uso e sem precisar cadastrar cartão).
         </p>
         <a
           href="https://live.vaikeuvou.app/criar"
