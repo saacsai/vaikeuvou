@@ -1,4 +1,4 @@
-import { getSession, isAdminPhone } from '@/lib/auth'
+import { getSession, canAccessPautas } from '@/lib/auth'
 import InfoPageShell from '@/components/InfoPageShell'
 import FaleClient from './FaleClient'
 import { FAQ } from '@/lib/faq'
@@ -10,7 +10,7 @@ export default async function FalePage() {
       title="Fale conosco"
       userName={session?.users.name ?? null}
       userAvatar={session?.users.avatar_url ?? null}
-      isAdmin={isAdminPhone(session?.users.phone)}
+      podeCriarPost={canAccessPautas(session?.users.phone)}
       heroImage="/fale-hero.jpg"
     >
       <div className="max-w-2xl mx-auto space-y-10 pb-6">

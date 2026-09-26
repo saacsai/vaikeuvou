@@ -1,6 +1,6 @@
 import { getSupabaseAdmin } from '@/lib/supabase'
 import { notFound } from 'next/navigation'
-import { getSession, isAdminPhone } from '@/lib/auth'
+import { getSession, canAccessPautas } from '@/lib/auth'
 import DashboardClient from './DashboardClient'
 
 type Props = { params: Promise<{ edit_token: string }>; searchParams: Promise<{ novo?: string }> }
@@ -43,7 +43,7 @@ export default async function DashboardPage({ params, searchParams }: Props) {
       userInstagram={session?.users.instagram ?? null}
       userMpConectado={!!organizador?.mp_access_token}
       comissaoPercentual={organizador?.comissao_percentual ?? 15}
-      isAdmin={isAdminPhone(session?.users.phone)}
+      podeCriarPost={canAccessPautas(session?.users.phone)}
     />
   )
 }

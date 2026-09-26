@@ -26,10 +26,10 @@ type Props = {
   userBio: string | null
   userInstagram: string | null
   termsAccepted: boolean
-  isAdmin?: boolean
+  podeCriarPost?: boolean
 }
 
-export default function CriarClient({ userName, userAvatar, userBio, userInstagram, termsAccepted, isAdmin }: Props) {
+export default function CriarClient({ userName, userAvatar, userBio, userInstagram, termsAccepted, podeCriarPost }: Props) {
   const router = useRouter()
   const [form, setForm] = useState<Form>({
     title: '', event_date: '', event_date_fim: '', event_time: '', duration_minutes: '',
@@ -151,7 +151,7 @@ export default function CriarClient({ userName, userAvatar, userBio, userInstagr
               <Image src="/logo.png" alt="vaikeuvou" width={1557} height={354} className="h-[43px] md:h-[47px] w-auto -mt-[15px]" />
             </a>
             <div className="flex items-center gap-1 md:hidden">
-              <ProfilePopover userName={userName} userAvatar={userAvatar} isAdmin={isAdmin} />
+              <ProfilePopover userName={userName} userAvatar={userAvatar} podeCriarPost={podeCriarPost} />
             </div>
           </div>
 
@@ -163,7 +163,7 @@ export default function CriarClient({ userName, userAvatar, userBio, userInstagr
           </div>
 
           <div className="hidden md:flex items-center gap-1 flex-shrink-0">
-            <ProfilePopover userName={userName} userAvatar={userAvatar} isAdmin={isAdmin} />
+            <ProfilePopover userName={userName} userAvatar={userAvatar} podeCriarPost={podeCriarPost} />
           </div>
         </div>
 

@@ -1,7 +1,7 @@
 import Image from 'next/image'
 import { notFound } from 'next/navigation'
 import { getSupabaseAdmin } from '@/lib/supabase'
-import { getSession, isAdminPhone } from '@/lib/auth'
+import { getSession, canAccessPautas } from '@/lib/auth'
 import { ProfilePopover } from '@/components/AppHeaderNav'
 import AppFooter from '@/components/AppFooter'
 import type { Rsvp } from '@/lib/supabase'
@@ -125,7 +125,7 @@ export default async function ConvidadosPage({ params }: Props) {
               <Image src="/logo.png" alt="vaikeuvou" width={1557} height={354} className="h-[43px] md:h-[47px] w-auto -mt-[15px]" />
             </a>
             <div className="flex items-center gap-1 md:hidden">
-              <ProfilePopover userName={session?.users.name ?? null} userAvatar={session?.users.avatar_url ?? null} isAdmin={isAdminPhone(session?.users.phone)} />
+              <ProfilePopover userName={session?.users.name ?? null} userAvatar={session?.users.avatar_url ?? null} podeCriarPost={canAccessPautas(session?.users.phone)} />
             </div>
           </div>
 
@@ -139,7 +139,7 @@ export default async function ConvidadosPage({ params }: Props) {
           </div>
 
           <div className="hidden md:flex items-center gap-1 flex-shrink-0">
-            <ProfilePopover userName={session?.users.name ?? null} userAvatar={session?.users.avatar_url ?? null} isAdmin={isAdminPhone(session?.users.phone)} />
+            <ProfilePopover userName={session?.users.name ?? null} userAvatar={session?.users.avatar_url ?? null} podeCriarPost={canAccessPautas(session?.users.phone)} />
           </div>
         </div>
 

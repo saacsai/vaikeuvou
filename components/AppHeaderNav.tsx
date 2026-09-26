@@ -63,10 +63,10 @@ function DocIcon({ className }: { className?: string }) {
 type ProfileProps = {
   userName: string | null
   userAvatar: string | null
-  isAdmin?: boolean
+  podeCriarPost?: boolean
 }
 
-export function ProfilePopover({ userName, userAvatar, isAdmin }: ProfileProps) {
+export function ProfilePopover({ userName, userAvatar, podeCriarPost }: ProfileProps) {
   const router = useRouter()
   const nome = userName ?? 'Você'
   const iniciais = nome.slice(0, 2).toUpperCase()
@@ -106,7 +106,7 @@ export function ProfilePopover({ userName, userAvatar, isAdmin }: ProfileProps) 
             Criar evento
             <PlusIcon className="w-4 h-4 text-gray-400" />
           </a>
-          {isAdmin && (
+          {podeCriarPost && (
             <a
               href="/admin/pautas"
               className="flex items-center justify-between px-1 py-2.5 rounded-lg hover:bg-gray-50 text-sm font-semibold uppercase tracking-wide text-gray-700"

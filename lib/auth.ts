@@ -32,6 +32,15 @@ export function isAdminPhone(phone: string | null | undefined): boolean {
   return !!phone && phone === process.env.ADMIN_PHONE
 }
 
+// Admin sempre pode; além dele, uma lista fixa de telefones liberados
+// manualmente (ex: Sandro) só pra escrever pautas — não dá acesso ao resto
+// do /admin (Usuários/Eventos), só a /admin/pautas, e só enxerga as próprias.
+export function canAccessPautas(phone: string | null | undefined): boolean {
+  if (isAdminPhone(phone)) return true
+  const editores = (process.env.EDITOR_PHONES ?? '').split(',').map(p => p.trim()).filter(Boolean)
+  return !!phone && editores.includes(phone)
+}
+
 export function normalizePhone(raw: string): string {
   const digits = raw.replace(/\D/g, '')
   // Adiciona 55 se não tiver código do país

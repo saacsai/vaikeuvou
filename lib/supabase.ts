@@ -55,6 +55,7 @@ export type BlogBrief = {
   ideias_centrais: string
   status: BlogBriefStatus
   event_id: string | null
+  criado_por: string | null
   created_at: string
 }
 

@@ -1,3 +1,5 @@
+import { redirect } from 'next/navigation'
+import { getSession, isAdminPhone } from '@/lib/auth'
 import { getSupabaseAdmin } from '@/lib/supabase'
 import SearchBox from '@/components/admin/SearchBox'
 
@@ -16,6 +18,9 @@ type Evento = {
 type Props = { searchParams: Promise<{ q?: string; page?: string }> }
 
 export default async function AdminEventosPage({ searchParams }: Props) {
+  const session = await getSession()
+  if (!session || !isAdminPhone(session.users.phone)) redirect('/admin/pautas')
+
   const { q, page: pageParam } = await searchParams
   const page = Math.max(1, parseInt(pageParam ?? '1', 10) || 1)
   const sb = getSupabaseAdmin()
