@@ -22,13 +22,20 @@ tema WordPress via SSH:
    (`/meus-convites`) não mudaram, só o texto visível.
 
 **Ajustes finos, mesma sessão**: (a) ícone dos pontinhos no desktop alinhado verticalmente com o
-texto do menu (`transform: translateY(10px)`, só `@media (min-width: 1101px)`); (b) achado
-importante — o ícone separado (`.spnc-widget-toggle`) nunca renderizou de forma confiável no
-mobile/tablet (mesmo mistério nunca resolvido da sessão anterior). Em vez de insistir nele, o
-ícone do PRÓPRIO botão hambúrguer (`.spnc-menu-open`, comprovadamente mobile-only) foi trocado
-pros mesmos pontinhos — mobile/tablet passa a abrir o painel de conta (já embutido no drawer
-principal) por um botão com ícone de pontinhos, sem depender do elemento que nunca funcionou
-direito em tela estreita.
+texto do menu (`transform: translateY(7px)` — micro-ajustado de 10px pra 7px depois de conferência
+visual, só `@media (min-width: 1101px)`); (b) achado importante — o ícone separado
+(`.spnc-widget-toggle`) nunca renderizou de forma confiável no mobile/tablet (mesmo mistério nunca
+resolvido da sessão anterior). Em vez de insistir nele, o ícone do PRÓPRIO botão hambúrguer
+(`.spnc-menu-open`, comprovadamente mobile-only) foi trocado pros mesmos pontinhos —
+mobile/tablet passa a abrir o painel de conta (já embutido no drawer principal) por um botão com
+ícone de pontinhos (`translateY(3px)` de micro-ajuste), sem depender do elemento que nunca
+funcionou direito em tela estreita.
+
+**Painel de conta deslogado (mesma sessão)**: logo trocado de `/logo-vertical.png` (com a tagline
+"vamo aí?" embutida na imagem) pro `/logo.png` padrão (mãozinha + wordmark horizontal, o mesmo do
+resto do app); texto de venda reescrito por pedido do Luciano. Duplicação de logo no mobile
+(sidebar do WP já mostra o próprio logo acima do drawer) resolvida com `?nologo=1` — só o iframe
+mobile usa esse parâmetro, o widget desktop separado continua mostrando o logo normalmente.
 
 Detalhe técnico completo em
 `~/.claude/projects/-Users-lucianomaeda/memory/project_vaikeuvou.md`.
