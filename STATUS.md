@@ -2,6 +2,36 @@
 
 Última atualização: 2026-09-26
 
+## Sessão 2026-09-26 (parte 10) — Schema.org (GEO/AEO) + llms.txt no blog WordPress
+
+Resolvida a "parte 2" pendente do Manual de GEO e AEO (a parte 1 foi a fila `blog_briefs`).
+
+**Descoberta no meio do caminho**: o Yoast (`wordpress-seo` v28.5) já emitia `Article`/`WebPage`/
+`ImageObject`/`Person` (autor) por post — a suspeita inicial de "schema inexistente" era falsa,
+vinha de eu ter testado a URL errada sem o prefixo de categoria (permalink é
+`/%category%/%postname%/`). Só faltava: `sameAs` real do autor (resolvido setando os campos
+nativos `instagram`/`linkedin` no perfil do usuário — o próprio Yoast já lê esses campos, zero
+código) e o nível de categoria no `BreadcrumbList` (o do Yoast pula direto pra o post, mesmo com
+`_yoast_wpseo_primary_category` setado — não resolvido do lado do Yoast, contornado com bloco
+próprio).
+
+**Construído** (tema filho `newsblogger/functions.php`, função `vkv_schema_post`, hookada em
+`wp_head` — testado e confirmado ao vivo com posts reais e um rascunho de teste):
+- `BreadcrumbList` completo (Início > Categoria/destino > Post).
+- `FAQPage` automático — extrai qualquer `<h2>` terminando em "?" seguido de `<p>`. Regra prática
+  documentada em `PERFIL_CRIADOR.md`: `#Tendeu` precisa escrever a pergunta literalmente nesse
+  formato pra ganhar o FAQPage de graça.
+- Base do `Event` (só ativa com postmeta `vkv_event_date` etc.) — pronta pra quando a automação
+  do `#VamoAí?` passar a setar esses campos ao criar o post.
+- `llms.txt` publicado em `https://vaikeuvou.app/llms.txt` — descreve o site, os 4 pilares
+  editoriais e os links principais, em formato simples pra agente de IA.
+
+**Pendências que ficam de fora** (são conteúdo, não técnico): `Review`/`LocalBusiness` pra
+`#VaikeuFui` sobre local específico; resumo/descrição escrita nas páginas de categoria (destino).
+
+Detalhe técnico completo em
+`~/.claude/projects/-Users-lucianomaeda/memory/project_vaikeuvou.md`.
+
 ## Sessão 2026-09-26 (parte 9) — link "Criar post", tipo "Revisar" e editores na fila
 
 Três pedidos encadeados sobre a fila `blog_briefs` (parte 8):
