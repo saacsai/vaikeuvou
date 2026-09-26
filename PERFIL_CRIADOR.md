@@ -157,3 +157,33 @@ WhatsApp/carta estendida: hedge constante, diminutivos, ironia sobre o próprio 
   conteúdo atual do post de verdade** (via SSH/wp-cli) — nunca reescrever do zero ignorando o que
   já está publicado. O resultado também respeita a regra acima: fica como revisão pendente de
   aprovação do Luciano, não substitui o post ao vivo sozinho.
+
+## Marcação estrutural (Schema.org) — GEO/AEO (implementado 2026-09-26)
+
+O Yoast (`wordpress-seo`) já cobre `Article`/`WebPage`/`ImageObject`/`Person` (autor) em todo
+post automaticamente — nada a fazer aí. O `sameAs` do autor (Instagram/LinkedIn reais) já está
+setado no perfil do usuário `luciano.maeda@gmail.com` (campos nativos `instagram`/`linkedin` que
+o próprio Yoast lê). O que o Yoast NÃO cobre, e o tema filho (`newsblogger/functions.php`,
+`vkv_schema_post`) complementa via um segundo bloco `<script type="ld+json">`:
+
+- **`BreadcrumbList` com o destino incluído** (Início > Categoria > Post) — o do Yoast pula a
+  categoria mesmo com `_yoast_wpseo_primary_category` setado. Funciona automaticamente pra
+  qualquer post com categoria única, nada a fazer na escrita.
+- **`FAQPage` automático**: extraído de qualquer `<h2>` que termine em "?" seguido de um `<p>`
+  logo depois. **Regra prática pra escrever `#Tendeu`**: a pergunta precisa estar literalmente
+  num H2 terminando em "?", com a resposta direta no parágrafo imediatamente seguinte — isso
+  ativa o FAQPage sem trabalho extra nenhum. Sem esse padrão, o post não ganha FAQPage (não é
+  erro, só não se aplica).
+- **`Event`**: só aparece se o post tiver os postmeta `vkv_event_date` (ISO 8601, obrigatório —
+  sem ele nada é emitido), e opcionalmente `vkv_event_title`, `vkv_event_location`,
+  `vkv_event_url`, `vkv_event_valor`. **Ao criar um post `#VamoAí?`, setar esses postmeta via
+  wp-cli** (`wp post meta update <id> vkv_event_date '...'` etc.) — os dados já vêm prontos no
+  brief (`composeVamoAiBrief`, ver `lib/blogBrief.ts`: data, local, valor, link do evento).
+
+**Pendências que ficam de fora dessa automação técnica (são conteúdo, não código)**:
+- `Review`/`LocalBusiness` pra `#VaikeuFui` sobre um local específico — não implementado.
+- Resumo curto/atualizado nas páginas de categoria (destino) — o manual pede isso pra virar
+  "página que a IA cita quando a pergunta é sobre a cidade em geral"; hoje as categorias não têm
+  descrição escrita.
+- `llms.txt` já existe em `https://vaikeuvou.app/llms.txt` — atualizar manualmente se a estrutura
+  editorial mudar (novo pilar, novo destino relevante etc.).
