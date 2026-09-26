@@ -1,6 +1,17 @@
 # vaikeuvou.app — Status
 
-Última atualização: 2026-09-25
+Última atualização: 2026-09-26
+
+## Sessão 2026-09-26 — regressão no desktop após fix de mobile (WordPress)
+
+A correção de 2026-09-25 (ver seção abaixo) embutiu o iframe do painel de conta dentro do
+`.spnc-collapse#spnc-menu-open` — só que esse container não é exclusivo de mobile: em telas
+largas ele vira o próprio menu horizontal do desktop (sempre visível, sem off-canvas). Resultado:
+o painel (com CTA "Criar evento" e tagline no estado deslogado) passou a aparecer como um bloco
+grande no meio do header do desktop, quebrando o layout (ver `ref11.png`). Corrigido com CSS:
+`.vkv-embed-perfil-wrap { display: none; }` como regra base + `display: block` só dentro de
+`@media (max-width: 1100px)` (mesmo breakpoint que o tema já usa pra alternar desktop/mobile).
+Confirmado ao vivo que o CSS novo está no ar — pendente de confirmação visual do Luciano.
 
 ## Sessão 2026-09-25 — painel de conta sumia no tablet/mobile (WordPress)
 
