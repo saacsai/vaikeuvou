@@ -2,6 +2,25 @@
 
 Última atualização: 2026-09-26
 
+## Sessão 2026-09-26 (parte 4) — ponte de identidade nos comentários do blog
+
+Quem está logado no `live.vaikeuvou.app` agora comenta reconhecido no blog WordPress — sem
+preencher nome/e-mail, com a foto real na lista de comentários. Quem não tem conta comenta como
+sempre (nome + e-mail avulso, sem exigir nada).
+
+**Como**: novo endpoint `GET live.vaikeuvou.app/api/comment-identity` (CORS só pra
+`vaikeuvou.app`) devolve identidade de quem está logado; script no blog
+(`newsblogger/assets/js/comment-identity.js`) chama isso e pré-preenche/esconde os campos do
+formulário nativo do WP; foto vai num campo oculto, salva como `comment_meta` no envio, e um
+filtro `get_avatar_url` troca o Gravatar padrão pela foto real. Comentário continua sendo salvo
+inteiramente no WordPress — sem migração de banco, sem perder moderação/spam nativos.
+
+**Pendente de teste real**: não dá pra simular sessão de navegador via SSH/curl — falta o Luciano
+confirmar ao vivo (logar, abrir um post, ver se reconhece automaticamente).
+
+Detalhe técnico completo em
+`~/.claude/projects/-Users-lucianomaeda/memory/project_vaikeuvou.md`.
+
 ## Sessão 2026-09-26 (parte 3) — página "Buscar Eventos" no blog WordPress
 
 No ar: `https://vaikeuvou.app/buscar/`. Busca por palavra-chave + filtro por Cidade (categoria) e
