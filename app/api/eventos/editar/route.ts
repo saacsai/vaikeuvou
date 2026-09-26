@@ -15,6 +15,9 @@ export async function PATCH(req: NextRequest) {
   for (const key of allowed) {
     if (key in fields) updates[key] = fields[key] || null
   }
+  // Booleano: `false || null` cairia em null, então trata à parte do loop
+  // genérico acima (que assume string/number).
+  if ('divulgar_blog' in fields) updates.divulgar_blog = !!fields.divulgar_blog
   if (Object.keys(updates).length === 0) return NextResponse.json({ error: 'Nenhum campo para atualizar' }, { status: 400 })
 
   const sb = getSupabaseAdmin()

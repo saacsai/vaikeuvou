@@ -42,6 +42,7 @@ export type Event = {
   programacao: string | null
   comissao_percentual: number
   max_parcelas: number
+  divulgar_blog: boolean
 }
 
 export type Rsvp = {

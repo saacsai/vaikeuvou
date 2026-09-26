@@ -84,6 +84,7 @@ function toForm(evento: Event): EventFormFields {
     descricao_pacote: evento.descricao_pacote ?? '',
     programacao: evento.programacao ?? '',
     max_parcelas: evento.max_parcelas,
+    divulgar_blog: evento.divulgar_blog,
   }
 }
 
@@ -103,7 +104,7 @@ export default function DashboardClient({ evento, rsvps, isNovo, userName, userA
 
   const dirty = JSON.stringify(form) !== JSON.stringify(initial)
 
-  function set(k: keyof EventFormFields, v: string | number) {
+  function set(k: keyof EventFormFields, v: string | number | boolean) {
     setForm(p => ({ ...p, [k]: v }))
   }
 
@@ -511,6 +512,20 @@ export default function DashboardClient({ evento, rsvps, isNovo, userName, userA
                   </button>
                 ))}
               </div>
+              {form.max_depth === 999 && (
+                <label className="mt-3 flex items-start gap-2.5 rounded-xl border border-gray-200 bg-gray-50 p-3 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={form.divulgar_blog}
+                    onChange={e => set('divulgar_blog', e.target.checked)}
+                    className="mt-0.5 w-4 h-4 flex-shrink-0 accent-brand"
+                  />
+                  <span className="text-xs text-gray-600">
+                    <strong className="text-gray-900">Autorizo divulgar esse evento no blog vaikeuvou.</strong>
+                    {' '}Vira matéria no blog (tag #VamoAí?) — você revisa antes de publicar.
+                  </span>
+                </label>
+              )}
             </div>
 
             <div className="lg:hidden">

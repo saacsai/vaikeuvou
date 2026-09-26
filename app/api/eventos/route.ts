@@ -11,7 +11,7 @@ export async function POST(req: NextRequest) {
   const {
     title, event_date, event_date_fim, duration_minutes, location, description, max_depth, bg_image_url,
     video_url, external_url, external_url_label, cidade,
-    valor, descricao_pacote, programacao, max_parcelas,
+    valor, descricao_pacote, programacao, max_parcelas, divulgar_blog,
   } = await req.json()
 
   if (!title || !event_date) {
@@ -60,6 +60,9 @@ export async function POST(req: NextRequest) {
       programacao:          programacao || null,
       comissao_percentual:  comissaoPercentual,
       max_parcelas:         max_parcelas || 3,
+      // Opt-in de divulgação no blog só faz sentido pra evento "Aberto"
+      // (max_depth 999) — ignora silenciosamente se vier true sem isso.
+      divulgar_blog:        (max_depth ?? 2) === 999 ? !!divulgar_blog : false,
       creator_phone: phone,
       user_id:       session.user_id,
     })

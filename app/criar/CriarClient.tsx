@@ -36,6 +36,7 @@ export default function CriarClient({ userName, userAvatar, userBio, userInstagr
     external_url: '', external_url_label: '', video_url: '',
     bg_image_url: '', cidade: '',
     valor: '', descricao_pacote: '', programacao: '', max_parcelas: 3,
+    divulgar_blog: false,
   })
   const [multiDia, setMultiDia] = useState(false)
   const [saving, setSaving] = useState(false)
@@ -57,7 +58,7 @@ export default function CriarClient({ userName, userAvatar, userBio, userInstagr
   // Aceite de Termos/Privacidade — só pergunta uma vez, na primeira criação.
   const [aceitouTermos, setAceitouTermos] = useState(false)
 
-  function set(k: keyof Form, v: string | number) {
+  function set(k: keyof Form, v: string | number | boolean) {
     setForm(p => ({ ...p, [k]: v }))
   }
 
@@ -364,6 +365,20 @@ export default function CriarClient({ userName, userAvatar, userBio, userInstagr
                   </button>
                 ))}
               </div>
+              {form.max_depth === 999 && (
+                <label className="mt-3 flex items-start gap-2.5 rounded-xl border border-gray-200 bg-gray-50 p-3 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={form.divulgar_blog}
+                    onChange={e => set('divulgar_blog', e.target.checked)}
+                    className="mt-0.5 w-4 h-4 flex-shrink-0 accent-brand"
+                  />
+                  <span className="text-xs text-gray-600">
+                    <strong className="text-gray-900">Autorizo divulgar esse evento no blog vaikeuvou.</strong>
+                    {' '}Vira matéria no blog (tag #VamoAí?) — você revisa antes de publicar.
+                  </span>
+                </label>
+              )}
             </div>
 
             {!userName && (

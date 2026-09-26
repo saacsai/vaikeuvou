@@ -16,6 +16,7 @@ export type EventFormFields = {
   descricao_pacote: string
   programacao: string
   max_parcelas: number
+  divulgar_blog: boolean
 }
 
 export const DURACAO_OPCOES = [
