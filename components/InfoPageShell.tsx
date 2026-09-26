@@ -6,13 +6,14 @@ type Props = {
   title: string
   userName: string | null
   userAvatar: string | null
+  isAdmin?: boolean
   /** Quando presente: logo » imagem retangular » título grande, no lugar do
    * breadcrumb padrão. Usado em páginas de "capa", como /como-funciona. */
   heroImage?: string
   children?: React.ReactNode
 }
 
-export default function InfoPageShell({ title, userName, userAvatar, heroImage, children }: Props) {
+export default function InfoPageShell({ title, userName, userAvatar, isAdmin, heroImage, children }: Props) {
   return (
     <div className="min-h-screen bg-white text-gray-900 flex flex-col">
       <div className="max-w-5xl mx-auto w-full px-4 py-8 flex-1">
@@ -23,7 +24,7 @@ export default function InfoPageShell({ title, userName, userAvatar, heroImage, 
               <a href="https://vaikeuvou.app" className="flex-shrink-0">
                 <Image src="/logo.png" alt="vaikeuvou" width={1557} height={354} className="h-[43px] md:h-[47px] w-auto -mt-[15px]" />
               </a>
-              <ProfilePopover userName={userName} userAvatar={userAvatar} />
+              <ProfilePopover userName={userName} userAvatar={userAvatar} isAdmin={isAdmin} />
             </div>
 
             <div className="relative w-full aspect-[2.4/1] rounded-lg overflow-hidden mb-8">
@@ -39,7 +40,7 @@ export default function InfoPageShell({ title, userName, userAvatar, heroImage, 
                 <Image src="/logo.png" alt="vaikeuvou" width={1557} height={354} className="h-[43px] md:h-[47px] w-auto -mt-[15px]" />
               </a>
               <div className="flex items-center gap-1 md:hidden">
-                <ProfilePopover userName={userName} userAvatar={userAvatar} />
+                <ProfilePopover userName={userName} userAvatar={userAvatar} isAdmin={isAdmin} />
               </div>
             </div>
 
@@ -49,7 +50,7 @@ export default function InfoPageShell({ title, userName, userAvatar, heroImage, 
             </div>
 
             <div className="hidden md:flex items-center gap-1 flex-shrink-0">
-              <ProfilePopover userName={userName} userAvatar={userAvatar} />
+              <ProfilePopover userName={userName} userAvatar={userAvatar} isAdmin={isAdmin} />
             </div>
           </div>
         )}

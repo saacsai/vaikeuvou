@@ -28,6 +28,10 @@ export async function getSession() {
   return session as { id: string; token: string; user_id: string; users: { id: string; phone: string; name: string | null; email: string | null; avatar_url: string | null; bio: string | null; vibe: string | null; instagram: string | null; credits: number; terms_accepted_at: string | null; mp_access_token: string | null; mp_refresh_token: string | null; mp_user_id: string | null; comissao_percentual: number | null } }
 }
 
+export function isAdminPhone(phone: string | null | undefined): boolean {
+  return !!phone && phone === process.env.ADMIN_PHONE
+}
+
 export function normalizePhone(raw: string): string {
   const digits = raw.replace(/\D/g, '')
   // Adiciona 55 se não tiver código do país

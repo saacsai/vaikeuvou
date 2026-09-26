@@ -41,6 +41,7 @@ type Props = {
   userInstagram: string | null
   userMpConectado: boolean
   comissaoPercentual: number
+  isAdmin?: boolean
 }
 
 function parseEventDate(iso: string): { date: string; time: string } {
@@ -88,7 +89,7 @@ function toForm(evento: Event): EventFormFields {
   }
 }
 
-export default function DashboardClient({ evento, rsvps, isNovo, userName, userAvatar, userBio, userInstagram, userMpConectado, comissaoPercentual }: Props) {
+export default function DashboardClient({ evento, rsvps, isNovo, userName, userAvatar, userBio, userInstagram, userMpConectado, comissaoPercentual, isAdmin }: Props) {
   const [initial,   setInitial]   = useState<EventFormFields>(() => toForm(evento))
   const [form,      setForm]      = useState<EventFormFields>(() => toForm(evento))
   const [multiDia,  setMultiDia]  = useState(() => !!evento.event_date_fim)
@@ -172,7 +173,7 @@ export default function DashboardClient({ evento, rsvps, isNovo, userName, userA
               <Image src="/logo.png" alt="vaikeuvou" width={1557} height={354} className="h-[43px] md:h-[47px] w-auto -mt-[15px]" />
             </a>
             <div className="flex items-center gap-1 md:hidden">
-              <ProfilePopover userName={userName} userAvatar={userAvatar} />
+              <ProfilePopover userName={userName} userAvatar={userAvatar} isAdmin={isAdmin} />
             </div>
           </div>
 
@@ -184,7 +185,7 @@ export default function DashboardClient({ evento, rsvps, isNovo, userName, userA
           </div>
 
           <div className="hidden md:flex items-center gap-1 flex-shrink-0">
-            <ProfilePopover userName={userName} userAvatar={userAvatar} />
+            <ProfilePopover userName={userName} userAvatar={userAvatar} isAdmin={isAdmin} />
           </div>
         </div>
 

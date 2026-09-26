@@ -1,5 +1,5 @@
 import { redirect } from 'next/navigation'
-import { getSession } from '@/lib/auth'
+import { getSession, isAdminPhone } from '@/lib/auth'
 import { getSupabaseAdmin } from '@/lib/supabase'
 import InfoPageShell from '@/components/InfoPageShell'
 import PerfilClient from './PerfilClient'
@@ -17,7 +17,7 @@ export default async function PerfilPage() {
   if (!user) redirect('/login?next=/perfil')
 
   return (
-    <InfoPageShell title="Meu perfil" userName={user.name} userAvatar={user.avatar_url}>
+    <InfoPageShell title="Meu perfil" userName={user.name} userAvatar={user.avatar_url} isAdmin={isAdminPhone(user.phone)}>
       <PerfilClient
         userId={user.id}
         phone={user.phone}

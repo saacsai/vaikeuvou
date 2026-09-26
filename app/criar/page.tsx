@@ -1,5 +1,5 @@
 import { redirect } from 'next/navigation'
-import { getSession } from '@/lib/auth'
+import { getSession, isAdminPhone } from '@/lib/auth'
 import CriarClient from './CriarClient'
 
 export default async function CriarPage() {
@@ -13,6 +13,7 @@ export default async function CriarPage() {
       userBio={session.users.bio}
       userInstagram={session.users.instagram}
       termsAccepted={!!session.users.terms_accepted_at}
+      isAdmin={isAdminPhone(session.users.phone)}
     />
   )
 }

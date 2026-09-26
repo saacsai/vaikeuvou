@@ -1,4 +1,4 @@
-import { getSession } from '@/lib/auth'
+import { getSession, isAdminPhone } from '@/lib/auth'
 import InfoPageShell from '@/components/InfoPageShell'
 import { FAQ } from '@/lib/faq'
 
@@ -25,6 +25,7 @@ export default async function ComoFuncionaPage() {
       title="Como funciona?"
       userName={session?.users.name ?? null}
       userAvatar={session?.users.avatar_url ?? null}
+      isAdmin={isAdminPhone(session?.users.phone)}
       heroImage="/como-funciona-hero.jpg"
     >
       <div className="max-w-2xl mx-auto space-y-12 pb-6">

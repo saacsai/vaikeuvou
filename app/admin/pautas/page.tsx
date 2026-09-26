@@ -7,6 +7,7 @@ const TAG_LABEL: Record<string, string> = {
   Tendeu:      '#Tendeu',
   ProntoFalei: '#ProntoFalei',
   VamoAi:      '#VamoAí?',
+  Revisar:     'Revisar',
 }
 
 export default async function AdminPautasPage() {

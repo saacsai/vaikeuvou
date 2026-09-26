@@ -151,3 +151,9 @@ WhatsApp/carta estendida: hedge constante, diminutivos, ironia sobre o próprio 
   ponto de partida — sem brief manual, mas ainda assim segue todas as regras de voz acima.
 - **Todo texto gerado por IA passa por revisão humana antes de publicar** — nunca publica
   automaticamente. Fica como rascunho no WordPress aguardando o Luciano revisar/editar/publicar.
+- Pra pauta tipo **`Revisar`** (post já publicado que precisa de ajuste): `titulo` é o título
+  EXATO do post existente no WordPress (é assim que ele é localizado — via `wp post list` ou
+  `WP_Query` por título), `ideias_centrais` é o que precisa mudar. **Antes de reformular, ler o
+  conteúdo atual do post de verdade** (via SSH/wp-cli) — nunca reescrever do zero ignorando o que
+  já está publicado. O resultado também respeita a regra acima: fica como revisão pendente de
+  aprovação do Luciano, não substitui o post ao vivo sozinho.

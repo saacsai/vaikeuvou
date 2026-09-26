@@ -1,4 +1,4 @@
-import { getSession } from '@/lib/auth'
+import { getSession, isAdminPhone } from '@/lib/auth'
 import InfoPageShell from '@/components/InfoPageShell'
 
 export default async function HistoriaPage() {
@@ -8,6 +8,7 @@ export default async function HistoriaPage() {
       title="18 anos depois"
       userName={session?.users.name ?? null}
       userAvatar={session?.users.avatar_url ?? null}
+      isAdmin={isAdminPhone(session?.users.phone)}
       heroImage="/historia-hero.jpg"
     >
       <div className="max-w-2xl mx-auto space-y-6 text-sm text-gray-600 leading-relaxed pb-6">

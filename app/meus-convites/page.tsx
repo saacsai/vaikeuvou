@@ -1,6 +1,6 @@
 import Image from 'next/image'
 import { redirect } from 'next/navigation'
-import { getSession } from '@/lib/auth'
+import { getSession, isAdminPhone } from '@/lib/auth'
 import { getSupabaseAdmin } from '@/lib/supabase'
 import { fmtDate } from '@/lib/slug'
 import { ProfilePopover } from '@/components/AppHeaderNav'
@@ -49,6 +49,7 @@ export default async function MeusEventosPage({ searchParams }: Props) {
   if (pagePassado > totalPagesPassado && totalPassados > 0) redirect(`/meus-convites?passado=${totalPagesPassado}`)
 
   const user = session.users
+  const isAdmin = isAdminPhone(user.phone)
   const semConvites = totalFuturos === 0 && totalPassados === 0
 
   return (
@@ -63,7 +64,7 @@ export default async function MeusEventosPage({ searchParams }: Props) {
                 <Image src="/logo.png" alt="vaikeuvou" width={1557} height={354} className="h-[43px] md:h-[47px] w-auto -mt-[15px]" />
               </a>
               <div className="flex items-center gap-1 md:hidden">
-                <ProfilePopover userName={user.name} userAvatar={user.avatar_url} />
+                <ProfilePopover userName={user.name} userAvatar={user.avatar_url} isAdmin={isAdmin} />
               </div>
             </div>
 
@@ -73,7 +74,7 @@ export default async function MeusEventosPage({ searchParams }: Props) {
             </div>
 
             <div className="hidden md:flex items-center gap-1 flex-shrink-0">
-              <ProfilePopover userName={user.name} userAvatar={user.avatar_url} />
+              <ProfilePopover userName={user.name} userAvatar={user.avatar_url} isAdmin={isAdmin} />
             </div>
           </div>
 

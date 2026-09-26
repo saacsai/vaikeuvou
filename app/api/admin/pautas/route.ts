@@ -10,7 +10,7 @@ export async function POST(req: NextRequest) {
 
   const { tipo, titulo, ideias_centrais } = await req.json()
 
-  if (!tipo || !['VaikeuFui', 'Tendeu', 'ProntoFalei'].includes(tipo)) {
+  if (!tipo || !['VaikeuFui', 'Tendeu', 'ProntoFalei', 'Revisar'].includes(tipo)) {
     return NextResponse.json({ error: 'Tipo inválido.' }, { status: 400 })
   }
   if (!titulo?.trim() || !ideias_centrais?.trim()) {

@@ -49,12 +49,24 @@ function MessageIcon({ className }: { className?: string }) {
   )
 }
 
+function DocIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z" />
+      <path d="M14 2v6h6" />
+      <path d="M9 13h6" />
+      <path d="M9 17h6" />
+    </svg>
+  )
+}
+
 type ProfileProps = {
   userName: string | null
   userAvatar: string | null
+  isAdmin?: boolean
 }
 
-export function ProfilePopover({ userName, userAvatar }: ProfileProps) {
+export function ProfilePopover({ userName, userAvatar, isAdmin }: ProfileProps) {
   const router = useRouter()
   const nome = userName ?? 'Você'
   const iniciais = nome.slice(0, 2).toUpperCase()
@@ -94,6 +106,15 @@ export function ProfilePopover({ userName, userAvatar }: ProfileProps) {
             Criar evento
             <PlusIcon className="w-4 h-4 text-gray-400" />
           </a>
+          {isAdmin && (
+            <a
+              href="/admin/pautas"
+              className="flex items-center justify-between px-1 py-2.5 rounded-lg hover:bg-gray-50 text-sm font-semibold uppercase tracking-wide text-gray-700"
+            >
+              Criar post
+              <DocIcon className="w-4 h-4 text-gray-400" />
+            </a>
+          )}
         </div>
 
         <div className="py-3 border-b border-gray-100">
