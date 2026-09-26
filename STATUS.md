@@ -2,6 +2,18 @@
 
 Última atualização: 2026-09-26
 
+## Sessão 2026-09-26 (parte 7) — fix: imagem por IA "grudava" em eventos novos
+
+Bug real: gerar imagem por IA em `/criar` nunca marcava a geração como resolvida no banco (só
+acontecia no painel, que já tem `edit_token`) — a linha ficava `pending`/`event_id null` pra
+sempre e reaparecia como "recuperável" em todo evento novo, mesmo já usada antes. Corrigido em
+`app/api/eventos/route.ts`: ao criar o evento, resolve qualquer geração pendente órfã do usuário
+(aprova a que bate com a capa usada, rejeita as outras). 1 registro órfão real em produção
+(evento "Caça ao Tesouro Bertioga") corrigido manualmente via REST API. Commit `5772ab3`.
+
+Detalhe técnico completo em
+`~/.claude/projects/-Users-lucianomaeda/memory/project_vaikeuvou.md`.
+
 ## Sessão 2026-09-26 (parte 6) — 10 imagens de cabeçalho do evento sem filtro laranja
 
 As fotos-preset de `lib/headers.ts` (Show/Futebol/Aventura/Reunião/Amigos/Confraternização/
