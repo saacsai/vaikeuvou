@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation'
 import { getSession, isAdminPhone, canAccessPautas } from '@/lib/auth'
 import { getSupabaseAdmin } from '@/lib/supabase'
+import { ProfilePopover } from '@/components/AppHeaderNav'
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const session = await getSession()
@@ -34,7 +35,11 @@ export default async function AdminLayout({ children }: { children: React.ReactN
           <div className="flex items-center gap-x-2">
             <span className="text-brand font-bold text-[25px]">Admin</span>
           </div>
-          <a href="/" className="text-gray-400 text-sm hover:text-gray-600">← live.vaikeuvou.app</a>
+          <ProfilePopover
+            userName={session.users.name}
+            userAvatar={session.users.avatar_url}
+            podeCriarPost={canAccessPautas(session.users.phone)}
+          />
         </div>
 
         {stats && (

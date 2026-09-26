@@ -45,6 +45,11 @@ GEO/AEO): `#VaikeuFui`, `#Tendeu`, `#VamoAí?`, `#ProntoFalei`.
 - Tom jornalístico, não programático/listagem — é uma chamada, não um cartaz.
 - Estrutura: contexto do evento (o quê, quando, onde) → por que ir (gancho social: quem
   confirmou, tipo de público) → CTA claro pro `live.vaikeuvou.app`.
+- **Regra fixa de encerramento**: todo post `#VamoAí?`, sem exceção, termina com um CTA explícito
+  linkado direto pra página DAQUELE evento específico (`https://live.vaikeuvou.app/e/<slug>` — o
+  link já vem pronto no brief, campo "Link do evento" de `composeVamoAiBrief`), nunca um link
+  genérico pro app ou pra home. O texto do CTA é livre (varia com o tom do post — "Confirma
+  presença aqui", "Garante o seu", etc.), mas o destino do link é sempre esse, sem variação.
 - A "ideia central" já vem pronta (é o evento em si) — a IA só pesquisa contexto ao redor
   (região, o que cerca o local) e escreve. Não precisa de brief manual do Luciano.
 - Marcar com Schema.org `Event` (data, local, preço, `offers` com link de compra).
