@@ -83,7 +83,7 @@ export default async function EmbedPerfilPage() {
           rel="noopener noreferrer"
           className="flex items-center justify-between px-1 py-2.5 rounded-lg hover:bg-gray-50 text-sm font-semibold uppercase tracking-wide text-gray-700"
         >
-          Meus convites
+          Meus eventos
           <EnvelopeIcon className="w-4 h-4 text-gray-400" />
         </a>
         <a
@@ -92,7 +92,7 @@ export default async function EmbedPerfilPage() {
           rel="noopener noreferrer"
           className="flex items-center justify-between px-1 py-2.5 rounded-lg hover:bg-gray-50 text-sm font-semibold uppercase tracking-wide text-gray-700"
         >
-          Criar convite
+          Criar evento
           <PlusIcon className="w-4 h-4 text-gray-400" />
         </a>
       </div>

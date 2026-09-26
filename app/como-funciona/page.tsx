@@ -3,17 +3,17 @@ import InfoPageShell from '@/components/InfoPageShell'
 import { FAQ } from '@/lib/faq'
 
 const PASSOS = [
-  { n: 1, title: 'Crie o convite', desc: 'Título, data, local e um recado — em menos de um minuto o convite já está pronto.' },
+  { n: 1, title: 'Crie o evento', desc: 'Título, data, local e um recado — em menos de um minuto o evento já está pronto.' },
   { n: 2, title: 'Compartilhe o link', desc: 'Manda no grupo do WhatsApp, no story, onde quiser. Não precisa app nem cadastro pra quem recebe.' },
   { n: 3, title: 'Acompanhe quem confirma', desc: 'Cada pessoa que clica no BORA aparece pra você na hora, no seu painel.' },
 ]
 
 const GRATIS = [
-  'Criar convites ilimitados',
+  'Criar eventos ilimitados',
   'Editar tudo depois de criado — título, data, local, recado, privacidade, link externo',
   'Trocar a foto e o vídeo de cabeçalho quantas vezes quiser',
   'Ver quem confirmou presença',
-  'Compartilhar no WhatsApp e incorporar o convite em outros sites',
+  'Compartilhar no WhatsApp e incorporar o evento em outros sites',
   'Confirmar presença (pra quem é convidado, sempre grátis)',
 ]
 
@@ -32,7 +32,7 @@ export default async function ComoFuncionaPage() {
         {/* Intro */}
         <div className="text-center space-y-3">
           <p className="text-gray-600 text-sm leading-relaxed">
-            vaikeuvou é a forma mais rápida de criar um convite bonito pra qualquer rolê
+            vaikeuvou é a forma mais rápida de criar um evento bonito pra qualquer rolê
             e saber, na hora, quem confirmou &ldquo;BORA&rdquo;. <strong className="text-gray-800">Tudo é grátis</strong> —
             sem crédito, sem assinatura, sem mensalidade.
           </p>
@@ -74,7 +74,7 @@ export default async function ComoFuncionaPage() {
             <div className="flex-1 min-w-0">
               <p className="font-bold text-gray-800 text-sm">Imagem de cabeçalho gerada por IA</p>
               <p className="text-xs text-gray-500 mt-1 leading-relaxed">
-                Cada convite tem direito a 1 geração grátis por IA — depois disso, continua podendo
+                Cada evento tem direito a 1 geração grátis por IA — depois disso, continua podendo
                 usar os temas prontos ou enviar sua própria foto, sem limite.
               </p>
             </div>

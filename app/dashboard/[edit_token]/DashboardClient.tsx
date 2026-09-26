@@ -177,7 +177,7 @@ export default function DashboardClient({ evento, rsvps, isNovo, userName, userA
 
           <div className="flex items-center gap-x-2 flex-wrap md:flex-1 min-w-0">
             <span className="text-gray-300 text-sm whitespace-nowrap">»</span>
-            <a href="/meus-convites" className="text-gray-400 hover:text-gray-600 text-sm whitespace-nowrap">Meus convites</a>
+            <a href="/meus-convites" className="text-gray-400 hover:text-gray-600 text-sm whitespace-nowrap">Meus eventos</a>
             <span className="text-gray-300 text-sm whitespace-nowrap">»</span>
             <span className="text-brand font-bold text-[25px] truncate">{evento.title}</span>
           </div>
@@ -189,7 +189,7 @@ export default function DashboardClient({ evento, rsvps, isNovo, userName, userA
 
         {isNovo && (
           <div className="bg-green-50 border border-green-200 rounded-xl p-4 mb-6">
-            <p className="text-green-700 font-bold text-sm">🎉 Convite criado com sucesso!</p>
+            <p className="text-green-700 font-bold text-sm">🎉 Evento criado com sucesso!</p>
           </div>
         )}
 
@@ -219,12 +219,12 @@ export default function DashboardClient({ evento, rsvps, isNovo, userName, userA
           <div className="bg-white border border-gray-100 rounded-xl p-4 shadow-sm space-y-2">
             {isPast ? (
               <>
-                <p className="text-xs font-bold text-gray-400 uppercase tracking-wide">Convite encerrado</p>
+                <p className="text-xs font-bold text-gray-400 uppercase tracking-wide">Evento encerrado</p>
                 <p className="text-gray-500 text-sm">Esse evento já aconteceu em {evento.event_date_fim ? fmtDateRange(evento.event_date, evento.event_date_fim) : fmtDate(evento.event_date)} — não é mais possível compartilhar ou editar.</p>
               </>
             ) : (
               <>
-                <p className="text-xs font-bold text-gray-400 uppercase tracking-wide">Link do convite</p>
+                <p className="text-xs font-bold text-gray-400 uppercase tracking-wide">Link do evento</p>
                 <div className="flex gap-2">
                   <input
                     readOnly value={linkConvite}
@@ -250,7 +250,7 @@ export default function DashboardClient({ evento, rsvps, isNovo, userName, userA
                 >
                   {copiado ? '✓ Código copiado' : 'Copiar código de incorporação'}
                 </button>
-                <p className="text-[10px] text-gray-400 text-center">Cole no seu site/blog — abre este convite quando alguém clicar.</p>
+                <p className="text-[10px] text-gray-400 text-center">Cole no seu site/blog — abre este evento quando alguém clicar.</p>
               </>
             )}
           </div>
@@ -310,7 +310,7 @@ export default function DashboardClient({ evento, rsvps, isNovo, userName, userA
               onClick={() => setEditando(true)}
               className="flex items-center gap-2 px-5 py-3 rounded-xl border border-gray-200 hover:border-brand hover:bg-brand/5 text-gray-700 font-semibold text-sm uppercase tracking-wide transition-colors"
             >
-              Editar convite
+              Editar evento
               <EditIcon className="w-4 h-4" />
             </button>
           </div>
@@ -319,7 +319,7 @@ export default function DashboardClient({ evento, rsvps, isNovo, userName, userA
 
           <div className="space-y-5">
             <div className="flex items-center gap-3">
-              <p className="text-xs font-bold text-gray-400 uppercase tracking-wide">Editar convite</p>
+              <p className="text-xs font-bold text-gray-400 uppercase tracking-wide">Editar evento</p>
               <button onClick={() => setEditando(false)} className="text-xs font-bold text-brand hover:text-brand-dark uppercase tracking-wide">
                 Fechar ✕
               </button>
@@ -425,7 +425,7 @@ export default function DashboardClient({ evento, rsvps, isNovo, userName, userA
                     type="number" min={1} max={12} step="1"
                     className="w-32 bg-white border border-gray-300 rounded-xl px-4 py-3 text-gray-900 outline-none focus:border-brand text-sm"
                   />
-                  <p className="text-[10px] text-gray-400 mt-0.5">Padrão 3x — usado no destaque de preço no convite.</p>
+                  <p className="text-[10px] text-gray-400 mt-0.5">Padrão 3x — usado no destaque de preço no evento.</p>
                 </div>
 
                 <div>
@@ -525,7 +525,7 @@ export default function DashboardClient({ evento, rsvps, isNovo, userName, userA
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Vídeo do convite</label>
+              <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Vídeo do evento</label>
               <input
                 value={form.video_url}
                 onChange={e => set('video_url', e.target.value)}
@@ -533,7 +533,7 @@ export default function DashboardClient({ evento, rsvps, isNovo, userName, userA
                 type="url"
                 className="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 outline-none focus:border-brand text-sm"
               />
-              <p className="text-[10px] text-gray-400 mt-1">Aparece abaixo do botão BORA na página do convite</p>
+              <p className="text-[10px] text-gray-400 mt-1">Aparece abaixo do botão BORA na página do evento</p>
             </div>
 
             {msg && (

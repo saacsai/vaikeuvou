@@ -39,9 +39,9 @@ export async function POST(req: NextRequest) {
       .eq('edit_token', edit_token)
       .single()
 
-    if (!evento) return NextResponse.json({ error: 'Convite não encontrado.' }, { status: 404 })
+    if (!evento) return NextResponse.json({ error: 'Evento não encontrado.' }, { status: 404 })
     if (evento.user_id !== session.user_id) {
-      return NextResponse.json({ error: 'Esse convite não é seu.' }, { status: 403 })
+      return NextResponse.json({ error: 'Esse evento não é seu.' }, { status: 403 })
     }
     eventId = evento.id
     eventTitle = evento.title
@@ -58,7 +58,7 @@ export async function POST(req: NextRequest) {
   const { count } = await contagem
 
   if ((count ?? 0) >= LIMITE_POR_EVENTO) {
-    return NextResponse.json({ error: 'Limite de imagem por IA atingido pra esse convite (1 por evento).' }, { status: 402 })
+    return NextResponse.json({ error: 'Limite de imagem por IA já atingido pra esse evento (1 por evento).' }, { status: 402 })
   }
 
   try {

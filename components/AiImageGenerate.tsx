@@ -87,7 +87,7 @@ export default function AiImageGenerate({ editToken, title, hasAvatar, onUploade
       setStage('preview')
     } else {
       setMsg(res.status === 402
-        ? 'Esse convite já usou a geração grátis de imagem por IA.'
+        ? 'Esse evento já usou a geração grátis de imagem por IA.'
         : (json.error ?? 'Erro ao gerar imagem.'))
     }
     setGenerating(false)
@@ -139,7 +139,7 @@ export default function AiImageGenerate({ editToken, title, hasAvatar, onUploade
       <button
         type="button"
         onClick={() => setStage('prompt')}
-        title="Gerar imagem com IA — 1 grátis por convite"
+        title="Gerar imagem com IA — 1 grátis por evento"
         className="aspect-square rounded-lg bg-gray-50 hover:bg-gray-100 border-2 border-dashed border-gray-300 flex flex-col items-center justify-center gap-1 transition-colors"
       >
         <span className="text-base">✨</span>

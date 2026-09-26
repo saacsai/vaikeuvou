@@ -357,7 +357,7 @@ export default function EventoClient({ evento, rsvps, parentRsvpId, criador, con
             <div className="mt-6 rounded-lg overflow-hidden aspect-video">
               <iframe
                 src={embedUrl}
-                title="Vídeo do convite"
+                title="Vídeo do evento"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                 allowFullScreen
                 className="w-full h-full"
@@ -382,7 +382,7 @@ export default function EventoClient({ evento, rsvps, parentRsvpId, criador, con
 
           <div className="mt-4 pt-4 border-t border-gray-100 text-center">
             <a href={base} target="_blank" rel="noopener noreferrer" className="text-[11px] text-black/70 hover:text-black transition-colors">
-              Crie seu convite grátis em vaikeuvou.app
+              Crie seu evento grátis em vaikeuvou.app
             </a>
           </div>
         </div>

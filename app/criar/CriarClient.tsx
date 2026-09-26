@@ -120,7 +120,7 @@ export default function CriarClient({ userName, userAvatar, userBio, userInstagr
     })
     const json = await res.json()
 
-    if (!res.ok) { setErro(json.error ?? 'Erro ao criar convite.'); setSaving(false); return }
+    if (!res.ok) { setErro(json.error ?? 'Erro ao criar evento.'); setSaving(false); return }
 
     if (pendingHeaderImage) {
       const imgForm = new FormData()
@@ -155,9 +155,9 @@ export default function CriarClient({ userName, userAvatar, userBio, userInstagr
 
           <div className="flex items-center gap-x-2 flex-wrap md:flex-1">
             <span className="text-gray-300 text-sm whitespace-nowrap">»</span>
-            <a href="/meus-convites" className="text-gray-400 hover:text-gray-600 text-sm whitespace-nowrap">Meus convites</a>
+            <a href="/meus-convites" className="text-gray-400 hover:text-gray-600 text-sm whitespace-nowrap">Meus eventos</a>
             <span className="text-gray-300 text-sm whitespace-nowrap">»</span>
-            <span className="text-brand font-bold text-[25px] whitespace-nowrap">Criar convite</span>
+            <span className="text-brand font-bold text-[25px] whitespace-nowrap">Criar evento</span>
           </div>
 
           <div className="hidden md:flex items-center gap-1 flex-shrink-0">
@@ -271,7 +271,7 @@ export default function CriarClient({ userName, userAvatar, userBio, userInstagr
                     type="number" min={1} max={12} step="1"
                     className="w-32 bg-white border border-gray-300 rounded-xl px-4 py-3 text-gray-900 outline-none focus:border-brand text-sm"
                   />
-                  <p className="text-[10px] text-gray-400 mt-0.5">Padrão 3x — usado no destaque de preço no convite.</p>
+                  <p className="text-[10px] text-gray-400 mt-0.5">Padrão 3x — usado no destaque de preço no evento.</p>
                 </div>
 
                 <div>
@@ -331,7 +331,7 @@ export default function CriarClient({ userName, userAvatar, userBio, userInstagr
                   onUploaded={setAvatarUrl}
                   fallbackInitials={initials}
                 />
-                <p className="text-[10px] text-gray-400 mt-1 text-center">Aparece na assinatura do seu convite — sem ela fica sem graça.</p>
+                <p className="text-[10px] text-gray-400 mt-1 text-center">Aparece na assinatura do seu evento — sem ela fica sem graça.</p>
               </div>
             )}
 
@@ -388,7 +388,7 @@ export default function CriarClient({ userName, userAvatar, userBio, userInstagr
                   rows={2}
                   className="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 outline-none focus:border-brand text-sm resize-none"
                 />
-                <p className="text-[10px] text-gray-400 mt-1">Aparece na assinatura do seu convite.</p>
+                <p className="text-[10px] text-gray-400 mt-1">Aparece na assinatura do seu evento.</p>
               </div>
             )}
 
@@ -404,7 +404,7 @@ export default function CriarClient({ userName, userAvatar, userBio, userInstagr
                     className="w-full bg-transparent py-3 pl-1 text-gray-900 placeholder-gray-400 outline-none text-sm"
                   />
                 </div>
-                <p className="text-[10px] text-gray-400 mt-1">Também aparece na assinatura do seu convite.</p>
+                <p className="text-[10px] text-gray-400 mt-1">Também aparece na assinatura do seu evento.</p>
               </div>
             )}
 
@@ -415,7 +415,7 @@ export default function CriarClient({ userName, userAvatar, userBio, userInstagr
 
             <div>
               <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">
-                Vídeo do convite
+                Vídeo do evento
               </label>
               <input
                 value={form.video_url}
@@ -424,7 +424,7 @@ export default function CriarClient({ userName, userAvatar, userBio, userInstagr
                 type="url"
                 className="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 outline-none focus:border-brand text-sm"
               />
-              <p className="text-[10px] text-gray-400 mt-1">Aparece abaixo do botão BORA na página do convite</p>
+              <p className="text-[10px] text-gray-400 mt-1">Aparece abaixo do botão BORA na página do evento</p>
             </div>
 
             {!termsAccepted && (
@@ -437,9 +437,9 @@ export default function CriarClient({ userName, userAvatar, userBio, userInstagr
                 />
                 <span>
                   Li e concordo com os{' '}
-                  <a href="/termos" target="_blank" rel="noopener noreferrer" className="text-brand font-semibold hover:underline">Termos de Uso</a>
+                  <a href="https://vaikeuvou.app/termos-de-uso/" target="_blank" rel="noopener noreferrer" className="text-brand font-semibold hover:underline">Termos de Uso</a>
                   {' '}e a{' '}
-                  <a href="/privacidade" target="_blank" rel="noopener noreferrer" className="text-brand font-semibold hover:underline">Política de Privacidade</a>
+                  <a href="https://vaikeuvou.app/politica-de-privacidade/" target="_blank" rel="noopener noreferrer" className="text-brand font-semibold hover:underline">Política de Privacidade</a>
                 </span>
               </label>
             )}
@@ -451,7 +451,7 @@ export default function CriarClient({ userName, userAvatar, userBio, userInstagr
               disabled={saving}
               className="w-full py-4 rounded-xl bg-brand hover:bg-brand-dark disabled:opacity-50 text-white font-bold text-lg uppercase tracking-wide transition-colors"
             >
-              {saving ? 'Criando…' : 'Criar convite'}
+              {saving ? 'Criando…' : 'Criar evento'}
             </button>
           </div>
 

@@ -20,7 +20,7 @@ const oswald = Oswald({
 
 export const metadata: Metadata = {
   title: "vaikeuvou — Vamo aí?",
-  description: "Crie um convite em segundos. Compartilhe no WhatsApp. Veja quem vai.",
+  description: "Crie um evento em segundos. Compartilhe no WhatsApp. Veja quem vai.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

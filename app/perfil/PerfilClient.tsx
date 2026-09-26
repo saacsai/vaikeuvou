@@ -49,7 +49,7 @@ export default function PerfilClient({ phone, name: initialName, avatarUrl: init
         <div className="bg-brand/5 border border-brand/20 rounded-xl p-4 space-y-1">
           <p className="text-sm font-bold text-brand">Capriche na sua assinatura!</p>
           <p className="text-xs text-gray-600 leading-relaxed">
-            Foto, bio e @ aparecem embaixo do seu nome em todo convite que você
+            Foto, bio e @ aparecem embaixo do seu nome em todo evento que você
             criar — sem eles, a assinatura fica sem graça. Vale a pena preencher
             uma vez só.
           </p>
@@ -88,7 +88,7 @@ export default function PerfilClient({ phone, name: initialName, avatarUrl: init
               rows={2}
               className="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 outline-none focus:border-brand text-sm resize-none"
             />
-            <p className="text-[10px] text-gray-400">Aparece na assinatura dos seus convites, embaixo do seu nome. {bio.length}/140</p>
+            <p className="text-[10px] text-gray-400">Aparece na assinatura dos seus eventos, embaixo do seu nome. {bio.length}/140</p>
           </div>
 
           <div className="space-y-2">
@@ -104,7 +104,7 @@ export default function PerfilClient({ phone, name: initialName, avatarUrl: init
                 className="w-full bg-transparent py-3 pl-1 text-gray-900 placeholder-gray-400 outline-none text-sm"
               />
             </div>
-            <p className="text-[10px] text-gray-400">Também aparece na assinatura dos seus convites.</p>
+            <p className="text-[10px] text-gray-400">Também aparece na assinatura dos seus eventos.</p>
           </div>
 
           <div className="space-y-2">
@@ -118,7 +118,7 @@ export default function PerfilClient({ phone, name: initialName, avatarUrl: init
               rows={3}
               className="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 outline-none focus:border-brand text-sm resize-none"
             />
-            <p className="text-[10px] text-gray-400">Não aparece no convite — é só pra IA entender seu estilo quando a gente gerar imagens personalizadas (em breve).</p>
+            <p className="text-[10px] text-gray-400">Não aparece no evento — é só pra IA entender seu estilo quando a gente gerar imagens personalizadas (em breve).</p>
           </div>
 
           <button
