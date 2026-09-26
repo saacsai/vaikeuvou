@@ -2,6 +2,22 @@
 
 Última atualização: 2026-09-26
 
+## Sessão 2026-09-26 (parte 11) — acabamentos finais: link no iframe, header do admin, regra de CTA
+
+Três ajustes pequenos fechando a sessão:
+
+- **"Criar post" faltava no `/embed/perfil`** (painel de conta dentro do iframe da sidebar do
+  WordPress) — só tinha sido adicionado no menu de bolinhas do app principal. Adicionado, mesmo
+  gate (`canAccessPautas`).
+- **`/admin` (inclusive `/admin/pautas`)** trocou o link de texto "← live.vaikeuvou.app" pelo
+  mesmo `ProfilePopover` (menu de bolinhas) usado em toda tela logada do app — padroniza o
+  header.
+- **Regra fixa de encerramento pro `#VamoAí?`**, formalizada em `PERFIL_CRIADOR.md`: todo post
+  termina com CTA linkado direto pra página DAQUELE evento específico
+  (`https://live.vaikeuvou.app/e/<slug>`, já vem no brief), nunca um link genérico pro app.
+
+Commits `573f0fb`, `506204f`.
+
 ## Sessão 2026-09-26 (parte 10) — Schema.org (GEO/AEO) + llms.txt no blog WordPress
 
 Resolvida a "parte 2" pendente do Manual de GEO e AEO (a parte 1 foi a fila `blog_briefs`).
