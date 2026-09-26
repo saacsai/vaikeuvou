@@ -73,6 +73,32 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: error?.message ?? 'Erro ao criar evento' }, { status: 500 })
   }
 
+  // Fecha qualquer geração de imagem por IA feita em /criar antes do evento
+  // existir (por isso fica com event_id nulo até aqui) — sem isso, a
+  // geração ficava "pending" pra sempre e reaparecia como recuperável na
+  // criação do PRÓXIMO evento, mesmo já tendo sido usada (ou descartada)
+  // neste. A que tiver a mesma URL usada como capa vira "approved" e ganha
+  // o event_id; qualquer outra pendente do usuário vira "rejected" (o
+  // upload em /criar só permite decidir uma imagem por vez, então nunca
+  // deveria sobrar mais de uma, mas resolve todas por segurança).
+  const { data: pendentes } = await sb
+    .from('ai_image_generations')
+    .select('id, url, storage_path')
+    .eq('user_id', session.user_id)
+    .eq('status', 'pending')
+    .is('event_id', null)
+
+  if (pendentes && pendentes.length > 0) {
+    for (const gen of pendentes) {
+      if (bg_image_url && gen.url === bg_image_url) {
+        await sb.from('ai_image_generations').update({ status: 'approved', event_id: data.id }).eq('id', gen.id)
+      } else {
+        await sb.from('ai_image_generations').update({ status: 'rejected' }).eq('id', gen.id)
+        await sb.storage.from('event-headers').remove([gen.storage_path])
+      }
+    }
+  }
+
   // Geocodificação best-effort — usada só pra verificar proximidade no
   // check-in, nunca bloqueia a criação do evento se falhar.
   if (location) {
