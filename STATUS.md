@@ -20,9 +20,11 @@ padrão de gatilho automático do FAQPage/Event (nenhuma configuração manual p
   contra open redirect) — necessário pra devolver a pessoa pro mesmo post do blog depois de logar,
   já marcando como fã automaticamente (sem precisar clicar de novo).
 
-Commits `db51a05`, `0aca72d`. **Não testado ao vivo com login real** — depende de rodar a
-migration primeiro, e o fluxo de OTP por WhatsApp não dá pra simular sem conta descartável de
-verdade. Luciano precisa validar o clique-fim-a-fim pessoalmente.
+Commits `db51a05`, `0aca72d`. Migration rodada e API testada de ponta a ponta com conta
+descartável (criada e apagada na hora): GET → POST marca fã (count 0→1) → GET confirma → POST
+desmarca (count 1→0) → GET confirma. **Só falta testar o clique de verdade no navegador** (sem
+login → botão → tela de login → volta logado → marca sozinho) — isso depende do WhatsApp real do
+Luciano pro OTP, não dá pra simular.
 
 ## Sessão 2026-09-27 — primeiro teste real da fila editorial + regra de cor de link
 
