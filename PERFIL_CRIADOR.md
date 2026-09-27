@@ -33,11 +33,11 @@ status quo empresarial de ferramentas tipo Sympla/Eventbrite. A irreverência ma
 posicionamento mesmo que custe um pouco de usabilidade "não me faça pensar". Isso vale pro
 texto também: prefere o jeito de falar do Luciano ao jeito "correto" de agência.
 
-## Os 4 pilares editoriais
+## Os 5 pilares editoriais
 
 Toda postagem carrega exatamente 1 tag de pilar — é a régua editorial, não só organização.
 Grafia oficial das tags (fonte de verdade = WordPress, não este documento nem o manual de
-GEO/AEO): `#VaikeuFui`, `#Tendeu`, `#VamoAí?`, `#ProntoFalei`.
+GEO/AEO): `#VaikeuFui`, `#Tendeu`, `#VamoAí?`, `#ProntoFalei`, `#SouFã`.
 
 ### `#VamoAí?` — chamada jornalística + conversão
 - **Disparo**: automático, quando um evento no `live.vaikeuvou.app` é marcado "Aberto" (`max_depth
@@ -83,6 +83,23 @@ GEO/AEO): `#VaikeuFui`, `#Tendeu`, `#VamoAí?`, `#ProntoFalei`.
   concentrada.
 - **Disparo**: manual — título + descritivo geral do Luciano (o cerne do pensamento é dele; a IA
   não fabrica opinião).
+
+### `#SouFã` — post-âncora de destino (2026-09-27)
+- **1 post por destino/categoria** — a introdução geral da cidade, não resenha de um lugar
+  específico (esse papel continua com `#VaikeuFui`). Premissa: todo destino novo ganha o seu.
+  Primeiro caso real: post "#SouFã: Bertioga" (ID 86 no WordPress).
+- Carrega TAMBÉM as tags de tema que fizerem sentido (Praias/Passeios/Trilhas/Restaurantes) —
+  `#SouFã` substitui só a tag de pilar, não as de tema.
+- Visão geral do destino: o que é, o que tem, dica prática de deslocamento — não tenta ser
+  exaustivo, é o mapa geral que puxa pros posts específicos depois (linka internamente com
+  `#VaikeuFui`/`#VamoAí?` daquele mesmo destino conforme forem existindo).
+- **Botão "Tbm sou fã" + contador**: ativa sozinho em QUALQUER post com essa tag — é a tag em si
+  que dispara a feature, não uma configuração manual por post. Exige conta no vaikeuvou pra
+  marcar (pessoa sem login é mandada pro cadastro e volta pro mesmo post já marcada). Dá pra
+  desmarcar depois (toggle, não é permanente). Detalhe técnico completo na seção "Marcação
+  estrutural" abaixo.
+- **Disparo**: manual — mesmo padrão do #VaikeuFui/#Tendeu, mas o "descritivo geral" aqui é sobre
+  a cidade como um todo, não uma experiência pontual.
 
 ## Regras de voz
 
@@ -198,3 +215,19 @@ o próprio Yoast lê). O que o Yoast NÃO cobre, e o tema filho (`newsblogger/fu
   descrição escrita.
 - `llms.txt` já existe em `https://vaikeuvou.app/llms.txt` — atualizar manualmente se a estrutura
   editorial mudar (novo pilar, novo destino relevante etc.).
+
+## Botão "Tbm sou fã" (`#SouFã`, implementado 2026-09-27)
+
+Ativa sozinho em todo post com a tag `sou-fa` (`vkv_fan_button_script`/`vkv_fan_button_markup` em
+`functions.php`) — sem configuração manual por post, o gatilho é a tag. Contador e estado
+(fã/não-fã) vêm de `live.vaikeuvou.app/api/city-fans` (tabela `city_fans` no Supabase, migration
+`supabase_city_fans.sql`), consultado por `assets/js/fan-button.js` via `credentials: 'include'`
+— mesma ponte cross-domain do `comment-identity.js`.
+
+Fluxo de quem não tem conta: clica, a API responde 401, o JS manda pro login do
+`live.vaikeuvou.app` com `?next=<url-do-post>?fan=1`; depois de logar, `login/verificar/page.tsx`
+reconhece que o `next` é externo (só aceita host `vaikeuvou.app`, por segurança contra open
+redirect) e navega de volta pro post via `window.location.href`; o JS detecta o `?fan=1` na volta
+e marca como fã sozinho, sem exigir um segundo clique.
+
+É toggle — clicar de novo desmarca (linha em `city_fans` é por `user_id` + `wp_post_id`, único).
