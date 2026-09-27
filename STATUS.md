@@ -2,6 +2,17 @@
 
 Última atualização: 2026-09-27
 
+## Sessão 2026-09-27 (4ª parte) — #SouFã na fila de pautas
+
+`/admin/pautas` ganhou `#SouFã` como 5º tipo de pauta manual (post-âncora de destino), com copy
+própria no formulário (título = nome do destino, "ideias centrais" = visão geral da cidade, não
+experiência pontual). Migration `supabase_blog_briefs_soufa.sql` rodada e confirmada (insert de
+teste aceito e removido). Commit `2dc952f`.
+
+Com isso, os 5 pilares editoriais (#VaikeuFui, #Tendeu, #ProntoFalei, #VamoAí?, #SouFã) estão
+todos disponíveis na fila — 4 manuais direto no formulário, `#VamoAí?` automático via opt-in de
+evento.
+
 ## Sessão 2026-09-27 (3ª parte) — botão #SouFã corrigido + regra fixa de título por pilar
 
 Luciano publicou os 2 rascunhos da parte 1 (216, 218) ele mesmo, trocando slugs/títulos —
