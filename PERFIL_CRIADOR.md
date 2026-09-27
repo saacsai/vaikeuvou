@@ -144,8 +144,14 @@ WhatsApp/carta estendida: hedge constante, diminutivos, ironia sobre o próprio 
 
 ## Notas técnicas pra automação
 
-- **Cor da marca pra links estilizados (regras 13/18)**: `#000000` (preto — rebrand de
-  2026-09-24; a cor antiga `#ff6600`/laranja não existe mais em nenhuma peça de marca ativa).
+- **Cor de link inline dentro do corpo do post (regras 13/18)**: `#ff6600` (laranja, padrão
+  antigo do vaikeuvou — **corrigido em 2026-09-27**: a nota anterior aqui dizia preto pós-rebrand,
+  estava errada pra esse caso específico). Sem sublinhado parado, sublinha só no `:hover`. Regra
+  aplicada globalmente via CSS no tema filho (`newsblogger/style.css`, seletor
+  `.spnc-post .spnc-entry-content a`) — cobre todo post automaticamente, não precisa de `style`
+  inline por link. **Isso é diferente da cor de marca geral do site** (`#000000`, preto,
+  continua valendo pra botões/CTA/UI fora do corpo do texto) — a exceção é só link inline dentro
+  do texto do post.
 - **Grafia oficial das tags**: sempre igual ao WordPress (`#VaikeuFui`, `#Tendeu`, `#VamoAí?`,
   `#ProntoFalei`) — nunca variar capitalização nem omitir o "?" de `#VamoAí?`.
 - **Categoria de destino**: hoje só `Bertioga` existe (categoria raiz, sem subcategoria — a
