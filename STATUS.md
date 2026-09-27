@@ -1,6 +1,27 @@
 # vaikeuvou.app — Status
 
-Última atualização: 2026-09-26
+Última atualização: 2026-09-27
+
+## Sessão 2026-09-27 — primeiro teste real da fila editorial + regra de cor de link
+
+Primeira vez processando `blog_briefs` de ponta a ponta. Duas pautas pendentes (uma `Revisar`,
+uma `Tendeu` manual, ambas sobre `#Tendeu: Como funciona?`/`#Tendeu: O que é vaikeuvou?`),
+escritas seguindo `PERFIL_CRIADOR.md`, criadas como rascunho no WordPress e marcadas `gerado`.
+**Aprovado pelo Luciano** ("Sensacional! Do jeito que eu queria, aprovadíssimo") — primeira
+validação real da voz + pipeline funcionando.
+
+- Post 216 — `#Tendeu: O que é vaikeuvou?` (novo, rascunho).
+- Post 218 — `#Tendeu: Como funciona? (revisão)` (rascunho SEPARADO do post 180 ao vivo, conforme
+  regra de `Revisar` — Luciano vai aplicar manualmente ao publicar, já escolhendo a imagem de
+  capa).
+- FAQ antigo (`<details>`) do "Como funciona?" convertido pra H2-pergunta — ativa o FAQPage
+  automático implementado na parte 10.
+
+**Ajuste de regra, direto do feedback**: link dentro do corpo do post tem que ser laranja
+(`#ff6600`, padrão antigo do vaikeuvou) sem sublinhado parado, sublinha só no `:hover` — a nota
+anterior em `PERFIL_CRIADOR.md` dizia preto (pós-rebrand), estava errada pra esse caso específico.
+Corrigido com uma regra CSS global no tema filho (`newsblogger/style.css`), cobre todo post
+automaticamente — passado e futuro — sem precisar editar HTML de post nenhum. Confirmado ao vivo.
 
 ## Sessão 2026-09-26 (parte 11) — acabamentos finais: link no iframe, header do admin, regra de CTA
 
