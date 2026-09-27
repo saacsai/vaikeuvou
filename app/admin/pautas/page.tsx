@@ -9,6 +9,7 @@ const TAG_LABEL: Record<string, string> = {
   Tendeu:      '#Tendeu',
   ProntoFalei: '#ProntoFalei',
   VamoAi:      '#VamoAí?',
+  SouFa:       '#SouFã',
   Revisar:     'Revisar',
 }
 

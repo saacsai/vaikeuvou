@@ -7,13 +7,15 @@ const TIPOS = [
   { value: 'VaikeuFui',   label: '#VaikeuFui',   desc: 'Resenha em primeira pessoa — só lugar onde foi e gostou' },
   { value: 'Tendeu',      label: '#Tendeu',      desc: 'Tutorial — responde uma dúvida específica' },
   { value: 'ProntoFalei', label: '#ProntoFalei', desc: 'Opinião — constrói a tese "quem vai importa mais que onde"' },
+  { value: 'SouFa',       label: '#SouFã',       desc: 'Post-âncora de um destino — visão geral da cidade, 1 por categoria' },
   { value: 'Revisar',     label: 'Revisar',      desc: 'Post já publicado que precisa de ajuste' },
 ]
 
 export default function PautaForm() {
   const router = useRouter()
-  const [tipo,           setTipo]           = useState<'VaikeuFui' | 'Tendeu' | 'ProntoFalei' | 'Revisar'>('VaikeuFui')
+  const [tipo,           setTipo]           = useState<'VaikeuFui' | 'Tendeu' | 'ProntoFalei' | 'SouFa' | 'Revisar'>('VaikeuFui')
   const revisar = tipo === 'Revisar'
+  const souFa = tipo === 'SouFa'
   const [titulo,         setTitulo]         = useState('')
   const [ideiasCentrais, setIdeiasCentrais] = useState('')
   const [saving,         setSaving]         = useState(false)
@@ -51,7 +53,7 @@ export default function PautaForm() {
 
       <div>
         <label className="block text-xs font-semibold text-gray-500 mb-2 uppercase tracking-wide">Tipo</label>
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+        <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
           {TIPOS.map(t => (
             <button
               key={t.value}
@@ -70,12 +72,12 @@ export default function PautaForm() {
 
       <div>
         <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">
-          {revisar ? 'Título exato do post no WordPress' : 'Título'}
+          {revisar ? 'Título exato do post no WordPress' : souFa ? 'Destino (cidade)' : 'Título'}
         </label>
         <input
           value={titulo}
           onChange={e => setTitulo(e.target.value)}
-          placeholder={revisar ? 'Cole o título exatamente como está publicado' : 'Ex: Trilha da Pedra Grande em Atibaia'}
+          placeholder={revisar ? 'Cole o título exatamente como está publicado' : souFa ? 'Ex: Bertioga' : 'Ex: Trilha da Pedra Grande em Atibaia'}
           className="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 outline-none focus:border-brand text-sm"
         />
         {revisar && (
@@ -85,13 +87,15 @@ export default function PautaForm() {
 
       <div>
         <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">
-          {revisar ? 'O que revisar' : 'Ideias centrais'}
+          {revisar ? 'O que revisar' : souFa ? 'Sobre o destino' : 'Ideias centrais'}
         </label>
         <textarea
           value={ideiasCentrais}
           onChange={e => setIdeiasCentrais(e.target.value)}
           placeholder={revisar
             ? 'O que precisa mudar nesse post — ajuste de fato, tom, trecho a cortar/acrescentar etc. O texto original é lido antes de reformular.'
+            : souFa
+            ? 'Visão geral da cidade: o que tem, como chegar, dica prática. É o post-âncora do destino — as experiências específicas ficam pros #VaikeuFui.'
             : 'O cerne do que você viveu/pensa — o que só você sabe e a IA não pode inventar. Pode ser bagunçado, tópicos soltos, sem formatação.'}
           rows={5}
           className="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 outline-none focus:border-brand text-sm resize-none"

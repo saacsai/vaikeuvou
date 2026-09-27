@@ -45,7 +45,7 @@ export type Event = {
   divulgar_blog: boolean
 }
 
-export type BlogBriefTipo = 'VaikeuFui' | 'Tendeu' | 'ProntoFalei' | 'VamoAi' | 'Revisar'
+export type BlogBriefTipo = 'VaikeuFui' | 'Tendeu' | 'ProntoFalei' | 'VamoAi' | 'Revisar' | 'SouFa'
 export type BlogBriefStatus = 'pendente' | 'gerado'
 
 export type BlogBrief = {
