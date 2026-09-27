@@ -2,6 +2,28 @@
 
 Última atualização: 2026-09-27
 
+## Sessão 2026-09-27 (2ª parte) — 5º pilar #SouFã: post-âncora de destino + botão de fã
+
+Novo pilar editorial: 1 post por destino (categoria), visão geral da cidade — não resenha de um
+lugar específico (isso continua sendo `#VaikeuFui`). Post 86 (antes "#VaikeuFui: Bertioga")
+virou o primeiro caso real: "#SouFã: Bertioga", mantendo as tags de tema (Praias/Passeios/etc).
+
+**Botão "Tbm sou fã" + contador**, ativa sozinho em qualquer post com a tag `#SouFã` — mesmo
+padrão de gatilho automático do FAQPage/Event (nenhuma configuração manual por post):
+- Tabela `city_fans` (Supabase, migration `supabase_city_fans.sql`, **revelada no Finder, ainda
+  não rodada**) — toggle por `user_id`+`wp_post_id`.
+- `GET/POST live.vaikeuvou.app/api/city-fans` — mesma ponte cross-domain (`credentials:
+  'include'`) já usada pros comentários.
+- `newsblogger/assets/js/fan-button.js` + hooks em `functions.php` — renderiza o botão, consulta
+  contador, alterna estado.
+- **Login/verificar agora aceita `next` externo** (só pro domínio `vaikeuvou.app`, com whitelist
+  contra open redirect) — necessário pra devolver a pessoa pro mesmo post do blog depois de logar,
+  já marcando como fã automaticamente (sem precisar clicar de novo).
+
+Commits `db51a05`, `0aca72d`. **Não testado ao vivo com login real** — depende de rodar a
+migration primeiro, e o fluxo de OTP por WhatsApp não dá pra simular sem conta descartável de
+verdade. Luciano precisa validar o clique-fim-a-fim pessoalmente.
+
 ## Sessão 2026-09-27 — primeiro teste real da fila editorial + regra de cor de link
 
 Primeira vez processando `blog_briefs` de ponta a ponta. Duas pautas pendentes (uma `Revisar`,
