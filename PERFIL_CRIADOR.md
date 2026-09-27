@@ -39,6 +39,12 @@ Toda postagem carrega exatamente 1 tag de pilar — é a régua editorial, não 
 Grafia oficial das tags (fonte de verdade = WordPress, não este documento nem o manual de
 GEO/AEO): `#VaikeuFui`, `#Tendeu`, `#VamoAí?`, `#ProntoFalei`, `#SouFã`.
 
+**Regra fixa de título (2026-09-27), sem exceção — nunca usa `:`**:
+- `#SouFã` e `#VaikeuFui` **prefixam** o título: `#SouFã Bertioga`, `#VaikeuFui Trilha da
+  Cachoeira do Elefante`.
+- `#VamoAí?`, `#ProntoFalei` e `#Tendeu` **assinam o final** do título: `O que é vaikeuvou?
+  #Tendeu`, `Não importa pra onde, o importante é quem vai #ProntoFalei`.
+
 ### `#VamoAí?` — chamada jornalística + conversão
 - **Disparo**: automático, quando um evento no `live.vaikeuvou.app` é marcado "Aberto" (`max_depth
   = 999`, ver `CriarClient.tsx`) **e** o organizador autoriza a divulgação no opt-in do blog.
@@ -87,7 +93,7 @@ GEO/AEO): `#VaikeuFui`, `#Tendeu`, `#VamoAí?`, `#ProntoFalei`, `#SouFã`.
 ### `#SouFã` — post-âncora de destino (2026-09-27)
 - **1 post por destino/categoria** — a introdução geral da cidade, não resenha de um lugar
   específico (esse papel continua com `#VaikeuFui`). Premissa: todo destino novo ganha o seu.
-  Primeiro caso real: post "#SouFã: Bertioga" (ID 86 no WordPress).
+  Primeiro caso real: post "#SouFã Bertioga" (ID 86 no WordPress).
 - Carrega TAMBÉM as tags de tema que fizerem sentido (Praias/Passeios/Trilhas/Restaurantes) —
   `#SouFã` substitui só a tag de pilar, não as de tema.
 - Visão geral do destino: o que é, o que tem, dica prática de deslocamento — não tenta ser
