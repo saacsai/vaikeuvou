@@ -6,6 +6,22 @@ import { Suspense } from 'react'
 import Image from 'next/image'
 import AppFooter from '@/components/AppFooter'
 
+// Depois do login, `next` normalmente é caminho interno (router.push resolve).
+// Mas o botão "Tbm sou fã" do blog manda de volta pra uma URL externa
+// (vaikeuvou.app) — só permite isso pra esse domínio específico, senão vira
+// open redirect (login?next=https://site-malicioso.com).
+function nextSeguro(next: string): { interno: true; valor: string } | { interno: false; valor: string } | null {
+  if (!next) return null
+  if (next.startsWith('/')) return { interno: true, valor: next }
+  try {
+    const url = new URL(next)
+    if (url.hostname === 'vaikeuvou.app') return { interno: false, valor: next }
+  } catch {
+    // next inválido — ignora
+  }
+  return null
+}
+
 function VerificarForm() {
   const router  = useRouter()
   const params  = useSearchParams()
@@ -35,10 +51,18 @@ function VerificarForm() {
 
     if (!res.ok) { setErro(json.error ?? 'Código inválido.'); setSaving(false); return }
 
+    const destino = nextSeguro(next)
+    if (destino && !destino.interno) {
+      // Volta pra URL externa (post do blog) — precisa de navegação de
+      // verdade, router.push só resolve rota interna do Next.js.
+      window.location.href = destino.valor
+      return
+    }
+
     // Sem destino explícito (login não veio de um CTA como "Criar convite"):
     // decide pelo estado do usuário — sem convites ainda, o primeiro passo
     // natural é criar um; já tendo, cai na lista.
-    router.push(next || (json.hasEvents ? '/meus-convites' : '/criar'))
+    router.push(destino?.valor || (json.hasEvents ? '/meus-convites' : '/criar'))
   }
 
   async function reenviar() {
