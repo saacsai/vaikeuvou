@@ -2,6 +2,26 @@
 
 Última atualização: 2026-09-27
 
+## Sessão 2026-09-27 (3ª parte) — botão #SouFã corrigido + regra fixa de título por pilar
+
+Luciano publicou os 2 rascunhos da parte 1 (216, 218) ele mesmo, trocando slugs/títulos —
+confirmei que o WordPress redirecionou (301) as URLs antigas sozinho, nada quebrou. Post 180
+(o "Como funciona?" original) foi pra lixeira, substituído pelo 218.
+
+**Fix**: botão "Tbm sou fã" tava com texto branco em fundo branco por padrão — de novo o
+`body.newsblogger button {color:#fff}` do `custom-color.php` sobrescrevendo sem `!important`
+(mesmo bug do `.vkv-pill`/`.vkv-clear`, dessa vez em cima de um elemento novo). Corrigido e
+redesenhado: botão sempre branco preenchido (nunca "invisível" contra a faixa preta), fica
+laranja (`#ff6600`) quando a pessoa já é fã — usa a cor de link inline como acento de estado.
+
+**Regra fixa de título, sem exceção (formalizada em `PERFIL_CRIADOR.md`)**: nunca usa `:` no
+título. `#SouFã`/`#VaikeuFui` prefixam ("#VaikeuFui Praia da Boracéia"); `#VamoAí?`/
+`#ProntoFalei`/`#Tendeu` assinam o final ("Título #Tendeu"). Aplicada retroativamente em todos os
+9 posts publicados — títulos e links internos entre eles corrigidos pra apontar direto nas URLs
+canônicas atuais (evita saltos de redirect desnecessários).
+
+Commit `087e583`.
+
 ## Sessão 2026-09-27 (2ª parte) — 5º pilar #SouFã: post-âncora de destino + botão de fã
 
 Novo pilar editorial: 1 post por destino (categoria), visão geral da cidade — não resenha de um
