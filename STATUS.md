@@ -2,6 +2,20 @@
 
 Última atualização: 2026-09-28
 
+## Sessão 2026-09-28 (2ª parte) — corrige /contact/ (lixo de demo do tema) + regra de fecho #SouFã
+
+**Bug real corrigido**: `https://vaikeuvou.app/contact/` era conteúdo de demonstração do tema,
+nunca customizado — um shortcode de formulário apontando pra um form inexistente ("Formulário de
+contato não encontrado") e um mapa do Google embutido mostrando **Londres**. Substituído por
+conteúdo real, no espírito de `/fale` do app: intro + `fale@vaikeuvou.app`, formulário de contato
+funcional de verdade (form CF7 119, que já existia mas não estava em uso — testado com um envio
+real, `status: mail_sent`, chega em `luciano.maeda@gmail.com`), FAQ (mesmas perguntas do
+`/como-funciona`), rodapé com razão social/CNPJ. Título da página também tinha erro de digitação
+("Fale consco") — corrigido pra "Fale conosco".
+
+Também formalizada regra de fecho do `#SouFã` (CTA explícito + trocadilho marca+destino),
+calibrada comparando o rascunho de Ubatuba com a edição real do Luciano — ver `PERFIL_CRIADOR.md`.
+
 ## Sessão 2026-09-28 — 2ª leva de posts + confirmação do botão #SouFã em produção
 
 Confirmado: o botão "Tbm sou fã" foi usado de verdade (1 registro real em `city_fans`, post da
