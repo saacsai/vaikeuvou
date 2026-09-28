@@ -2,6 +2,20 @@
 
 Última atualização: 2026-09-28
 
+## Sessão 2026-09-28 (3ª parte) — SMTP autenticado pro e-mail transacional do WordPress
+
+Continuação da parte 2: o formulário de `/contact/` reportava `status: mail_sent`, mas o Luciano
+não recebeu o e-mail de teste. Causa: `wp_mail()` usava `mail()` cru do PHP (via wrapper
+`hsendmail` da Hostinger), sem DKIM configurado — Gmail provavelmente descartava/marcava como
+spam silenciosamente, mesmo com SPF presente.
+
+**Fix**: SMTP autenticado via `phpmailer_init` (tema filho) apontando pra `smtp.hostinger.com:465`
+(SSL), autenticando com a caixa real `fale@vaikeuvou.app`. Credenciais em constantes no
+`wp-config.php` (`VKV_SMTP_*`, fora do tema — nunca versionado, arquivo só existe no servidor).
+Testado com `wp_mail()` direto via wp-cli + captura de `wp_mail_failed` — sem erro, PHPMailer
+confirmou envio aceito pelo servidor SMTP (não é mais só o "sucesso genérico" do CF7). Pendente:
+Luciano confirmar recebimento real na caixa (inclusive spam).
+
 ## Sessão 2026-09-28 (2ª parte) — corrige /contact/ (lixo de demo do tema) + regra de fecho #SouFã
 
 **Bug real corrigido**: `https://vaikeuvou.app/contact/` era conteúdo de demonstração do tema,
