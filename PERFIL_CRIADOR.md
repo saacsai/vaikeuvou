@@ -106,6 +106,19 @@ GEO/AEO): `#VaikeuFui`, `#Tendeu`, `#VamoAí?`, `#ProntoFalei`, `#SouFã`.
   estrutural" abaixo.
 - **Disparo**: manual — mesmo padrão do #VaikeuFui/#Tendeu, mas o "descritivo geral" aqui é sobre
   a cidade como um todo, não uma experiência pontual.
+- **Este é o pilar de maior potencial de tráfego** — segundo o Luciano, é o que dá ao site uma
+  razão própria de existir pra quem visita ("se sustenta por si"), não só divulgação de evento.
+  Capricho extra na escrita se justifica aqui mais que nos outros pilares.
+- **Regra fixa de fecho** (calibrada comparando o rascunho de "#SouFã Ubatuba" com a edição real
+  do Luciano, 2026-09-28): o parágrafo final tem 2 partes obrigatórias, nessa ordem —
+  1. **CTA explícito pro botão**, nomeando a ação, não só sugerindo ("Comenta aí e clica em Sou
+     Fã." — não basta um "deixa registrado aí embaixo" vago).
+  2. **Trocadilho de assinatura juntando a marca com o destino** (ex: "Vaikeuvou Ubatuba, a gente
+     se cruza lá no calçadão do Itaguá") — inédito nesse pilar, funciona como fecho-bordão
+     específico de cada `#SouFã`, não repete a mesma frase de post pra post.
+- Reforçar o próprio `#SouFã` no corpo do texto, não só no título — ex: trocar "motivo a mais"
+  solto por "motivo a mais de ser fã desta cidade", ecoar no fecho ("Por isso Sou fã desta
+  cidade").
 
 ## Regras de voz
 
