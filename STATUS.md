@@ -1,6 +1,24 @@
 # vaikeuvou.app — Status
 
-Última atualização: 2026-09-27
+Última atualização: 2026-09-28
+
+## Sessão 2026-09-28 — 2ª leva de posts + confirmação do botão #SouFã em produção
+
+Confirmado: o botão "Tbm sou fã" foi usado de verdade (1 registro real em `city_fans`, post da
+Bertioga, feito pelo Luciano na noite de 27/09) — ciclo completo (clique → login → volta marcado)
+validado em produção.
+
+Processadas as 2 pautas que estavam pendentes:
+- **Post 247** — "Eventos gratuitos x Eventos pagos qual a diferença no vaikeuvou? #Tendeu" —
+  explica o modelo de negócio (campo de valor em branco = grátis, ingresso/rateio = pago,
+  Mercado Pago, comissão padrão 15%, por que cobrança adiantada aumenta comparecimento real).
+  Fecha o loop de uma promessa deixada no post "Como funciona?" (post 218, que ganhou o link real
+  no lugar do texto solto "vou contar com calma num post separado").
+- **Post 245** — "#SouFã Ubatuba" — 2º post-âncora de destino (depois de Bertioga). Categoria
+  `Ubatuba` criada do zero (não existia). Menciona 4 praias específicas (Enseada, Domingas Dias,
+  Itamambuca, Praia da Fazenda) como gancho pra futuros `#VaikeuFui`.
+
+Ambos rascunho, aguardando revisão/capa/publicação do Luciano.
 
 ## Sessão 2026-09-27 (4ª parte) — #SouFã na fila de pautas
 
