@@ -13,8 +13,9 @@ spam silenciosamente, mesmo com SPF presente.
 (SSL), autenticando com a caixa real `fale@vaikeuvou.app`. Credenciais em constantes no
 `wp-config.php` (`VKV_SMTP_*`, fora do tema — nunca versionado, arquivo só existe no servidor).
 Testado com `wp_mail()` direto via wp-cli + captura de `wp_mail_failed` — sem erro, PHPMailer
-confirmou envio aceito pelo servidor SMTP (não é mais só o "sucesso genérico" do CF7). Pendente:
-Luciano confirmar recebimento real na caixa (inclusive spam).
+confirmou envio aceito pelo servidor SMTP (não é mais só o "sucesso genérico" do CF7).
+**Confirmado pelo Luciano: e-mail chegou de verdade na caixa principal.** `/contact/` está
+funcional de ponta a ponta.
 
 ## Sessão 2026-09-28 (2ª parte) — corrige /contact/ (lixo de demo do tema) + regra de fecho #SouFã
 
