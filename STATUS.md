@@ -2,6 +2,15 @@
 
 Última atualização: 2026-09-28
 
+## Sessão 2026-09-28 (4ª parte) — slug /contact/ → /fale-conosco/
+
+Slug trocado pra bater com o nome real da página. WordPress só redireciona slug antigo sozinho
+pra `post`, não pra `page` — sem isso a URL antiga viraria 404. Adicionado redirect manual (301,
+hook `template_redirect` no tema filho) pra não quebrar link externo/salvo. Também corrigidos os
+4 posts que linkavam pra `/contact/` (247, 218, 137, 138 — Tendeu "Gratuito x pago", Tendeu "Como
+funciona", Termos de Uso, Política de Privacidade), agora apontando direto pra `/fale-conosco/`
+sem passar pelo redirect.
+
 ## Sessão 2026-09-28 (3ª parte) — SMTP autenticado pro e-mail transacional do WordPress
 
 Continuação da parte 2: o formulário de `/contact/` reportava `status: mail_sent`, mas o Luciano
