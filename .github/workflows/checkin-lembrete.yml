@@ -11,5 +11,5 @@ jobs:
     steps:
       - name: Chamar endpoint de lembrete
         run: |
-          curl -sf -X GET "https://vaikeuvou.app/api/cron/checkin-lembrete" \
+          curl -sf -X GET "https://live.vaikeuvou.app/api/cron/checkin-lembrete" \
             -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}"

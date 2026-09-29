@@ -11,5 +11,5 @@ jobs:
     steps:
       - name: Checar estado da instância e alertar se desconectada
         run: |
-          curl -sf -X GET "https://vaikeuvou.app/api/cron/monitor-evolution" \
+          curl -sf -X GET "https://live.vaikeuvou.app/api/cron/monitor-evolution" \
             -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}"
