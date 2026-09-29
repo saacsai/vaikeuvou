@@ -1,6 +1,23 @@
 # vaikeuvou.app — Status
 
-Última atualização: 2026-09-28
+Última atualização: 2026-09-29
+
+## Sessão 2026-09-29 — bug real: crons do GitHub Actions parados desde 23/09
+
+Luciano reportou vários e-mails de falha ("Run failed: Lembrete de check-in"). Não era da
+Vercel (achou que sim pelo formato do e-mail) — é GitHub Actions (`.github/workflows/`).
+
+**Causa raiz**: os 2 workflows (`checkin-lembrete.yml`, `monitor-evolution.yml`) chamavam
+`https://vaikeuvou.app/api/cron/...` — domínio que virou o blog WordPress em 23/09. Antes disso a
+URL "errada" funcionava por coincidência (apontava pro próprio app). Depois da migração do
+domínio pro blog, toda chamada dava 404, e os dois crons ficaram **silenciosamente parados desde
+23/09 16:38 UTC** — ou seja, lembretes de check-in via WhatsApp e o monitor da instância WhatsApp
+não rodaram por 6 dias sem ninguém perceber (só apareceu porque o e-mail de falha do GitHub
+chamou atenção).
+
+**Fix**: trocado pra `https://live.vaikeuvou.app/api/cron/...` (domínio correto do app Next.js)
+nos dois arquivos. Disparo manual dos 2 workflows confirmou `success` depois do fix. Commit
+`c7e348d`.
 
 ## Sessão 2026-09-28 (4ª parte) — slug /contact/ → /fale-conosco/
 
