@@ -1,6 +1,28 @@
 # vaikeuvou.app — Status
 
-Última atualização: 2026-09-29
+Última atualização: 2026-09-30
+
+## Sessão 2026-09-30 — primeiro `#VamoAí?` real de verdade + 2 bugs corrigidos no FAQPage
+
+Primeira pauta `#VamoAí?` automática gerada por um evento real (opt-in de divulgação ativado):
+"Cachoeira do Elefante — Trilha Mirante/Mirante", evento pago (R$128, 10/10), linkado com o post
+`#VaikeuFui` já existente sobre a mesma cachoeira (deixando claro que é rota/operador diferente —
+guiado, pago, via Vale Verde — da caminhada pessoal do Luciano). Postmeta `vkv_event_*` setados,
+Event + FAQPage confirmados no schema. Rascunho no WordPress (post 266), aguardando revisão.
+
+**2 bugs reais achados e corrigidos no extrator de FAQPage** (`vkv_extrair_faq`,
+`newsblogger/functions.php`), ambos existentes desde a implementação original (2026-09-26),
+nunca detectados porque nenhum post anterior expôs os dois casos ao mesmo tempo:
+1. Regex `(.*?\?)` pro texto da pergunta cruzava a tag `</h2>` quando um H2 ANTERIOR não
+   terminava em "?" — grudava duas perguntas num texto só. Fix: `([^<]*?\?)`, impede cruzar
+   fronteira de tag.
+2. Posts criados sem `<p>` explícito no `post_content` (parágrafo confiado no `wpautop` do
+   WordPress, que só roda na exibição) nunca batiam com o regex — **o post "Como funciona?"
+   (218) nunca teve FAQPage nenhum desde que foi publicado**, apesar de ter 6 perguntas em H2.
+   Fix: `wpautop($post->post_content)` antes de extrair, normaliza os dois estilos de conteúdo.
+
+Confirmado ao vivo em 3 posts (Cachoeira, Como Funciona, O que é vaikeuvou) depois do fix — todas
+as perguntas esperadas aparecem corretas.
 
 ## Sessão 2026-09-29 — bug real: crons do GitHub Actions parados desde 23/09
 
