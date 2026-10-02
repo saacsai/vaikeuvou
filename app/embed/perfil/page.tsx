@@ -58,7 +58,7 @@ export default async function EmbedPerfilPage({ searchParams }: Props) {
     return (
       <div className="p-4 flex flex-col items-center text-center gap-4">
         {!nologo && (
-          <Image src="/logo.png" alt="vaikeuvou" width={1457} height={401} className="h-10 w-auto" />
+          <Image src="/logo.png" alt="vaikeuvou" width={1230} height={315} className="h-10 w-auto" />
         )}
         <p className="text-gray-400 text-[13px] leading-relaxed">
           Organize seus eventos e compartilhe com seus contatos de forma gratuita. Experimente

@@ -22,7 +22,7 @@ export default function InfoPageShell({ title, userName, userAvatar, podeCriarPo
           <>
             <div className="flex items-center justify-between mb-6">
               <a href="https://vaikeuvou.app" className="flex-shrink-0">
-                <Image src="/logo.png" alt="vaikeuvou" width={1457} height={401} className="h-[43px] md:h-[47px] w-auto -mt-[15px]" />
+                <Image src="/logo.png" alt="vaikeuvou" width={1230} height={315} className="h-[43px] md:h-[47px] w-auto -mt-[15px]" />
               </a>
               <ProfilePopover userName={userName} userAvatar={userAvatar} podeCriarPost={podeCriarPost} />
             </div>
@@ -37,7 +37,7 @@ export default function InfoPageShell({ title, userName, userAvatar, podeCriarPo
           <div className="flex flex-col md:flex-row md:items-center gap-x-2 gap-y-1 mb-8">
             <div className="flex items-center justify-between md:contents">
               <a href="https://vaikeuvou.app" className="flex-shrink-0">
-                <Image src="/logo.png" alt="vaikeuvou" width={1457} height={401} className="h-[43px] md:h-[47px] w-auto -mt-[15px]" />
+                <Image src="/logo.png" alt="vaikeuvou" width={1230} height={315} className="h-[43px] md:h-[47px] w-auto -mt-[15px]" />
               </a>
               <div className="flex items-center gap-1 md:hidden">
                 <ProfilePopover userName={userName} userAvatar={userAvatar} podeCriarPost={podeCriarPost} />

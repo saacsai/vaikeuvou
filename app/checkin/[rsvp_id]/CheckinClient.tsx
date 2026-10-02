@@ -47,7 +47,7 @@ export default function CheckinClient({ rsvpId, userName, eventoTitulo, jaConfir
   return (
     <div className="min-h-screen flex flex-col items-center bg-[#fcede1]">
       <div className="relative w-full max-w-lg bg-white sm:my-8 sm:rounded-lg sm:shadow-xl overflow-hidden px-6 pt-8 pb-8">
-        <Image src="/logo.png" alt="vaikeuvou" width={1457} height={401} className="w-[200px] max-w-full h-auto mb-6" />
+        <Image src="/logo.png" alt="vaikeuvou" width={1230} height={315} className="w-[200px] max-w-full h-auto mb-6" />
 
         {etapa === 'inicial' && (
           <div className="space-y-4">
