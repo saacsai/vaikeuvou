@@ -15,6 +15,12 @@ processar saber que não precisa gerar/buscar uma.
 **Pendente**: migration `supabase_migration_add_imagem_blog_briefs.sql` revelada no Finder,
 Luciano precisa rodar no Supabase antes do upload funcionar de verdade.
 
+**Importante pro processamento da fila (não é automático ainda)**: não existe pipeline que
+converte `blog_briefs` pendente em rascunho WordPress sozinho — isso continua manual, feito por
+mim numa sessão quando pedido pra "processar a fila". A partir de agora, ao processar uma pauta
+que já tenha `imagem_destacada_url` preenchida, usar essa foto como imagem destacada do post em
+vez de gerar uma por IA — checar esse campo sempre antes de gerar imagem nova.
+
 
 ## Sessão 2026-09-30 — primeiro `#VamoAí?` real de verdade + 2 bugs corrigidos no FAQPage
 
