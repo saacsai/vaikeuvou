@@ -2,6 +2,24 @@
 
 Última atualização: 2026-10-02
 
+## Sessão 2026-10-02 (3ª parte) — toggle de acesso a "Criar post" + widget /embed/destinos refinado
+
+- **`/admin/usuarios`**: nova coluna "Criar post" com toggle — habilita `pode_criar_post` (coluna
+  nova em `users`) por usuário, sem precisar mexer em env var. `canAccessPautas` mudou de
+  assinatura (recebe o usuário inteiro, não só o telefone) — `EDITOR_PHONES` continua valendo como
+  fallback.
+- **`/embed/destinos`**: várias rodadas de ajuste visual pra bater com ref13/ref14/ref15 — card
+  branco com sombra (não borda), `rounded-md` (6px, padrão do tema, não o rounded-xl do
+  Tailwind), imagem com metade da altura (`aspect-[2/1]`), título saiu de dentro do iframe (fica
+  a cargo de um widget nativo de Heading do WordPress acima dele). Ganhou altura dinâmica via
+  `postMessage` (`window.load` + `ResizeObserver`) — sem isso o iframe ficava com altura fixa
+  chutada, sobrando espaço em branco quando tinha menos destinos que o previsto.
+- **Bug real encontrado**: o widget WordPress não atualizava porque (1) cache de objeto do
+  WordPress servia versão antiga mesmo depois de editar, e (2) o editor de blocos (Gutenberg)
+  cortava a tag `<script>` quando colada pelo painel admin. Resolvido via SSH/WP-CLI: `wp cache
+  flush` + reescrita direta do `widget_block` no banco (bypassa o sanitizador da UI).
+
+
 ## Sessão 2026-10-02 (2ª parte) — redirect da raiz + link de login no iframe
 
 - `next.config.ts`: raiz de `live.vaikeuvou.app` (`/`) mandava pro blog (`vaikeuvou.app`) — agora
