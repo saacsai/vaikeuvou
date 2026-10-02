@@ -49,7 +49,7 @@ export default async function MeusEventosPage({ searchParams }: Props) {
   if (pagePassado > totalPagesPassado && totalPassados > 0) redirect(`/meus-convites?passado=${totalPagesPassado}`)
 
   const user = session.users
-  const podeCriarPost = canAccessPautas(user.phone)
+  const podeCriarPost = canAccessPautas(user)
   const semConvites = totalFuturos === 0 && totalPassados === 0
 
   return (

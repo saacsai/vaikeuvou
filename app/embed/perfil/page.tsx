@@ -87,7 +87,7 @@ export default async function EmbedPerfilPage({ searchParams }: Props) {
   const nome = session.users.name ?? 'Você'
   const iniciais = nome.slice(0, 2).toUpperCase()
   const avatar = session.users.avatar_url
-  const podeCriarPost = canAccessPautas(session.users.phone)
+  const podeCriarPost = canAccessPautas(session.users)
 
   return (
     <div className="p-3">

@@ -125,7 +125,7 @@ export default async function ConvidadosPage({ params }: Props) {
               <Image src="/logo.png" alt="vaikeuvou" width={1557} height={354} className="h-[43px] md:h-[47px] w-auto -mt-[15px]" />
             </a>
             <div className="flex items-center gap-1 md:hidden">
-              <ProfilePopover userName={session?.users.name ?? null} userAvatar={session?.users.avatar_url ?? null} podeCriarPost={canAccessPautas(session?.users.phone)} />
+              <ProfilePopover userName={session?.users.name ?? null} userAvatar={session?.users.avatar_url ?? null} podeCriarPost={canAccessPautas(session?.users)} />
             </div>
           </div>
 
@@ -139,7 +139,7 @@ export default async function ConvidadosPage({ params }: Props) {
           </div>
 
           <div className="hidden md:flex items-center gap-1 flex-shrink-0">
-            <ProfilePopover userName={session?.users.name ?? null} userAvatar={session?.users.avatar_url ?? null} podeCriarPost={canAccessPautas(session?.users.phone)} />
+            <ProfilePopover userName={session?.users.name ?? null} userAvatar={session?.users.avatar_url ?? null} podeCriarPost={canAccessPautas(session?.users)} />
           </div>
         </div>
 

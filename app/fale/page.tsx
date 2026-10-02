@@ -10,7 +10,7 @@ export default async function FalePage() {
       title="Fale conosco"
       userName={session?.users.name ?? null}
       userAvatar={session?.users.avatar_url ?? null}
-      podeCriarPost={canAccessPautas(session?.users.phone)}
+      podeCriarPost={canAccessPautas(session?.users)}
       heroImage="/fale-hero.jpg"
     >
       <div className="max-w-2xl mx-auto space-y-10 pb-6">

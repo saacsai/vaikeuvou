@@ -12,6 +12,7 @@ type Usuario = {
   instagram: string | null
   created_at: string
   comissao_percentual: number | null
+  pode_criar_post: boolean
 }
 
 export default function UsuarioRow({ usuario }: { usuario: Usuario }) {
@@ -21,6 +22,22 @@ export default function UsuarioRow({ usuario }: { usuario: Usuario }) {
   const [editando, setEditando] = useState(false)
   const [rascunho, setRascunho] = useState(usuario.comissao_percentual?.toString() ?? '')
   const [salvando, setSalvando] = useState(false)
+
+  const [podeCriarPost, setPodeCriarPost] = useState(usuario.pode_criar_post)
+  const [salvandoEditor, setSalvandoEditor] = useState(false)
+
+  async function alternarEditor() {
+    const novoValor = !podeCriarPost
+    setSalvandoEditor(true)
+    setPodeCriarPost(novoValor) // otimista
+    const res = await fetch('/api/admin/usuarios/editor', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ user_id: usuario.id, pode_criar_post: novoValor }),
+    })
+    if (!res.ok) setPodeCriarPost(!novoValor) // reverte se falhar
+    setSalvandoEditor(false)
+  }
 
   async function salvar() {
     setSalvando(true)
@@ -91,6 +108,20 @@ export default function UsuarioRow({ usuario }: { usuario: Usuario }) {
             {comissao !== null ? `${comissao}%` : <span className="text-gray-300">padrão (15%)</span>}
           </button>
         )}
+      </td>
+      <td className="px-4 py-3">
+        <button
+          type="button"
+          onClick={alternarEditor}
+          disabled={salvandoEditor}
+          aria-pressed={podeCriarPost}
+          title={podeCriarPost ? 'Pode criar post — clique pra desabilitar' : 'Não pode criar post — clique pra habilitar'}
+          className={`relative w-9 h-5 rounded-full transition-colors disabled:opacity-50 ${podeCriarPost ? 'bg-brand' : 'bg-gray-200'}`}
+        >
+          <span
+            className={`absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform ${podeCriarPost ? 'translate-x-4' : ''}`}
+          />
+        </button>
       </td>
       <td className="px-4 py-3 text-gray-500 text-xs">
         {new Date(usuario.created_at).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric' })}

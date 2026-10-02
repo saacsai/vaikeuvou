@@ -15,6 +15,7 @@ type Usuario = {
   instagram: string | null
   created_at: string
   comissao_percentual: number | null
+  pode_criar_post: boolean
 }
 
 type Props = { searchParams: Promise<{ q?: string; page?: string }> }
@@ -29,7 +30,7 @@ export default async function AdminUsuariosPage({ searchParams }: Props) {
 
   let query = sb
     .from('users')
-    .select('id, name, phone, avatar_url, bio, instagram, created_at, comissao_percentual', { count: 'exact' })
+    .select('id, name, phone, avatar_url, bio, instagram, created_at, comissao_percentual, pode_criar_post', { count: 'exact' })
 
   if (q?.trim()) {
     const termo = q.trim()
@@ -60,6 +61,7 @@ export default async function AdminUsuariosPage({ searchParams }: Props) {
               <th className="px-4 py-3">Usuário</th>
               <th className="px-4 py-3">Perfil</th>
               <th className="px-4 py-3">Comissão</th>
+              <th className="px-4 py-3">Criar post</th>
               <th className="px-4 py-3">Criado em</th>
               <th className="px-4 py-3" />
             </tr>
@@ -69,7 +71,7 @@ export default async function AdminUsuariosPage({ searchParams }: Props) {
               <UsuarioRow key={u.id} usuario={u} />
             ))}
             {usuarios.length === 0 && (
-              <tr><td colSpan={5} className="px-4 py-8 text-center text-gray-400">Nenhum usuário encontrado.</td></tr>
+              <tr><td colSpan={6} className="px-4 py-8 text-center text-gray-400">Nenhum usuário encontrado.</td></tr>
             )}
           </tbody>
         </table>

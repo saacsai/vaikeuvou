@@ -43,7 +43,7 @@ export default async function DashboardPage({ params, searchParams }: Props) {
       userInstagram={session?.users.instagram ?? null}
       userMpConectado={!!organizador?.mp_access_token}
       comissaoPercentual={organizador?.comissao_percentual ?? 15}
-      podeCriarPost={canAccessPautas(session?.users.phone)}
+      podeCriarPost={canAccessPautas(session?.users)}
     />
   )
 }

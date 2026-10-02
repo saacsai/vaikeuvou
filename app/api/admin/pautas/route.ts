@@ -4,7 +4,7 @@ import { getSession, canAccessPautas } from '@/lib/auth'
 
 export async function POST(req: NextRequest) {
   const session = await getSession()
-  if (!session || !canAccessPautas(session.users.phone)) {
+  if (!session || !canAccessPautas(session.users)) {
     return NextResponse.json({ error: 'Não autorizado.' }, { status: 403 })
   }
 

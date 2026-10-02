@@ -15,7 +15,7 @@ const TAG_LABEL: Record<string, string> = {
 
 export default async function AdminPautasPage() {
   const session = await getSession()
-  if (!session || !canAccessPautas(session.users.phone)) redirect('/')
+  if (!session || !canAccessPautas(session.users)) redirect('/')
 
   const isAdmin = isAdminPhone(session.users.phone)
   const sb = getSupabaseAdmin()

@@ -25,20 +25,26 @@ export async function getSession() {
     .update({ expires_at: new Date(Date.now() + SLIDING_MS).toISOString() })
     .eq('token', token)
 
-  return session as { id: string; token: string; user_id: string; users: { id: string; phone: string; name: string | null; email: string | null; avatar_url: string | null; bio: string | null; vibe: string | null; instagram: string | null; credits: number; terms_accepted_at: string | null; mp_access_token: string | null; mp_refresh_token: string | null; mp_user_id: string | null; comissao_percentual: number | null } }
+  return session as { id: string; token: string; user_id: string; users: { id: string; phone: string; name: string | null; email: string | null; avatar_url: string | null; bio: string | null; vibe: string | null; instagram: string | null; credits: number; terms_accepted_at: string | null; mp_access_token: string | null; mp_refresh_token: string | null; mp_user_id: string | null; comissao_percentual: number | null; pode_criar_post: boolean } }
 }
 
 export function isAdminPhone(phone: string | null | undefined): boolean {
   return !!phone && phone === process.env.ADMIN_PHONE
 }
 
-// Admin sempre pode; além dele, uma lista fixa de telefones liberados
-// manualmente (ex: Sandro) só pra escrever pautas — não dá acesso ao resto
-// do /admin (Usuários/Eventos), só a /admin/pautas, e só enxerga as próprias.
-export function canAccessPautas(phone: string | null | undefined): boolean {
-  if (isAdminPhone(phone)) return true
+type PautasUser = { phone?: string | null; pode_criar_post?: boolean | null } | null | undefined
+
+// Admin sempre pode; além dele, quem tem `pode_criar_post` habilitado em
+// /admin/usuarios (toggle do admin) ou está na lista fixa EDITOR_PHONES
+// (fallback antigo, ex: Sandro, antes do toggle existir) — não dá acesso ao
+// resto do /admin (Usuários/Eventos), só a /admin/pautas, e só enxerga as
+// próprias.
+export function canAccessPautas(user: PautasUser): boolean {
+  if (!user) return false
+  if (isAdminPhone(user.phone)) return true
+  if (user.pode_criar_post) return true
   const editores = (process.env.EDITOR_PHONES ?? '').split(',').map(p => p.trim()).filter(Boolean)
-  return !!phone && editores.includes(phone)
+  return !!user.phone && editores.includes(user.phone)
 }
 
 export function normalizePhone(raw: string): string {

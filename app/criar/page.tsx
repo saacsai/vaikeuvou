@@ -13,7 +13,7 @@ export default async function CriarPage() {
       userBio={session.users.bio}
       userInstagram={session.users.instagram}
       termsAccepted={!!session.users.terms_accepted_at}
-      podeCriarPost={canAccessPautas(session.users.phone)}
+      podeCriarPost={canAccessPautas(session.users)}
     />
   )
 }

@@ -10,14 +10,14 @@ export default async function PerfilPage() {
 
   const { data: user } = await getSupabaseAdmin()
     .from('users')
-    .select('id, phone, name, avatar_url, bio, vibe, instagram')
+    .select('id, phone, name, avatar_url, bio, vibe, instagram, pode_criar_post')
     .eq('id', session.user_id)
     .single()
 
   if (!user) redirect('/login?next=/perfil')
 
   return (
-    <InfoPageShell title="Meu perfil" userName={user.name} userAvatar={user.avatar_url} podeCriarPost={canAccessPautas(user.phone)}>
+    <InfoPageShell title="Meu perfil" userName={user.name} userAvatar={user.avatar_url} podeCriarPost={canAccessPautas(user)}>
       <PerfilClient
         userId={user.id}
         phone={user.phone}

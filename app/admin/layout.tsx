@@ -5,7 +5,7 @@ import { ProfilePopover } from '@/components/AppHeaderNav'
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const session = await getSession()
-  if (!session || !canAccessPautas(session.users.phone)) redirect('/')
+  if (!session || !canAccessPautas(session.users)) redirect('/')
 
   const isAdmin = isAdminPhone(session.users.phone)
 
@@ -38,7 +38,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
           <ProfilePopover
             userName={session.users.name}
             userAvatar={session.users.avatar_url}
-            podeCriarPost={canAccessPautas(session.users.phone)}
+            podeCriarPost={canAccessPautas(session.users)}
           />
         </div>
 

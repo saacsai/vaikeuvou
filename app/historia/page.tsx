@@ -8,7 +8,7 @@ export default async function HistoriaPage() {
       title="18 anos depois"
       userName={session?.users.name ?? null}
       userAvatar={session?.users.avatar_url ?? null}
-      podeCriarPost={canAccessPautas(session?.users.phone)}
+      podeCriarPost={canAccessPautas(session?.users)}
       heroImage="/historia-hero.jpg"
     >
       <div className="max-w-2xl mx-auto space-y-6 text-sm text-gray-600 leading-relaxed pb-6">
