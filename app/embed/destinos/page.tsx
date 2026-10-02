@@ -86,6 +86,24 @@ export default async function EmbedDestinosPage() {
           </a>
         )
       })}
+
+      {/* Avisa a altura real pro pai (iframe na sidebar WordPress) via postMessage —
+          sem isso o iframe fica com altura fixa chutada, sobrando ou cortando
+          conforme a quantidade de destinos muda. ResizeObserver cobre imagem
+          carregando depois do load inicial. */}
+      <script
+        dangerouslySetInnerHTML={{
+          __html: `
+            (function () {
+              function enviarAltura() {
+                window.parent.postMessage({ vkvIframe: 'destinos', height: document.documentElement.scrollHeight }, '*')
+              }
+              window.addEventListener('load', enviarAltura)
+              new ResizeObserver(enviarAltura).observe(document.documentElement)
+            })()
+          `,
+        }}
+      />
     </div>
   )
 }
