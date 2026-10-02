@@ -2,6 +2,30 @@
 
 Última atualização: 2026-10-02
 
+## Sessão 2026-10-02 (4ª parte) — terceira evolução da marca
+
+Marca nova (ref: `~/Vaikeuvou/logos e botoes/novo/terceira_marca_original.png`): mão evoluída de
+forma (dedo mais alto/esguio, traços mais limpos), reposicionada pra DEPOIS do texto "vaikeuvou"
+(antes vinha antes). Padrão cromático preservado (tinta quase-preta ~#1F1A17). Mesma marca já
+estava no header do WordPress — Luciano trocou direto por lá antes de pedir aqui (attachment 271,
+`cropped-terceira_evolucao_vaikeuvou_site.png`).
+
+Atualizado no app: `public/logo.png` (proporção mudou de 1557x354 pra 1457x401 — `width`/`height`
+do `next/image` corrigidos nos 13 lugares que usam o arquivo), `public/logo-white.png`
+(recolorido), `public/logo-vertical.png` (reconstruído reaproveitando as faixas de texto
+originais "vaikeuvou"/"vamo aí?", só trocando o ícone), `app/icon.png`/`apple-icon.png`/
+`favicon.ico` (círculo+anel redesenhado do zero — tentar só apagar a mão antiga por cima do
+arquivo existente quebrava o anel, porque a área de apagar cruzava o traço fino do círculo).
+
+**Pendente, não mexido ainda**: o favicon do PRÓPRIO WordPress (`site_icon`, attachment 204,
+`2026/09/cropped-favicon.png`) continua com a mão antiga — só o logo do header foi trocado por
+Luciano. Avisar/perguntar antes de trocar.
+
+**Nota**: um arquivo solto `public/logo-white - cópia.png` (duplicata órfã, não referenciada em
+código nenhum) acabou entrando no commit junto por estar na mesma pasta — inofensivo, mas vale
+limpar numa próxima faxina.
+
+
 ## Sessão 2026-10-02 (3ª parte) — toggle de acesso a "Criar post" + widget /embed/destinos refinado
 
 - **`/admin/usuarios`**: nova coluna "Criar post" com toggle — habilita `pode_criar_post` (coluna
