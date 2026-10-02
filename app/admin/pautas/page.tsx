@@ -22,7 +22,7 @@ export default async function AdminPautasPage() {
 
   let query = sb
     .from('blog_briefs')
-    .select('id, tipo, titulo, ideias_centrais, status, event_id, criado_por, created_at')
+    .select('id, tipo, titulo, ideias_centrais, status, event_id, criado_por, imagem_destacada_url, created_at')
     .order('created_at', { ascending: false })
     .limit(100)
 
@@ -104,6 +104,12 @@ function PautasTable({ pautas, vazio, isAdmin, nomeByPhone }: {
               </td>
               <td className="px-4 py-3 text-xs text-gray-400">
                 {p.event_id ? 'Evento (automático)' : 'Manual'}
+                {p.imagem_destacada_url && (
+                  <a href={p.imagem_destacada_url} target="_blank" rel="noreferrer"
+                     className="ml-2 inline-block text-[10px] px-1.5 py-0.5 rounded-full bg-green-50 text-green-700 font-bold">
+                    📷 imagem
+                  </a>
+                )}
               </td>
               {isAdmin && (
                 <td className="px-4 py-3 text-xs text-gray-400 whitespace-nowrap">

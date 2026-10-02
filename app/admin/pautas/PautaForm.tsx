@@ -18,9 +18,31 @@ export default function PautaForm() {
   const souFa = tipo === 'SouFa'
   const [titulo,         setTitulo]         = useState('')
   const [ideiasCentrais, setIdeiasCentrais] = useState('')
+  const [imagem,         setImagem]         = useState<File | null>(null)
   const [saving,         setSaving]         = useState(false)
   const [erro,           setErro]           = useState('')
   const [ok,             setOk]             = useState(false)
+
+  const MIN_W = 1280
+  const MIN_H = 768
+
+  function escolherImagem(file: File | null) {
+    setErro('')
+    if (!file) { setImagem(null); return }
+
+    const img = new Image()
+    const url = URL.createObjectURL(file)
+    img.onload = () => {
+      URL.revokeObjectURL(url)
+      if (img.naturalWidth < MIN_W || img.naturalHeight < MIN_H) {
+        setErro(`Imagem muito pequena (${img.naturalWidth}x${img.naturalHeight}) — mínimo ${MIN_W}x${MIN_H}.`)
+        setImagem(null)
+        return
+      }
+      setImagem(file)
+    }
+    img.src = url
+  }
 
   async function salvar() {
     if (!titulo.trim() || !ideiasCentrais.trim()) {
@@ -31,17 +53,20 @@ export default function PautaForm() {
     setErro('')
     setOk(false)
 
-    const res = await fetch('/api/admin/pautas', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ tipo, titulo, ideias_centrais: ideiasCentrais }),
-    })
+    const body = new FormData()
+    body.set('tipo', tipo)
+    body.set('titulo', titulo)
+    body.set('ideias_centrais', ideiasCentrais)
+    if (imagem) body.set('imagem', imagem)
+
+    const res = await fetch('/api/admin/pautas', { method: 'POST', body })
     const json = await res.json()
 
     if (!res.ok) { setErro(json.error ?? 'Erro ao salvar.'); setSaving(false); return }
 
     setTitulo('')
     setIdeiasCentrais('')
+    setImagem(null)
     setOk(true)
     setSaving(false)
     router.refresh()
@@ -100,6 +125,23 @@ export default function PautaForm() {
           rows={5}
           className="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 outline-none focus:border-brand text-sm resize-none"
         />
+      </div>
+
+      <div>
+        <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">
+          Imagem destacada (opcional)
+        </label>
+        <input
+          type="file"
+          accept="image/*"
+          onChange={e => escolherImagem(e.target.files?.[0] ?? null)}
+          className="w-full text-sm text-gray-500 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:bg-brand/10 file:text-brand file:font-bold file:text-xs file:uppercase"
+        />
+        <p className="text-[10px] text-gray-400 mt-1">
+          Mínimo {MIN_W}x{MIN_H}px. Se não enviar, a imagem é gerada por IA depois — manda a sua
+          se já tiver uma foto melhor, assim quem for publicar não precisa correr atrás dela.
+        </p>
+        {imagem && <p className="text-[10px] text-green-600 mt-1">✓ {imagem.name} selecionada.</p>}
       </div>
 
       {erro && <p className="text-xs text-red-500">{erro}</p>}
