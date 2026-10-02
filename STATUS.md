@@ -1,6 +1,20 @@
 # vaikeuvou.app — Status
 
-Última atualização: 2026-09-30
+Última atualização: 2026-10-02
+
+## Sessão 2026-10-02 — upload opcional de imagem destacada na pauta
+
+Problema: imagem destacada do post hoje vem de IA (ou falta) — quando é o Luciano criando,
+tanto faz, mas quando é outra pessoa publicando, falta correr atrás da foto depois. Fix:
+`PautaForm` ganhou campo de upload opcional (`imagem_destacada_url` em `blog_briefs`), com
+validação client-side de dimensão mínima 1280x768 antes de aceitar o arquivo. Reaproveita o
+bucket `event-headers` (pasta `blog-briefs/`) em vez de criar bucket novo. Tabela de pautas
+(`/admin/pautas`) mostra um badge "📷 imagem" quando a pauta já tem foto anexada, pra quem for
+processar saber que não precisa gerar/buscar uma.
+
+**Pendente**: migration `supabase_migration_add_imagem_blog_briefs.sql` revelada no Finder,
+Luciano precisa rodar no Supabase antes do upload funcionar de verdade.
+
 
 ## Sessão 2026-09-30 — primeiro `#VamoAí?` real de verdade + 2 bugs corrigidos no FAQPage
 
