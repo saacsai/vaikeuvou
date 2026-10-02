@@ -72,6 +72,14 @@ export default async function EmbedPerfilPage({ searchParams }: Props) {
         >
           Criar evento
         </a>
+        <a
+          href="https://live.vaikeuvou.app/login?next=/meus-convites"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-xs text-gray-400 hover:text-gray-600 underline"
+        >
+          Já tem conta? Efetuar login
+        </a>
       </div>
     )
   }
