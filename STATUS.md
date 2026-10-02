@@ -2,6 +2,18 @@
 
 Última atualização: 2026-10-02
 
+## Sessão 2026-10-02 (5ª parte) — correção: marca certa era a quarta evolução, não a terceira
+
+Luciano apontou que o arquivo usado na parte anterior (`terceira_marca_original.png`) estava
+errado — o correto é `~/Vaikeuvou/logos e botoes/novo/quarta_evolucao_marca_vaikeuvou.png`.
+Refeito tudo com o arquivo certo: mesmo processo (trim, recolorido branco, ícones com
+círculo+anel redesenhado, logo-vertical reconstruído reaproveitando as faixas de texto), mas
+símbolo da mão extraído DIRETO deste arquivo (coluna 1083-1264, bbox 182x233) em vez de reusar
+`vaikeuvou_simbolo.png` da leva de 24/set (que era da evolução anterior, não bate mais). Proporção
+real mudou de novo: `logo.png` 1457x401 → 1230x315 — `width`/`height` do `next/image` corrigidos
+nos mesmos 13 lugares de novo. Commit `bc3d2f5`.
+
+
 ## Sessão 2026-10-02 (4ª parte) — terceira evolução da marca
 
 Marca nova (ref: `~/Vaikeuvou/logos e botoes/novo/terceira_marca_original.png`): mão evoluída de
