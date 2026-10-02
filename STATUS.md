@@ -2,6 +2,15 @@
 
 Última atualização: 2026-10-02
 
+## Sessão 2026-10-02 (2ª parte) — redirect da raiz + link de login no iframe
+
+- `next.config.ts`: raiz de `live.vaikeuvou.app` (`/`) mandava pro blog (`vaikeuvou.app`) — agora
+  redireciona pra `/criar`, dentro do próprio app.
+- `app/embed/perfil/page.tsx` (widget que roda em `<iframe>` na sidebar do WordPress): estado
+  deslogado ganhou link "Já tem conta? Efetuar login" (`/login?next=/meus-convites`) abaixo do
+  botão "Criar evento" — texto discreto, não botão, pra não competir visualmente (mesmo princípio
+  "uma ação clara" do benchmark Google Busca já fixado nesta sessão de identidade visual).
+
 ## Sessão 2026-10-02 — upload opcional de imagem destacada na pauta
 
 Problema: imagem destacada do post hoje vem de IA (ou falta) — quando é o Luciano criando,
