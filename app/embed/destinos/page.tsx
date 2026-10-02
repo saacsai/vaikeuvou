@@ -56,21 +56,25 @@ export default async function EmbedDestinosPage() {
             href={p.link}
             target="_blank"
             rel="noopener noreferrer"
-            className="block border border-gray-100 rounded-xl overflow-hidden hover:shadow-sm transition-shadow"
+            className="block border border-gray-100 rounded-xl bg-white hover:shadow-sm transition-shadow"
           >
             {img && (
-              <div className="relative aspect-[4/3]">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={img} alt="" className="w-full h-full object-cover" />
-                <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 to-transparent p-3 pt-8">
-                  <p
-                    className="text-white font-bold text-sm leading-snug"
-                    dangerouslySetInnerHTML={{ __html: p.title.rendered }}
-                  />
+              <>
+                <div className="relative aspect-[4/3] rounded-t-xl overflow-hidden">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={img} alt="" className="w-full h-full object-cover" />
                 </div>
-              </div>
+                <div className="relative px-3 -mt-8">
+                  <div className="bg-white rounded-xl shadow-lg p-3">
+                    <p
+                      className="font-bold text-gray-900 text-sm leading-snug"
+                      dangerouslySetInnerHTML={{ __html: p.title.rendered }}
+                    />
+                  </div>
+                </div>
+              </>
             )}
-            <div className="flex items-center justify-between px-3 py-2 text-[11px] text-gray-400">
+            <div className="flex items-center justify-between px-3 pt-2 pb-3 text-[11px] text-gray-400">
               <span>
                 {new Date(p.date).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric' })}
               </span>
