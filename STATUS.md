@@ -2,6 +2,38 @@
 
 Última atualização: 2026-10-03
 
+## Sessão 2026-10-03 (6ª parte) — quórum de evento (vagas mín/máx) + contador de clique externo
+
+Longa sessão de brainstorming antes de implementar (necessidade real, veio de apresentação pra
+15 pessoas) — decisões fechadas: quórum é obrigatório na criação, exceto checkout externo
+(organizador controla por fora); máximo é trava automática real; mínimo NUNCA bloqueia sozinho —
+é sempre decisão do organizador, inclusive podendo tocar o evento abaixo do mínimo se achar
+viável; retenção do repasse MP até a decisão é tese válida (confirmada via blog oficial MP: split
+≠ repasse, existe "evento de liberação", reembolso em split já é rateado entre organizador e
+plataforma automaticamente) mas **não implementada ainda** — precisa ler a API real de retenção
+antes de integrar dinheiro de verdade.
+
+**Construído**: `events.vagas_minimas/vagas_maximas/data_viabilizacao/viabilizacao_confirmada_em/
+cancelado_em`; função `vkv_confirmar_rsvp` no banco (trava a linha do evento, checa
+`vagas_maximas` antes de inserir — race-safe de verdade, não só checagem informativa) usada no
+RSVP livre e no webhook MP; pré-checagem informativa em `/api/rsvp/checkout` antes de abrir o MP;
+campos obrigatórios em `/criar` e `/dashboard` (exceto com link externo preenchido); painel de
+quórum no dashboard com barra de progresso + botões Confirmar realização (libera assim que atinge
+o mínimo, não precisa esperar a data) / Cancelar evento (sempre disponível enquanto pendente);
+página pública mostra "Esgotado" quando lotado e progresso quando tem mínimo definido; tabela
+`event_external_clicks` + rota `/api/eventos/clique-externo` registrando clique no link externo.
+
+**Pendente/fora de escopo desta leva, flagueado de propósito**: retenção/liberação de repasse MP
+e reembolso automático em cancelamento — os botões Confirmar/Cancelar só gravam a decisão
+(timestamp), não mexem em dinheiro ainda.
+
+**Migration pendente**: `supabase_migration_quorum_evento.sql` revelada no Finder, Luciano
+precisa rodar antes de testar qualquer coisa desta leva. **Ainda não testado ao vivo** (migration
+não rodada) — primeira coisa a validar quando rodar: criar um evento com quórum, confirmar
+RSVPs até o máximo e conferir se trava mesmo (inclusive testar 2 abas simultâneas na última
+vaga).
+
+
 ## Sessão 2026-10-03 (5ª parte) — logo do WordPress na tela de login (/vaikeuvou_admin)
 
 Tela de login (hook `login_enqueue_scripts` em `functions.php`) trocou o "W" padrão do WordPress
