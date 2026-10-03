@@ -79,6 +79,16 @@ primeiro #VamoAí? de verdade do blog, 2026-10) — seguir essa estrutura exata 
    **Isso substitui a regra antiga de link de texto puro** — manter sempre o widget daqui pra
    frente, não regredir pra link simples.
 
+   **Exceção — evento com checkout externo** (`external_url` preenchido no evento, ver sessão de
+   brainstorming 2026-10-03 sobre parceiros com pagamento próprio): o widget embedado confirma
+   presença NO vaikeuvou, mas não compra o ingresso de verdade — usar o widget aí seria enganoso
+   (RSVP grátis não é a mesma coisa que garantir vaga num evento pago por fora). Nesse caso, CTA
+   vira **link de texto simples** pra página do evento (que já mostra o botão de compra externa
+   com destaque) — testado no post 290 (Show do Deep Purple, ingresso via Viagogo).
+   Se a pergunta de pré-requisito (item 4) também não fizer sentido pro tipo de evento, adaptar
+   pra "Onde comprar o ingresso?" — além de responder a dúvida real, ainda vira entrada do
+   FAQPage automático.
+
 ### `#VaikeuFui` — resenhas em primeira pessoa
 - Só lugares onde a gente foi e gostou. **Regra fixa: nunca publicar review negativa** — os
   lugares reviewed normalmente são parceiros/QGs do próprio ecossistema.
