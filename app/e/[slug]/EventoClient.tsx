@@ -200,7 +200,7 @@ export default function EventoClient({ evento, rsvps, parentRsvpId, criador, con
                   href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(evento.location)}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-brand hover:text-gray-500"
+                  className="text-[#ff6600] hover:text-gray-500"
                 >
                   {evento.location}
                 </a>
@@ -221,7 +221,7 @@ export default function EventoClient({ evento, rsvps, parentRsvpId, criador, con
                       keepalive: true,
                     }).catch(() => {})
                   }}
-                  className="text-brand hover:text-gray-500"
+                  className="text-[#ff6600] hover:text-gray-500"
                 >
                   {linkLabel}
                 </a>
@@ -231,7 +231,7 @@ export default function EventoClient({ evento, rsvps, parentRsvpId, criador, con
               <div>
                 <p className="flex items-center gap-1.5 flex-wrap">
                   <span>💳</span>
-                  <span className="font-semibold text-gray-700">{fmtBRL(evento.valor!)} por pessoa</span>
+                  <span className="font-bold text-gray-900 text-lg">{fmtBRL(evento.valor!)} por pessoa</span>
                 </p>
                 {evento.max_parcelas > 1 && (
                   <p className="text-[11px] text-gray-400 mt-0.5">Parcelamento em até 12x no cartão de crédito, consulte condições no pagamento</p>
@@ -244,13 +244,13 @@ export default function EventoClient({ evento, rsvps, parentRsvpId, criador, con
             <div className="mb-[26px]">
               {evento.descricao_pacote && (
                 <div>
-                  <p className="text-xs font-bold text-gray-400 uppercase tracking-wide mb-1">O que está incluso</p>
+                  <p className="text-sm font-extrabold text-gray-900 uppercase tracking-wide mb-1.5">O que está incluso</p>
                   <p className="text-sm text-gray-600 whitespace-pre-line">{evento.descricao_pacote}</p>
                 </div>
               )}
               {evento.programacao && (
                 <div className="mt-[30px]">
-                  <p className="text-xs font-bold text-gray-400 uppercase tracking-wide mb-1">Programação</p>
+                  <p className="text-sm font-extrabold text-gray-900 uppercase tracking-wide mb-1.5">Programação</p>
                   <p className="text-sm text-gray-600 whitespace-pre-line">{evento.programacao}</p>
                 </div>
               )}
