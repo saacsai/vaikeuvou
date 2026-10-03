@@ -2,6 +2,21 @@
 
 Última atualização: 2026-10-03
 
+## Sessão 2026-10-03 (12ª parte) — /criar virou wizard de 5 etapas
+
+Formulário cresceu muito (quórum, organizador, editor mínimo — tudo das partes anteriores desta
+mesma sessão) e virou scroll longo e poluído, com preview ao vivo competindo atenção. Reescrito
+`app/criar/CriarClient.tsx` como wizard: (1) Básico, (2) Preço e pacote, (3) Vagas e divulgação,
+(4) Capa e assinatura, (5) Revisão (preview só aparece aqui agora, não mais ao vivo lateral).
+Validação por etapa (`validarEtapa(n)`) + revalidação completa no submit final (cobre navegação
+pelo histórico do browser). Evento continua nascendo num único POST no final — etapas são só
+organização de UI, sem criação parcial no banco. Mesma regra de negócio de antes, zero campo
+removido, só reorganizado.
+
+**Não testado visualmente** (página exige login, não dá pra simular sessão real pra testar) —
+Luciano precisa clicar nas 5 etapas e confirmar que o fluxo ficou do jeito esperado.
+
+
 ## Sessão 2026-10-03 (11ª parte) — LP do evento mais larga no desktop
 
 `max-w-lg` (512px fixo) → `max-w-lg md:max-w-xl lg:max-w-2xl` (512→576→672px) no card principal
