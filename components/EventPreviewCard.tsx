@@ -1,6 +1,7 @@
 import Image from 'next/image'
 import { titleToHeader } from '@/lib/headers'
 import { fmtPreviewDate, type EventFormFields } from '@/lib/eventForm'
+import { renderMiniMarkup } from '@/lib/miniMarkup'
 
 type Props = {
   form: EventFormFields
@@ -33,12 +34,14 @@ export default function EventPreviewCard({ form, userName, userAvatar, userBio, 
 
         <div className="space-y-1 text-xs text-gray-500 mb-4">
           <p>📅 {dateLabel || 'Data e horário'}</p>
-          <p>📍 <span className={form.location ? 'text-brand' : ''}>{form.location || 'Local'}</span></p>
+          <p>📍 <span className={form.location ? 'text-[#ff6600]' : ''}>{form.location || 'Local'}</span></p>
           {form.external_url && (
-            <p>🔗 <span className="text-brand">{form.external_url_label || 'Saiba mais'}</span></p>
+            <p>🔗 <span className="text-[#ff6600]">{form.external_url_label || 'Saiba mais'}</span></p>
           )}
           {form.description && (
-            <p className="text-gray-500 mt-2 leading-relaxed italic">&ldquo;{form.description}&rdquo;</p>
+            <p className="text-gray-500 mt-2 leading-relaxed italic">
+              &ldquo;<span dangerouslySetInnerHTML={{ __html: renderMiniMarkup(form.description) }} />&rdquo;
+            </p>
           )}
         </div>
 

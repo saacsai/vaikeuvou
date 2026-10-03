@@ -406,12 +406,10 @@ export default function CriarClient({ userName, userAvatar, userBio, userInstagr
 
             <div>
               <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Comentários</label>
-              <textarea
+              <MiniEditor
                 value={form.description}
-                onChange={e => set('description', e.target.value)}
+                onChange={v => set('description', v)}
                 placeholder="Personalize a mensagem com um convite especial para quem está recebendo."
-                rows={3}
-                className="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 outline-none focus:border-brand text-sm resize-none"
               />
             </div>
 

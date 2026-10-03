@@ -291,9 +291,9 @@ export default function EventoClient({ evento, rsvps, parentRsvpId, criador, con
             )}
             <div className="min-w-0">
               {heroMensagem ? (
-                <p className="text-sm text-gray-700 italic">&ldquo;{heroMensagem}&rdquo;</p>
+                <p className="text-sm text-gray-700 italic">&ldquo;<span dangerouslySetInnerHTML={{ __html: renderMiniMarkup(heroMensagem) }} />&rdquo;</p>
               ) : evento.description ? (
-                <p className="text-sm text-gray-700 italic">&ldquo;{evento.description}&rdquo;</p>
+                <p className="text-sm text-gray-700 italic">&ldquo;<span dangerouslySetInnerHTML={{ __html: renderMiniMarkup(evento.description) }} />&rdquo;</p>
               ) : (
                 <p className="text-sm text-gray-400">Organizado por {criadorNome}</p>
               )}

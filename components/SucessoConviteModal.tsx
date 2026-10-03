@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import AvatarCropUpload from '@/components/AvatarCropUpload'
+import MiniEditor from '@/components/MiniEditor'
 
 type Props = {
   rsvpId: string
@@ -99,13 +100,12 @@ export default function SucessoConviteModal({ rsvpId, nome, pago, linkConvite, w
             {fotoUrl && !recortando && <p className="text-xs text-green-600 text-center font-semibold">✓ Foto confirmada</p>}
             {recortando && <p className="text-xs text-amber-600 text-center font-semibold">☝️ Clique em &quot;Usar esta foto ✓&quot; pra confirmar</p>}
 
-            <textarea
+            <MiniEditor
               value={mensagem}
-              onChange={e => setMensagem(e.target.value)}
+              onChange={setMensagem}
               placeholder="Escreva uma mensagem — ex: Vem comigo, vai ser demais!"
               rows={2}
               maxLength={200}
-              className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-sm text-gray-900 placeholder-gray-400 outline-none focus:border-brand resize-none"
             />
 
             <div className="flex gap-2 pt-1">

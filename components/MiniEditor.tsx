@@ -8,6 +8,7 @@ type Props = {
   onChange: (v: string) => void
   placeholder?: string
   rows?: number
+  maxLength?: number
 }
 
 const BOTOES: { marker: MiniMarkupMarker; label: string; className: string }[] = [
@@ -19,7 +20,7 @@ const BOTOES: { marker: MiniMarkupMarker; label: string; className: string }[] =
 // Editor mínimo — negrito/itálico/sublinhado, nada além disso. Guarda como
 // texto com marcação leve (**negrito**, _itálico_, ++sublinhado++), não
 // HTML — renderiza de verdade via renderMiniMarkup (lib/miniMarkup.ts).
-export default function MiniEditor({ value, onChange, placeholder, rows = 3 }: Props) {
+export default function MiniEditor({ value, onChange, placeholder, rows = 3, maxLength }: Props) {
   const ref = useRef<HTMLTextAreaElement>(null)
 
   function aplicar(marker: MiniMarkupMarker) {
@@ -54,6 +55,7 @@ export default function MiniEditor({ value, onChange, placeholder, rows = 3 }: P
         onChange={e => onChange(e.target.value)}
         placeholder={placeholder}
         rows={rows}
+        maxLength={maxLength}
         className="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 outline-none focus:border-brand text-sm resize-none"
       />
     </div>
