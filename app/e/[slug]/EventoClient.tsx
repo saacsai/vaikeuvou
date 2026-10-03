@@ -418,7 +418,7 @@ export default function EventoClient({ evento, rsvps, parentRsvpId, criador, con
           </div>
 
           <div className="mt-4 pt-4 border-t border-gray-100 text-center">
-            <a href={base} target="_blank" rel="noopener noreferrer" className="text-[11px] text-black/70 hover:text-black transition-colors">
+            <a href="https://vaikeuvou.app" target="_blank" rel="noopener noreferrer" className="text-[11px] text-black/70 hover:text-black transition-colors">
               Crie seu evento grátis em vaikeuvou.app
             </a>
           </div>
