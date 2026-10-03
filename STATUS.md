@@ -2,6 +2,25 @@
 
 Última atualização: 2026-10-03
 
+## Sessão 2026-10-03 (2ª parte) — preloader trocado pra símbolo da mãozinha
+
+Preloader nativo do tema (`#preloader1`, tela branca de carregamento inicial) mostrava bolinha
+quicando (`.spnc_bounceball`) + texto em inglês "Loading Now". Pedido: só o símbolo da marca.
+
+**Feito** (tema WordPress via SSH):
+- Símbolo extraído do `quarta_evolucao_marca_vaikeuvou.png` (mesmo usado na troca de marca da
+  sessão anterior, `/tmp/quarta_hand.png`), subido pra biblioteca de mídia do WP (`wp media
+  import`, attachment 276, `wp-content/uploads/2026/10/quarta_hand.png`).
+- `newsblogger/functions.php`: override de `newscrunch_preloader_feature` (mesmo padrão
+  `function_exists` já usado antes pro rodapé) — markup novo é só `<img class="vkv-preloader-
+  icon">`, sem bolinha nem texto.
+- `newsblogger/style.css`: animação `vkvPreloaderBounce` (translateY, 700ms alternate infinite)
+  no lugar do `spncBounce` original.
+- Backup `functions.php.bak-2026-10-03-pre-preloader` no servidor antes de sobrescrever.
+- Confirmado ao vivo via curl: markup novo presente, zero "Loading Now"/`spnc_bounceball`
+  restante, animação nova no CSS servido.
+
+
 ## Sessão 2026-10-03 — fonte do WordPress trocada pra Arial/Helvetica (igual ao app)
 
 Luciano perguntou qual fonte o app Next.js usa (Arial/Helvetica, hardcoded em
