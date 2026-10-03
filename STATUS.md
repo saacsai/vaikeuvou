@@ -2,6 +2,17 @@
 
 Última atualização: 2026-10-03
 
+## Sessão 2026-10-03 (7ª parte) — primeiro #VamoAí? publicado, template real documentado
+
+Luciano publicou o post 266 (Cachoeira do Elefante, rascunho de 2026-09-30) — primeiro #VamoAí?
+de verdade no ar. Li o resultado final e documentei em `PERFIL_CRIADOR.md` como template oficial
+pra próximas gerações automáticas: título "Dia DD/MM/AAAA Cidade-UF: ... #VamoAí?", estrutura
+fixa (abertura linkando `#VaikeuFui` relacionado se existir → "O que é o passeio" → H2-pergunta de
+pré-requisito → "Quem está organizando?" → "VamoAí?" fechando). **Mudança mais importante**: o CTA
+final deixou de ser link de texto simples e virou o **widget embedado** (`/embed/<slug>`, mesmo
+iframe do "código de incorporação" do dashboard) — mostra confirmação ao vivo direto no post.
+
+
 ## Sessão 2026-10-03 (6ª parte) — quórum de evento (vagas mín/máx) + contador de clique externo
 
 Longa sessão de brainstorming antes de implementar (necessidade real, veio de apresentação pra
