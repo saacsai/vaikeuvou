@@ -2,6 +2,17 @@
 
 Última atualização: 2026-10-03
 
+## Sessão 2026-10-03 (5ª parte) — logo do WordPress na tela de login (/vaikeuvou_admin)
+
+Tela de login (hook `login_enqueue_scripts` em `functions.php`) trocou o "W" padrão do WordPress
+pelo símbolo da mãozinha (mesmo arquivo do preloader, `quarta_hand.png`) — CSS inline
+`.login h1 a { background-image: ... }`. Link do logo (`login_headerurl`) agora aponta pro
+próprio site em vez de wordpress.org. Texto acessível/alt (`login_headertext`) trocado de
+"Powered by WordPress" pra "vaikeuvou.app". **Achado**: `login_h1_title` (filtro que eu tentei
+primeiro, por hábito de versões mais novas do WP core) não existe nesta versão instalada — o
+filtro certo aqui é `login_headertext`, confirmado lendo `wp-login.php` direto no servidor.
+
+
 ## Sessão 2026-10-03 (4ª parte) — /wp-admin escondido, login custom em /vaikeuvou_admin
 
 Plugin **WPS Hide Login** instalado via WP-CLI (`wp plugin install wps-hide-login --activate`),
