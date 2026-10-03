@@ -2,6 +2,17 @@
 
 Última atualização: 2026-10-03
 
+## Sessão 2026-10-03 (13ª parte) — edição do evento vira seções recolhíveis
+
+Mesmo motivo de poluição visual do `/criar`, mas solução diferente: edição não vira wizard forçado
+(quem já conhece o evento quer mexer numa coisa específica, não navegar passo a passo). `app/
+dashboard/[edit_token]/DashboardClient.tsx`: mesmos 4 agrupamentos do wizard (Básico/Preço/Vagas/
+Capa) como `AccordionSection` (novo componente local, reaproveitável só aqui por ora) — abre só a
+seção que quer, "Básico" vem aberta por padrão. Preview ao vivo mantido do lado (diferente do
+/criar) — decisão deliberada, faz mais sentido ajustando algo que já existe. Zero campo/regra
+removido, só reorganização visual, mesmo princípio do wizard.
+
+
 ## Sessão 2026-10-03 (12ª parte) — /criar virou wizard de 5 etapas
 
 Formulário cresceu muito (quórum, organizador, editor mínimo — tudo das partes anteriores desta
