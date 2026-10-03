@@ -1,4 +1,5 @@
 import { redirect } from 'next/navigation'
+import Image from 'next/image'
 import { getSession, isAdminPhone, canAccessPautas } from '@/lib/auth'
 import { getSupabaseAdmin } from '@/lib/supabase'
 import { ProfilePopover } from '@/components/AppHeaderNav'
@@ -31,15 +32,32 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   return (
     <div className="min-h-screen bg-white text-gray-900">
       <div className="max-w-5xl mx-auto px-4 py-8 space-y-6">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-x-2">
-            <span className="text-brand font-bold text-[25px]">Admin</span>
+        <div className="flex flex-col md:flex-row md:items-center gap-x-2 gap-y-1">
+          <div className="flex items-center justify-between md:contents">
+            <a href="https://vaikeuvou.app" className="flex-shrink-0">
+              <Image src="/logo.png" alt="vaikeuvou" width={1230} height={315} className="h-[43px] md:h-[47px] w-auto -mt-[25px]" />
+            </a>
+            <div className="flex items-center gap-1 md:hidden">
+              <ProfilePopover
+                userName={session.users.name}
+                userAvatar={session.users.avatar_url}
+                podeCriarPost={canAccessPautas(session.users)}
+              />
+            </div>
           </div>
-          <ProfilePopover
-            userName={session.users.name}
-            userAvatar={session.users.avatar_url}
-            podeCriarPost={canAccessPautas(session.users)}
-          />
+
+          <div className="flex items-center gap-x-2 flex-wrap md:flex-1">
+            <span className="text-gray-300 text-sm whitespace-nowrap">»</span>
+            <span className="text-brand font-bold text-[25px] whitespace-nowrap">Admin</span>
+          </div>
+
+          <div className="hidden md:flex items-center gap-1 flex-shrink-0">
+            <ProfilePopover
+              userName={session.users.name}
+              userAvatar={session.users.avatar_url}
+              podeCriarPost={canAccessPautas(session.users)}
+            />
+          </div>
         </div>
 
         {stats && (
