@@ -2,6 +2,14 @@
 
 Última atualização: 2026-10-03
 
+## Sessão 2026-10-03 (11ª parte) — LP do evento mais larga no desktop
+
+`max-w-lg` (512px fixo) → `max-w-lg md:max-w-xl lg:max-w-2xl` (512→576→672px) no card principal
+de `app/e/[slug]/EventoClient.tsx`. Mobile intocado. Largura moderada de propósito (coluna única,
+não reestruturada pra 2 colunas) — teto pra não deixar a linha de texto larga demais de escanear.
+Alternativa de layout 2 colunas (banner + info lado a lado) registrada como opção futura, não feita.
+
+
 ## Sessão 2026-10-03 (10ª parte) — editor mínimo estendido
 
 `MiniEditor` ganhou prop `maxLength` e foi aplicado em mais 2 lugares: mensagem de quem convida
