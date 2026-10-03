@@ -33,6 +33,31 @@ function EditIcon({ className }: { className?: string }) {
   )
 }
 
+// Seções recolhíveis do formulário de edição — diferente do wizard de
+// /criar (passos forçados em sequência), aqui quem já conhece o evento
+// abre direto a seção que quer mexer, sem navegar pelas outras. Decisão
+// da sessão de brainstorming 2026-10-03.
+function AccordionSection({ titulo, aberta, onToggle, children }: {
+  titulo: string
+  aberta: boolean
+  onToggle: () => void
+  children: React.ReactNode
+}) {
+  return (
+    <div className="border border-gray-200 rounded-xl overflow-hidden">
+      <button
+        type="button"
+        onClick={onToggle}
+        className="w-full flex items-center justify-between px-4 py-3 bg-gray-50 hover:bg-gray-100 text-left transition-colors"
+      >
+        <span className="text-sm font-bold text-gray-900">{titulo}</span>
+        <span className={`text-gray-400 text-xs transition-transform ${aberta ? 'rotate-180' : ''}`}>▾</span>
+      </button>
+      {aberta && <div className="p-4 space-y-5">{children}</div>}
+    </div>
+  )
+}
+
 type Props = {
   evento: Event
   rsvps: Rsvp[]
@@ -111,6 +136,11 @@ export default function DashboardClient({ evento, rsvps, isNovo, userName, userA
   const [editando,  setEditando]  = useState(false)
   const [salvandoViab, setSalvandoViab] = useState(false)
   const [erroViab,      setErroViab]      = useState('')
+  const [secoesAbertas, setSecoesAbertas] = useState<string[]>(['basico'])
+
+  function toggleSecao(s: string) {
+    setSecoesAbertas(p => p.includes(s) ? p.filter(x => x !== s) : [...p, s])
+  }
 
   function onHeaderImageUploaded(url: string) {
     setForm(p => ({ ...p, bg_image_url: url }))
@@ -402,226 +432,217 @@ export default function DashboardClient({ evento, rsvps, isNovo, userName, userA
         ) : (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start mb-12">
 
-          <div className="space-y-5">
-            <div className="flex items-center gap-3">
+          <div className="space-y-3">
+            <div className="flex items-center gap-3 mb-2">
               <p className="text-xs font-bold text-gray-400 uppercase tracking-wide">Editar evento</p>
               <button onClick={() => setEditando(false)} className="text-xs font-bold text-brand hover:text-brand-dark uppercase tracking-wide">
                 Fechar ✕
               </button>
             </div>
 
-            <div>
-              <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Nome do evento *</label>
-              <input
-                value={form.title}
-                onChange={e => set('title', e.target.value)}
-                placeholder="Ex: Churrasco de Sábado"
-                className="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 outline-none focus:border-brand text-base"
-              />
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div className="min-w-0">
-                <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">{multiDia ? 'Data de início *' : 'Data *'}</label>
-                <DatePicker value={form.event_date} onChange={v => set('event_date', v)} />
+            <AccordionSection titulo="Básico" aberta={secoesAbertas.includes('basico')} onToggle={() => toggleSecao('basico')}>
+              <div>
+                <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Nome do evento *</label>
+                <input
+                  value={form.title}
+                  onChange={e => set('title', e.target.value)}
+                  placeholder="Ex: Churrasco de Sábado"
+                  className="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 outline-none focus:border-brand text-base"
+                />
               </div>
-              {multiDia ? (
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div className="min-w-0">
-                  <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Data de término *</label>
-                  <DatePicker value={form.event_date_fim} onChange={v => set('event_date_fim', v)} />
+                  <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">{multiDia ? 'Data de início *' : 'Data *'}</label>
+                  <DatePicker value={form.event_date} onChange={v => set('event_date', v)} />
                 </div>
-              ) : (
-                <div className="min-w-0">
-                  <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Horário *</label>
-                  <TimePicker value={form.event_time} onChange={v => set('event_time', v)} />
+                {multiDia ? (
+                  <div className="min-w-0">
+                    <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Data de término *</label>
+                    <DatePicker value={form.event_date_fim} onChange={v => set('event_date_fim', v)} />
+                  </div>
+                ) : (
+                  <div className="min-w-0">
+                    <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Horário *</label>
+                    <TimePicker value={form.event_time} onChange={v => set('event_time', v)} />
+                  </div>
+                )}
+              </div>
+
+              <label className="flex items-center gap-2 text-xs text-gray-500">
+                <input
+                  type="checkbox"
+                  checked={multiDia}
+                  onChange={e => {
+                    const v = e.target.checked
+                    setMultiDia(v)
+                    if (!v) set('event_date_fim', '')
+                  }}
+                  className="rounded border-gray-300 text-brand focus:ring-brand"
+                />
+                Evento com mais de um dia (pacote/viagem)
+              </label>
+
+              {!multiDia && (
+                <div>
+                  <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Duração</label>
+                  <select
+                    value={form.duration_minutes}
+                    onChange={e => set('duration_minutes', e.target.value ? Number(e.target.value) : '')}
+                    className="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-gray-900 outline-none focus:border-brand text-sm"
+                  >
+                    <option value="">Não informar</option>
+                    {DURACAO_OPCOES.map((o, i) => (
+                      <option key={i} value={o.value}>{o.label}</option>
+                    ))}
+                  </select>
                 </div>
               )}
-            </div>
 
-            <label className="flex items-center gap-2 text-xs text-gray-500 -mt-2">
-              <input
-                type="checkbox"
-                checked={multiDia}
-                onChange={e => {
-                  const v = e.target.checked
-                  setMultiDia(v)
-                  if (!v) set('event_date_fim', '')
-                }}
-                className="rounded border-gray-300 text-brand focus:ring-brand"
-              />
-              Evento com mais de um dia (pacote/viagem)
-            </label>
-
-            {!multiDia && (
               <div>
-                <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Duração</label>
-                <select
-                  value={form.duration_minutes}
-                  onChange={e => set('duration_minutes', e.target.value ? Number(e.target.value) : '')}
-                  className="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-gray-900 outline-none focus:border-brand text-sm"
-                >
-                  <option value="">Não informar</option>
-                  {DURACAO_OPCOES.map((o, i) => (
-                    <option key={i} value={o.value}>{o.label}</option>
-                  ))}
-                </select>
-              </div>
-            )}
-
-            <div>
-              <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Local</label>
-              <input
-                value={form.location}
-                onChange={e => set('location', e.target.value)}
-                placeholder="Endereço ou nome do lugar"
-                className="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 outline-none focus:border-brand text-sm"
-              />
-            </div>
-
-            <div>
-              <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Cidade (opcional)</label>
-              <input
-                value={form.cidade}
-                onChange={e => set('cidade', e.target.value)}
-                placeholder="Só pra eventos ligados a um QG/destino turístico"
-                className="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 outline-none focus:border-brand text-sm"
-              />
-            </div>
-
-            <div>
-              <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Valor por pessoa (opcional)</label>
-              <input
-                value={form.valor}
-                onChange={e => set('valor', e.target.value ? Number(e.target.value) : '')}
-                placeholder="Deixe em branco pra evento grátis"
-                type="number" min={0} step="0.01"
-                className="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 outline-none focus:border-brand text-sm"
-              />
-              <p className="text-[10px] text-gray-400 mt-0.5">Com valor definido, confirmar presença (BORA) exige pagamento.</p>
-            </div>
-
-            {!!form.valor && (
-              <>
-                <div>
-                  <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Parcelamento em até</label>
-                  <input
-                    value={form.max_parcelas}
-                    onChange={e => set('max_parcelas', Number(e.target.value))}
-                    type="number" min={1} max={12} step="1"
-                    className="w-32 bg-white border border-gray-300 rounded-xl px-4 py-3 text-gray-900 outline-none focus:border-brand text-sm"
-                  />
-                  <p className="text-[10px] text-gray-400 mt-0.5">Padrão 3x — usado no destaque de preço no evento.</p>
-                </div>
-
-                <div>
-                  <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">O que está incluso (opcional)</label>
-                  <MiniEditor
-                    value={form.descricao_pacote}
-                    onChange={v => set('descricao_pacote', v)}
-                    placeholder="Ex: churrasco completo + bebida, ida e volta de barco, welcome drink..."
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Programação detalhada (opcional)</label>
-                  <MiniEditor
-                    value={form.programacao}
-                    onChange={v => set('programacao', v)}
-                    placeholder="Ex: 9h chegada, 10h saída do barco, 13h almoço, 17h volta..."
-                  />
-                </div>
-              </>
-            )}
-
-            <div>
-              <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Link externo</label>
-              <input
-                value={form.external_url}
-                onChange={e => set('external_url', e.target.value)}
-                placeholder="https://...(ingresso, mais informações, etc...)"
-                type="url"
-                className="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 outline-none focus:border-brand text-sm"
-              />
-            </div>
-
-            {form.external_url && (
-              <div>
-                <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Texto do botão</label>
+                <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Local</label>
                 <input
-                  value={form.external_url_label}
-                  onChange={e => set('external_url_label', e.target.value)}
-                  placeholder="Ex: Comprar ingresso 🎟️"
+                  value={form.location}
+                  onChange={e => set('location', e.target.value)}
+                  placeholder="Endereço ou nome do lugar"
                   className="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 outline-none focus:border-brand text-sm"
                 />
               </div>
-            )}
 
-            {!form.external_url && (
-              <div className="space-y-3 bg-gray-50 rounded-xl p-4">
-                <p className="text-xs font-bold text-gray-700">Quórum do evento *</p>
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Vagas mínimas</label>
-                    <input
-                      value={form.vagas_minimas}
-                      onChange={e => set('vagas_minimas', e.target.value ? Number(e.target.value) : '')}
-                      type="number" min={1} step="1"
-                      className="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 outline-none focus:border-brand text-sm"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Vagas máximas</label>
-                    <input
-                      value={form.vagas_maximas}
-                      onChange={e => set('vagas_maximas', e.target.value ? Number(e.target.value) : '')}
-                      type="number" min={1} step="1"
-                      className="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 outline-none focus:border-brand text-sm"
-                    />
-                  </div>
+              <div>
+                <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Cidade (opcional)</label>
+                <input
+                  value={form.cidade}
+                  onChange={e => set('cidade', e.target.value)}
+                  placeholder="Só pra eventos ligados a um QG/destino turístico"
+                  className="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 outline-none focus:border-brand text-sm"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-gray-500 mb-2 uppercase tracking-wide">Quem pode convidar?</label>
+                <div className="grid grid-cols-3 gap-2">
+                  {PRIVACIDADE.map(p => (
+                    <button
+                      key={p.value}
+                      onClick={() => set('max_depth', p.value)}
+                      className={`rounded-xl p-3 text-left border transition-colors ${
+                        form.max_depth === p.value
+                          ? 'border-brand bg-brand/5'
+                          : 'border-gray-200 bg-white hover:border-gray-300'
+                      }`}
+                    >
+                      <p className="text-xs font-bold text-gray-900">{p.label}</p>
+                      <p className="text-[10px] text-gray-400 mt-0.5">{p.desc}</p>
+                    </button>
+                  ))}
                 </div>
+              </div>
+            </AccordionSection>
+
+            <AccordionSection titulo="Preço e pacote" aberta={secoesAbertas.includes('preco')} onToggle={() => toggleSecao('preco')}>
+              <div>
+                <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Valor por pessoa (opcional)</label>
+                <input
+                  value={form.valor}
+                  onChange={e => set('valor', e.target.value ? Number(e.target.value) : '')}
+                  placeholder="Deixe em branco pra evento grátis"
+                  type="number" min={0} step="0.01"
+                  className="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 outline-none focus:border-brand text-sm"
+                />
+                <p className="text-[10px] text-gray-400 mt-0.5">Com valor definido, confirmar presença (BORA) exige pagamento.</p>
+              </div>
+
+              {!!form.valor && (
+                <>
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Parcelamento em até</label>
+                    <input
+                      value={form.max_parcelas}
+                      onChange={e => set('max_parcelas', Number(e.target.value))}
+                      type="number" min={1} max={12} step="1"
+                      className="w-32 bg-white border border-gray-300 rounded-xl px-4 py-3 text-gray-900 outline-none focus:border-brand text-sm"
+                    />
+                    <p className="text-[10px] text-gray-400 mt-0.5">Padrão 3x — usado no destaque de preço no evento.</p>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">O que está incluso (opcional)</label>
+                    <MiniEditor
+                      value={form.descricao_pacote}
+                      onChange={v => set('descricao_pacote', v)}
+                      placeholder="Ex: churrasco completo + bebida, ida e volta de barco, welcome drink..."
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Programação detalhada (opcional)</label>
+                    <MiniEditor
+                      value={form.programacao}
+                      onChange={v => set('programacao', v)}
+                      placeholder="Ex: 9h chegada, 10h saída do barco, 13h almoço, 17h volta..."
+                    />
+                  </div>
+                </>
+              )}
+            </AccordionSection>
+
+            <AccordionSection titulo="Vagas e divulgação" aberta={secoesAbertas.includes('vagas')} onToggle={() => toggleSecao('vagas')}>
+              <div>
+                <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Link externo</label>
+                <input
+                  value={form.external_url}
+                  onChange={e => set('external_url', e.target.value)}
+                  placeholder="https://...(ingresso, mais informações, etc...)"
+                  type="url"
+                  className="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 outline-none focus:border-brand text-sm"
+                />
+              </div>
+
+              {form.external_url && (
                 <div>
-                  <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Data limite pra decidir se o evento vai acontecer</label>
-                  <DatePicker value={form.data_viabilizacao} onChange={v => set('data_viabilizacao', v)} />
+                  <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Texto do botão</label>
+                  <input
+                    value={form.external_url_label}
+                    onChange={e => set('external_url_label', e.target.value)}
+                    placeholder="Ex: Comprar ingresso 🎟️"
+                    className="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 outline-none focus:border-brand text-sm"
+                  />
                 </div>
-              </div>
-            )}
+              )}
 
-            <div className="bg-gray-50 rounded-xl p-4 flex items-start gap-3">
-              <p className="text-xs text-gray-500 leading-relaxed">
-                Foto, nome, bio e @Instagram da sua assinatura se editam direto no
-                seu perfil. Acesse: <GridIcon className="inline-block w-3.5 h-3.5 align-[-2px] mx-0.5" /> menu » Editar perfil.
-              </p>
-            </div>
+              {!form.external_url && (
+                <div className="space-y-3 bg-gray-50 rounded-xl p-4">
+                  <p className="text-xs font-bold text-gray-700">Quórum do evento *</p>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Vagas mínimas</label>
+                      <input
+                        value={form.vagas_minimas}
+                        onChange={e => set('vagas_minimas', e.target.value ? Number(e.target.value) : '')}
+                        type="number" min={1} step="1"
+                        className="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 outline-none focus:border-brand text-sm"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Vagas máximas</label>
+                      <input
+                        value={form.vagas_maximas}
+                        onChange={e => set('vagas_maximas', e.target.value ? Number(e.target.value) : '')}
+                        type="number" min={1} step="1"
+                        className="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 outline-none focus:border-brand text-sm"
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Data limite pra decidir se o evento vai acontecer</label>
+                    <DatePicker value={form.data_viabilizacao} onChange={v => set('data_viabilizacao', v)} />
+                  </div>
+                </div>
+              )}
 
-            <div>
-              <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Comentários</label>
-              <MiniEditor
-                value={form.description}
-                onChange={v => set('description', v)}
-                placeholder="Personalize a mensagem com um convite especial para quem está recebendo."
-              />
-            </div>
-
-            <div>
-              <label className="block text-xs font-semibold text-gray-500 mb-2 uppercase tracking-wide">Quem pode convidar?</label>
-              <div className="grid grid-cols-3 gap-2">
-                {PRIVACIDADE.map(p => (
-                  <button
-                    key={p.value}
-                    onClick={() => set('max_depth', p.value)}
-                    className={`rounded-xl p-3 text-left border transition-colors ${
-                      form.max_depth === p.value
-                        ? 'border-brand bg-brand/5'
-                        : 'border-gray-200 bg-white hover:border-gray-300'
-                    }`}
-                  >
-                    <p className="text-xs font-bold text-gray-900">{p.label}</p>
-                    <p className="text-[10px] text-gray-400 mt-0.5">{p.desc}</p>
-                  </button>
-                ))}
-              </div>
               {form.max_depth === 999 && (
-                <label className="mt-3 flex items-start gap-2.5 rounded-xl border border-gray-200 bg-gray-50 p-3 cursor-pointer">
+                <label className="flex items-start gap-2.5 rounded-xl border border-gray-200 bg-gray-50 p-3 cursor-pointer">
                   <input
                     type="checkbox"
                     checked={form.divulgar_blog}
@@ -635,7 +656,7 @@ export default function DashboardClient({ evento, rsvps, isNovo, userName, userA
                 </label>
               )}
               {form.max_depth === 999 && form.divulgar_blog && (
-                <div className="mt-3 space-y-3 bg-gray-50 rounded-xl p-4">
+                <div className="space-y-3 bg-gray-50 rounded-xl p-4">
                   <p className="text-xs font-bold text-gray-700">Quem está organizando? *</p>
                   <div>
                     <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Nome do organizador/empresa</label>
@@ -691,30 +712,48 @@ export default function DashboardClient({ evento, rsvps, isNovo, userName, userA
                   </div>
                 </div>
               )}
-            </div>
+            </AccordionSection>
 
-            <div className="lg:hidden">
-              <BgSelector
-                value={form.bg_image_url}
-                onChange={v => set('bg_image_url', v)}
-                title={form.title}
-                editToken={evento.edit_token}
-                hasAvatar={!!userAvatar}
-                onUploaded={onHeaderImageUploaded}
-              />
-            </div>
+            <AccordionSection titulo="Capa e assinatura" aberta={secoesAbertas.includes('capa')} onToggle={() => toggleSecao('capa')}>
+              <div className="bg-gray-50 rounded-xl p-4 flex items-start gap-3">
+                <p className="text-xs text-gray-500 leading-relaxed">
+                  Foto, nome, bio e @Instagram da sua assinatura se editam direto no
+                  seu perfil. Acesse: <GridIcon className="inline-block w-3.5 h-3.5 align-[-2px] mx-0.5" /> menu » Editar perfil.
+                </p>
+              </div>
 
-            <div>
-              <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Vídeo do evento</label>
-              <input
-                value={form.video_url}
-                onChange={e => set('video_url', e.target.value)}
-                placeholder="Cole o link do vídeo do YouTube/Vimeo"
-                type="url"
-                className="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 outline-none focus:border-brand text-sm"
-              />
-              <p className="text-[10px] text-gray-400 mt-1">Aparece abaixo do botão BORA na página do evento</p>
-            </div>
+              <div>
+                <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Comentários</label>
+                <MiniEditor
+                  value={form.description}
+                  onChange={v => set('description', v)}
+                  placeholder="Personalize a mensagem com um convite especial para quem está recebendo."
+                />
+              </div>
+
+              <div className="lg:hidden">
+                <BgSelector
+                  value={form.bg_image_url}
+                  onChange={v => set('bg_image_url', v)}
+                  title={form.title}
+                  editToken={evento.edit_token}
+                  hasAvatar={!!userAvatar}
+                  onUploaded={onHeaderImageUploaded}
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Vídeo do evento</label>
+                <input
+                  value={form.video_url}
+                  onChange={e => set('video_url', e.target.value)}
+                  placeholder="Cole o link do vídeo do YouTube/Vimeo"
+                  type="url"
+                  className="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 outline-none focus:border-brand text-sm"
+                />
+                <p className="text-[10px] text-gray-400 mt-1">Aparece abaixo do botão BORA na página do evento</p>
+              </div>
+            </AccordionSection>
 
             {msg && (
               <p className={`text-sm ${msg === 'Salvo!' ? 'text-green-600' : 'text-red-500'}`}>{msg}</p>
