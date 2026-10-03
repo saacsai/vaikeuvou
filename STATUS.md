@@ -2,6 +2,18 @@
 
 Última atualização: 2026-10-03
 
+## Sessão 2026-10-03 (4ª parte) — /wp-admin escondido, login custom em /vaikeuvou_admin
+
+Plugin **WPS Hide Login** instalado via WP-CLI (`wp plugin install wps-hide-login --activate`),
+slug configurado via `wp option update whl_page vaikeuvou_admin`. `/wp-admin` e `/wp-login.php`
+agora redirecionam/404 pra uma página 404 genérica (zero pista pra quem tentar adivinhar); login
+de verdade só em `https://vaikeuvou.app/vaikeuvou_admin`. Confirmado via curl (wp-admin → 302 pra
+`/404/`, wp-login.php → 404, vaikeuvou_admin → 200 com form de login presente).
+
+**Recuperação se travar algum dia**: desativar o plugin via SSH (renomear a pasta
+`wp-content/plugins/wps-hide-login`) volta pro `/wp-admin` padrão na hora, sem mexer no banco.
+
+
 ## Sessão 2026-10-03 (3ª parte) — logo 5px mais alto, nos dois lugares
 
 Ajuste fino pedido por causa da proporção da marca nova (quarta evolução). **App Next.js**:
