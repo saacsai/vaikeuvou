@@ -81,21 +81,22 @@ export async function POST(req: NextRequest) {
 
   if (!pendente) return NextResponse.json({ ok: true })
 
-  const { error } = await sb.from('rsvps').insert({
-    event_id:       pendente.event_id,
-    user_name:      pendente.user_name,
-    user_phone:     pendente.user_phone,
-    parent_rsvp_id: pendente.parent_rsvp_id,
-    pago:           true,
-    valor_pago:     totalPaidAmount ? Number(totalPaidAmount) : null,
-    mp_payment_id:  dataId,
+  // Mesma função atômica do RSVP livre — pagamento já foi aprovado nesse
+  // ponto, então "evento_lotado" aqui é um caso real de corrida (checkout
+  // aberto quando ainda tinha vaga, mas lotou antes da aprovação): assim como
+  // 23505, não é erro nosso pra devolver 500 (a MP reenviaria à toa), mas
+  // precisa de estorno manual pelo organizador — não resolvemos sozinhos.
+  const { error } = await sb.rpc('vkv_confirmar_rsvp', {
+    p_event_id: pendente.event_id,
+    p_user_name: pendente.user_name,
+    p_user_phone: pendente.user_phone,
+    p_parent_rsvp_id: pendente.parent_rsvp_id,
+    p_pago: true,
+    p_valor_pago: totalPaidAmount ? Number(totalPaidAmount) : null,
+    p_mp_payment_id: dataId,
   })
 
-  // 23505 = viola a constraint única (event_id, user_phone) — dois checkouts
-  // pro mesmo telefone foram iniciados antes do primeiro confirmar. Não é
-  // erro nosso pra retornar 500 (a MP ficaria reenviando à toa); o pagamento
-  // duplicado, se acontecer, precisa ser estornado manualmente pelo organizador.
-  if (error && error.code !== '23505') {
+  if (error && error.code !== '23505' && !error.message?.includes('evento_lotado')) {
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
 

@@ -13,10 +13,25 @@ export async function POST(req: NextRequest) {
     title, event_date, event_date_fim, duration_minutes, location, description, max_depth, bg_image_url,
     video_url, external_url, external_url_label, cidade,
     valor, descricao_pacote, programacao, max_parcelas, divulgar_blog,
+    vagas_minimas, vagas_maximas, data_viabilizacao,
   } = await req.json()
 
   if (!title || !event_date) {
     return NextResponse.json({ error: 'título e data são obrigatórios' }, { status: 400 })
+  }
+
+  // Quórum obrigatório exceto checkout externo (organizador controla por
+  // fora) — nunca confiar só na validação do cliente.
+  if (!external_url) {
+    if (!vagas_minimas || !vagas_maximas || !data_viabilizacao) {
+      return NextResponse.json({ error: 'Vagas mínimas, máximas e data de viabilização são obrigatórias.' }, { status: 400 })
+    }
+    if (Number(vagas_minimas) > Number(vagas_maximas)) {
+      return NextResponse.json({ error: 'O mínimo de vagas não pode ser maior que o máximo.' }, { status: 400 })
+    }
+    if (data_viabilizacao >= event_date) {
+      return NextResponse.json({ error: 'A data de viabilização precisa ser antes da data do evento.' }, { status: 400 })
+    }
   }
 
   const phone = session.users.phone
@@ -66,6 +81,9 @@ export async function POST(req: NextRequest) {
       comissao_percentual:  comissaoPercentual,
       max_parcelas:         max_parcelas || 3,
       divulgar_blog:        divulgarBlogFinal,
+      vagas_minimas:        vagas_minimas || null,
+      vagas_maximas:        vagas_maximas || null,
+      data_viabilizacao:    data_viabilizacao || null,
       creator_phone: phone,
       user_id:       session.user_id,
     })

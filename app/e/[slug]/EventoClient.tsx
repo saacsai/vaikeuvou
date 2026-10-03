@@ -105,6 +105,7 @@ export default function EventoClient({ evento, rsvps, parentRsvpId, criador, con
   const embedUrl    = evento.video_url ? getVideoEmbed(evento.video_url) : null
   const linkLabel   = evento.external_url_label ?? 'Saiba mais'
   const podeConvidar = evento.max_depth > 1
+  const lotado = !!evento.vagas_maximas && rsvps.length >= evento.vagas_maximas
   const refFimEvento = evento.event_date_fim ? `${evento.event_date_fim}T23:59:59-03:00` : evento.event_date
   const isPast       = new Date(refFimEvento).getTime() < Date.now()
   const fimIso        = evento.duration_minutes
@@ -212,6 +213,14 @@ export default function EventoClient({ evento, rsvps, parentRsvpId, criador, con
                   href={evento.external_url}
                   target="_blank"
                   rel="noopener noreferrer"
+                  onClick={() => {
+                    fetch('/api/eventos/clique-externo', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({ event_id: evento.id }),
+                      keepalive: true,
+                    }).catch(() => {})
+                  }}
                   className="text-brand hover:text-gray-500"
                 >
                   {linkLabel}
@@ -294,14 +303,25 @@ export default function EventoClient({ evento, rsvps, parentRsvpId, criador, con
           {etapa === 'convite' && (
             <div className="space-y-3">
               <p className="text-gray-900 font-semibold text-[23px]">Vamo aí?</p>
-              <button
-                onClick={() => setEtapa('form')}
-                disabled={saving}
-                className="w-full py-4 rounded-lg bg-brand hover:bg-brand-dark disabled:opacity-50 transition-colors shadow-lg shadow-brand/20 flex items-center justify-center gap-[5px]"
-              >
-                <span className="text-white font-bold text-2xl uppercase tracking-wide">BORA</span>
-                <Image src="/icone_bora.png" alt="" width={474} height={537} className="h-8 w-auto" />
-              </button>
+              {lotado ? (
+                <div className="w-full py-4 rounded-lg bg-gray-100 text-center">
+                  <span className="text-gray-400 font-bold text-lg uppercase tracking-wide">Esgotado</span>
+                </div>
+              ) : (
+                <button
+                  onClick={() => setEtapa('form')}
+                  disabled={saving}
+                  className="w-full py-4 rounded-lg bg-brand hover:bg-brand-dark disabled:opacity-50 transition-colors shadow-lg shadow-brand/20 flex items-center justify-center gap-[5px]"
+                >
+                  <span className="text-white font-bold text-2xl uppercase tracking-wide">BORA</span>
+                  <Image src="/icone_bora.png" alt="" width={474} height={537} className="h-8 w-auto" />
+                </button>
+              )}
+              {evento.vagas_minimas && !lotado && (
+                <p className="text-xs text-gray-400">
+                  {rsvps.length} de {evento.vagas_minimas} confirmados pro evento acontecer.
+                </p>
+              )}
               {erro && <p className="text-red-500 text-sm">{erro}</p>}
             </div>
           )}

@@ -43,6 +43,11 @@ export type Event = {
   comissao_percentual: number
   max_parcelas: number
   divulgar_blog: boolean
+  vagas_minimas: number | null
+  vagas_maximas: number | null
+  data_viabilizacao: string | null
+  viabilizacao_confirmada_em: string | null
+  cancelado_em: string | null
 }
 
 export type BlogBriefTipo = 'VaikeuFui' | 'Tendeu' | 'ProntoFalei' | 'VamoAi' | 'Revisar' | 'SouFa'

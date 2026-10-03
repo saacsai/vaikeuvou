@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import type { Event, Rsvp } from '@/lib/supabase'
 import DatePicker from '@/components/DatePicker'
@@ -86,10 +87,14 @@ function toForm(evento: Event): EventFormFields {
     programacao: evento.programacao ?? '',
     max_parcelas: evento.max_parcelas,
     divulgar_blog: evento.divulgar_blog,
+    vagas_minimas: evento.vagas_minimas ?? '',
+    vagas_maximas: evento.vagas_maximas ?? '',
+    data_viabilizacao: evento.data_viabilizacao ?? '',
   }
 }
 
 export default function DashboardClient({ evento, rsvps, isNovo, userName, userAvatar, userBio, userInstagram, userMpConectado, comissaoPercentual, podeCriarPost }: Props) {
+  const router = useRouter()
   const [initial,   setInitial]   = useState<EventFormFields>(() => toForm(evento))
   const [form,      setForm]      = useState<EventFormFields>(() => toForm(evento))
   const [multiDia,  setMultiDia]  = useState(() => !!evento.event_date_fim)
@@ -97,6 +102,8 @@ export default function DashboardClient({ evento, rsvps, isNovo, userName, userA
   const [saving,    setSaving]    = useState(false)
   const [msg,       setMsg]       = useState('')
   const [editando,  setEditando]  = useState(false)
+  const [salvandoViab, setSalvandoViab] = useState(false)
+  const [erroViab,      setErroViab]      = useState('')
 
   function onHeaderImageUploaded(url: string) {
     setForm(p => ({ ...p, bg_image_url: url }))
@@ -127,6 +134,19 @@ export default function DashboardClient({ evento, rsvps, isNovo, userName, userA
     navigator.clipboard.writeText(txt)
     setCopiado(true)
     setTimeout(() => setCopiado(false), 2000)
+  }
+
+  async function decidirViabilizacao(acao: 'confirmar' | 'cancelar') {
+    setSalvandoViab(true)
+    setErroViab('')
+    const res = await fetch('/api/eventos/viabilizacao', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ edit_token: evento.edit_token, acao }),
+    })
+    const json = await res.json()
+    if (!res.ok) { setErroViab(json.error ?? 'Erro ao salvar.'); setSalvandoViab(false); return }
+    router.refresh()
   }
 
   async function salvar() {
@@ -270,6 +290,62 @@ export default function DashboardClient({ evento, rsvps, isNovo, userName, userA
             >
               Conectar Mercado Pago
             </a>
+          </div>
+        )}
+
+        {/* Quórum — só aparece quando o evento tem vagas mín/máx definidas
+            (não tem em evento com checkout externo). */}
+        {!!evento.vagas_minimas && !!evento.vagas_maximas && (
+          <div className="mb-10 bg-white border border-gray-100 rounded-xl p-4 shadow-sm space-y-3">
+            <div className="flex items-center justify-between flex-wrap gap-2">
+              <p className="text-xs font-bold text-gray-400 uppercase tracking-wide">Quórum do evento</p>
+              {evento.cancelado_em && (
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-red-50 text-red-600 uppercase">Cancelado</span>
+              )}
+              {evento.viabilizacao_confirmada_em && (
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-green-50 text-green-700 uppercase">Confirmado</span>
+              )}
+            </div>
+
+            <div className="flex items-center gap-3">
+              <div className="flex-1 h-2 bg-gray-100 rounded-full overflow-hidden">
+                <div
+                  className="h-full bg-brand rounded-full"
+                  style={{ width: `${Math.min(100, (rsvps.length / evento.vagas_minimas) * 100)}%` }}
+                />
+              </div>
+              <p className="text-xs font-semibold text-gray-600 whitespace-nowrap">
+                {rsvps.length} de {evento.vagas_minimas} mín. ({evento.vagas_maximas} máx.)
+              </p>
+            </div>
+
+            {!evento.cancelado_em && !evento.viabilizacao_confirmada_em && (
+              <>
+                <p className="text-[10px] text-gray-400">
+                  Prazo pra decidir: {fmtDate(evento.data_viabilizacao!)}
+                  {rsvps.length >= evento.vagas_minimas
+                    ? ' — mínimo atingido, já pode confirmar antes do prazo.'
+                    : ' — libera o botão de confirmar assim que atingir o mínimo, ou quando chegar o prazo.'}
+                </p>
+                {erroViab && <p className="text-xs text-red-500">{erroViab}</p>}
+                <div className="flex gap-2 flex-wrap">
+                  <button
+                    onClick={() => decidirViabilizacao('confirmar')}
+                    disabled={salvandoViab || (rsvps.length < evento.vagas_minimas && new Date(evento.data_viabilizacao!) > new Date())}
+                    className="px-4 py-2 rounded-lg bg-brand hover:bg-brand-dark disabled:opacity-40 disabled:cursor-not-allowed text-white text-xs font-bold uppercase tracking-wide"
+                  >
+                    Confirmar realização
+                  </button>
+                  <button
+                    onClick={() => decidirViabilizacao('cancelar')}
+                    disabled={salvandoViab}
+                    className="px-4 py-2 rounded-lg border border-red-200 text-red-600 hover:bg-red-50 disabled:opacity-40 text-xs font-bold uppercase tracking-wide"
+                  >
+                    Cancelar evento
+                  </button>
+                </div>
+              </>
+            )}
           </div>
         )}
 
@@ -474,6 +550,36 @@ export default function DashboardClient({ evento, rsvps, isNovo, userName, userA
                   placeholder="Ex: Comprar ingresso 🎟️"
                   className="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 outline-none focus:border-brand text-sm"
                 />
+              </div>
+            )}
+
+            {!form.external_url && (
+              <div className="space-y-3 bg-gray-50 rounded-xl p-4">
+                <p className="text-xs font-bold text-gray-700">Quórum do evento *</p>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Vagas mínimas</label>
+                    <input
+                      value={form.vagas_minimas}
+                      onChange={e => set('vagas_minimas', e.target.value ? Number(e.target.value) : '')}
+                      type="number" min={1} step="1"
+                      className="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 outline-none focus:border-brand text-sm"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Vagas máximas</label>
+                    <input
+                      value={form.vagas_maximas}
+                      onChange={e => set('vagas_maximas', e.target.value ? Number(e.target.value) : '')}
+                      type="number" min={1} step="1"
+                      className="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 outline-none focus:border-brand text-sm"
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Data limite pra decidir se o evento vai acontecer</label>
+                  <DatePicker value={form.data_viabilizacao} onChange={v => set('data_viabilizacao', v)} />
+                </div>
               </div>
             )}
 

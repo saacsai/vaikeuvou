@@ -38,6 +38,7 @@ export default function CriarClient({ userName, userAvatar, userBio, userInstagr
     bg_image_url: '', cidade: '',
     valor: '', descricao_pacote: '', programacao: '', max_parcelas: 3,
     divulgar_blog: false,
+    vagas_minimas: '', vagas_maximas: '', data_viabilizacao: '',
   })
   const [multiDia, setMultiDia] = useState(false)
   const [saving, setSaving] = useState(false)
@@ -82,6 +83,24 @@ export default function CriarClient({ userName, userAvatar, userBio, userInstagr
     if (multiDia && form.event_date_fim < form.event_date) {
       setErro('A data de término precisa ser igual ou depois da data de início.')
       return
+    }
+
+    // Quórum (mín/máx de pessoas) é obrigatório — exceto quando o checkout é
+    // externo, porque aí quem controla viabilização é o organizador, fora do
+    // nosso alcance (decisão da sessão de brainstorming 2026-10-03).
+    if (!form.external_url) {
+      if (!form.vagas_minimas || !form.vagas_maximas || !form.data_viabilizacao) {
+        setErro('Preencha vagas mínimas, máximas e a data de viabilização do evento.')
+        return
+      }
+      if (Number(form.vagas_minimas) > Number(form.vagas_maximas)) {
+        setErro('O mínimo de vagas não pode ser maior que o máximo.')
+        return
+      }
+      if (form.data_viabilizacao >= form.event_date) {
+        setErro('A data de viabilização precisa ser antes da data do evento.')
+        return
+      }
     }
 
     if (!termsAccepted && !aceitouTermos) {
@@ -321,6 +340,50 @@ export default function CriarClient({ userName, userAvatar, userBio, userInstagr
                   placeholder="Ex: Comprar ingresso 🎟️"
                   className="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 outline-none focus:border-brand text-sm"
                 />
+              </div>
+            )}
+
+            {/* Quórum — obrigatório pra viabilização, exceto checkout externo
+                (aí quem controla isso é o organizador, fora do vaikeuvou). */}
+            {form.external_url ? (
+              <p className="text-[11px] text-gray-400 bg-gray-50 rounded-xl px-4 py-3">
+                Com link externo, vagas mínimas/máximas e a decisão de viabilizar o evento ficam
+                por conta do seu próprio sistema de checkout.
+              </p>
+            ) : (
+              <div className="space-y-3 bg-gray-50 rounded-xl p-4">
+                <p className="text-xs font-bold text-gray-700">Quórum do evento *</p>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Vagas mínimas</label>
+                    <input
+                      value={form.vagas_minimas}
+                      onChange={e => set('vagas_minimas', e.target.value ? Number(e.target.value) : '')}
+                      placeholder="Ex: 10"
+                      type="number" min={1} step="1"
+                      className="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 outline-none focus:border-brand text-sm"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Vagas máximas</label>
+                    <input
+                      value={form.vagas_maximas}
+                      onChange={e => set('vagas_maximas', e.target.value ? Number(e.target.value) : '')}
+                      placeholder="Ex: 30"
+                      type="number" min={1} step="1"
+                      className="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 outline-none focus:border-brand text-sm"
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Data limite pra decidir se o evento vai acontecer</label>
+                  <DatePicker value={form.data_viabilizacao} onChange={v => set('data_viabilizacao', v)} />
+                  <p className="text-[10px] text-gray-400 mt-1">
+                    Precisa ser antes da data do evento. Até lá, você decide se bateu gente
+                    suficiente pra valer a pena — o botão de confirmar fica liberado assim que
+                    atingir o mínimo, não precisa esperar essa data se já bateu antes.
+                  </p>
+                </div>
               </div>
             )}
 

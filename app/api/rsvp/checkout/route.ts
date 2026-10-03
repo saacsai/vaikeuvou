@@ -25,13 +25,23 @@ export async function POST(req: NextRequest) {
 
   const { data: evento } = await sb
     .from('events')
-    .select('id, slug, title, max_depth, valor, max_parcelas, user_id')
+    .select('id, slug, title, max_depth, valor, max_parcelas, user_id, vagas_maximas')
     .eq('id', event_id)
     .single()
 
   if (!evento) return NextResponse.json({ error: 'Evento não encontrado' }, { status: 404 })
   if (!evento.valor || evento.valor <= 0) {
     return NextResponse.json({ error: 'Esse evento não tem valor definido' }, { status: 400 })
+  }
+
+  // Checagem informativa — evita abrir checkout da MP à toa pra quem chegou
+  // depois que já lotou. A trava de verdade (atômica, contra corrida) é no
+  // webhook, na hora de gravar o RSVP de fato.
+  if (evento.vagas_maximas) {
+    const { count } = await sb.from('rsvps').select('id', { count: 'exact', head: true }).eq('event_id', event_id)
+    if ((count ?? 0) >= evento.vagas_maximas) {
+      return NextResponse.json({ error: 'Esse evento já atingiu o número máximo de vagas.' }, { status: 409 })
+    }
   }
 
   // Comissão sempre lida da conta do organizador no momento da venda (não

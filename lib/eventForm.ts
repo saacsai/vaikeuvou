@@ -17,6 +17,9 @@ export type EventFormFields = {
   programacao: string
   max_parcelas: number
   divulgar_blog: boolean
+  vagas_minimas: number | ''
+  vagas_maximas: number | ''
+  data_viabilizacao: string
 }
 
 export const DURACAO_OPCOES = [
