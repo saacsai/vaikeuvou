@@ -2,6 +2,23 @@
 
 Última atualização: 2026-10-03
 
+## Sessão 2026-10-03 (9ª parte) — ajustes visuais na LP + editor mínimo
+
+LP do evento (`app/e/[slug]/EventoClient.tsx`): link "Local" e link externo/personalizado
+`text-brand` (preto, pós-rebrand) → `#ff6600` (mesmo laranja do corpo dos posts do blog); preço
+com mais destaque (`font-bold text-gray-900 text-lg`); títulos "O que está incluso"/"Programação"
+que se perdiam junto do texto abaixo (quase mesmo peso visual) → `text-sm font-extrabold
+text-gray-900`, separação clara agora.
+
+**Editor mínimo** (negrito/itálico/sublinhado) em "O que está incluso" e "Programação" —
+`lib/miniMarkup.ts` (marcação leve `**negrito**`/`_itálico_`/`++sublinhado++`, escapa tudo antes
+de renderizar, só depois troca os 3 padrões conhecidos por tag — sem aceitar HTML cru do usuário,
+zero risco de XSS) + `components/MiniEditor.tsx` (textarea com 3 botões que envolvem a seleção
+atual). Sem biblioteca nova. Aplicado nos dois formulários (criar + editar) e na renderização
+pública. Escopo deliberadamente restrito a esses 2 campos — não estendido a `description`/
+`organizador_descricao` ainda, avisar se quiser.
+
+
 ## Sessão 2026-10-03 (8ª parte) — botão do embed corrigido + campos de organizador no evento
 
 **Bug corrigido**: `/embed/[slug]` (botão CTA publicado dentro de cada post #VamoAí?, iframe fixo
