@@ -2,6 +2,24 @@
 
 Última atualização: 2026-10-03
 
+## Sessão 2026-10-03 (8ª parte) — botão do embed corrigido + campos de organizador no evento
+
+**Bug corrigido**: `/embed/[slug]` (botão CTA publicado dentro de cada post #VamoAí?, iframe fixo
+320x70 no HTML do post) estava sendo cortado — padding/fonte do botão passavam de 70px de altura.
+Reduzido padding (`p-1.5`/`py-2.5`), fonte (`text-sm`) e ícone (`h-4`) pra caber com folga. Texto
+do CTA trocado de "Confirme presença. Vamo aí?" pra "Bora, quero ir também!".
+
+**Gap real identificado**: o template do #VamoAí? (documentado na 7ª parte) tem seção "Quem está
+organizando?" — mas o sistema não tinha like nenhum de onde tirar esse dado automaticamente.
+Luciano concluiu corretamente que precisava virar campo capturado, não algo que a IA inventa.
+Adicionado `organizador_nome/descricao/endereco/contato/horario/link` (opcionais) em `events` —
+aparecem em `/criar` e `/dashboard` só quando "Autorizo divulgar no blog" está marcado, nome do
+organizador vira obrigatório nesse caso (client + server). `composeVamoAiBrief` já inclui esses
+dados na pauta automática — próximo #VamoAí? real já chega com isso pronto, sem brief manual.
+
+**Migration pendente**: `supabase_migration_organizador_evento.sql` revelada no Finder.
+
+
 ## Sessão 2026-10-03 (7ª parte) — primeiro #VamoAí? publicado, template real documentado
 
 Luciano publicou o post 266 (Cachoeira do Elefante, rascunho de 2026-09-30) — primeiro #VamoAí?
