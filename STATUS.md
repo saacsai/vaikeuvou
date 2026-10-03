@@ -2,6 +2,17 @@
 
 Última atualização: 2026-10-03
 
+## Sessão 2026-10-03 (10ª parte) — editor mínimo estendido
+
+`MiniEditor` ganhou prop `maxLength` e foi aplicado em mais 2 lugares: mensagem de quem convida
+(`SucessoConviteModal`, 200 caracteres) e "Comentários"/description nos dois formulários de
+evento. `EventoClient.tsx` e `EventPreviewCard.tsx` (preview ao vivo em `/criar`) atualizados pra
+renderizar a marcação — `description` é fallback visual de `heroMensagem` no mesmo bloco, tinham
+que ficar consistentes (senão um mostra formatação, o outro mostra `**asteriscos**` cru). De
+carona, `EventPreviewCard` ganhou o mesmo laranja `#ff6600` nos links Local/externo que a LP já
+tinha (tinha ficado pra trás no ajuste da 9ª parte).
+
+
 ## Sessão 2026-10-03 (9ª parte) — ajustes visuais na LP + editor mínimo
 
 LP do evento (`app/e/[slug]/EventoClient.tsx`): link "Local" e link externo/personalizado
