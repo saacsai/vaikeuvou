@@ -166,7 +166,7 @@ export default function EventoClient({ evento, rsvps, parentRsvpId, criador, con
 
   return (
     <div className="min-h-screen flex flex-col items-center" style={{ backgroundColor: header.bg }}>
-      <div className="relative w-full max-w-lg bg-white sm:my-8 sm:rounded-lg sm:shadow-xl overflow-hidden">
+      <div className="relative w-full max-w-lg md:max-w-xl lg:max-w-2xl bg-white sm:my-8 sm:rounded-lg sm:shadow-xl overflow-hidden">
 
         {isPast && (
           <div className="absolute inset-0 z-10 bg-white/90 backdrop-blur-[2px] flex items-center justify-center p-8">
