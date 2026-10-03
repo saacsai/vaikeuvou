@@ -14,6 +14,8 @@ export async function POST(req: NextRequest) {
     video_url, external_url, external_url_label, cidade,
     valor, descricao_pacote, programacao, max_parcelas, divulgar_blog,
     vagas_minimas, vagas_maximas, data_viabilizacao,
+    organizador_nome, organizador_descricao, organizador_endereco,
+    organizador_contato, organizador_horario, organizador_link,
   } = await req.json()
 
   if (!title || !event_date) {
@@ -59,6 +61,12 @@ export async function POST(req: NextRequest) {
   // (max_depth 999) — ignora silenciosamente se vier true sem isso.
   const divulgarBlogFinal = (max_depth ?? 2) === 999 ? !!divulgar_blog : false
 
+  // #VamoAí? credita quem organiza no post — sem isso não tem como escrever
+  // a seção "Quem está organizando?" (ver PERFIL_CRIADOR.md).
+  if (divulgarBlogFinal && !organizador_nome?.trim()) {
+    return NextResponse.json({ error: 'Preencha o nome do organizador pra divulgar no blog.' }, { status: 400 })
+  }
+
   const { data, error } = await sb
     .from('events')
     .insert({
@@ -84,6 +92,12 @@ export async function POST(req: NextRequest) {
       vagas_minimas:        vagas_minimas || null,
       vagas_maximas:        vagas_maximas || null,
       data_viabilizacao:    data_viabilizacao || null,
+      organizador_nome:       organizador_nome || null,
+      organizador_descricao:  organizador_descricao || null,
+      organizador_endereco:   organizador_endereco || null,
+      organizador_contato:    organizador_contato || null,
+      organizador_horario:    organizador_horario || null,
+      organizador_link:       organizador_link || null,
       creator_phone: phone,
       user_id:       session.user_id,
     })
@@ -101,7 +115,11 @@ export async function POST(req: NextRequest) {
     await sb.from('blog_briefs').insert({
       tipo: 'VamoAi',
       titulo: title,
-      ideias_centrais: composeVamoAiBrief({ event_date, location, description, cidade, valor, slug: data.slug }),
+      ideias_centrais: composeVamoAiBrief({
+        event_date, location, description, cidade, valor, slug: data.slug,
+        organizador_nome, organizador_descricao, organizador_endereco,
+        organizador_contato, organizador_horario, organizador_link,
+      }),
       status: 'pendente',
       event_id: data.id,
     })

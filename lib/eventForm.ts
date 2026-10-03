@@ -20,6 +20,12 @@ export type EventFormFields = {
   vagas_minimas: number | ''
   vagas_maximas: number | ''
   data_viabilizacao: string
+  organizador_nome: string
+  organizador_descricao: string
+  organizador_endereco: string
+  organizador_contato: string
+  organizador_horario: string
+  organizador_link: string
 }
 
 export const DURACAO_OPCOES = [

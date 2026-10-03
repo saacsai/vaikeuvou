@@ -9,6 +9,12 @@ export function composeVamoAiBrief(evento: {
   cidade: string | null
   valor: number | null
   slug: string
+  organizador_nome?: string | null
+  organizador_descricao?: string | null
+  organizador_endereco?: string | null
+  organizador_contato?: string | null
+  organizador_horario?: string | null
+  organizador_link?: string | null
 }): string {
   const partes: string[] = []
 
@@ -21,6 +27,18 @@ export function composeVamoAiBrief(evento: {
   if (evento.location) partes.push(`Local: ${evento.location}`)
   if (evento.valor) partes.push(`Valor: R$ ${evento.valor}`)
   if (evento.description) partes.push(`Descrição do organizador: ${evento.description}`)
+
+  // Seção "Quem está organizando?" do post #VamoAí? depende disso — sem
+  // esse dado o post fica sem crédito de quem organiza (ver PERFIL_CRIADOR.md).
+  if (evento.organizador_nome) {
+    partes.push(`Organizador: ${evento.organizador_nome}`)
+    if (evento.organizador_descricao) partes.push(`Sobre o organizador: ${evento.organizador_descricao}`)
+    if (evento.organizador_endereco) partes.push(`Endereço/base do organizador: ${evento.organizador_endereco}`)
+    if (evento.organizador_contato) partes.push(`Contato do organizador: ${evento.organizador_contato}`)
+    if (evento.organizador_horario) partes.push(`Horário de funcionamento: ${evento.organizador_horario}`)
+    if (evento.organizador_link) partes.push(`Site do organizador: ${evento.organizador_link}`)
+  }
+
   partes.push(`Link do evento: https://live.vaikeuvou.app/e/${evento.slug}`)
 
   return partes.join('\n')

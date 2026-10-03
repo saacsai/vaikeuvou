@@ -48,6 +48,12 @@ export type Event = {
   data_viabilizacao: string | null
   viabilizacao_confirmada_em: string | null
   cancelado_em: string | null
+  organizador_nome: string | null
+  organizador_descricao: string | null
+  organizador_endereco: string | null
+  organizador_contato: string | null
+  organizador_horario: string | null
+  organizador_link: string | null
 }
 
 export type BlogBriefTipo = 'VaikeuFui' | 'Tendeu' | 'ProntoFalei' | 'VamoAi' | 'Revisar' | 'SouFa'

@@ -90,6 +90,12 @@ function toForm(evento: Event): EventFormFields {
     vagas_minimas: evento.vagas_minimas ?? '',
     vagas_maximas: evento.vagas_maximas ?? '',
     data_viabilizacao: evento.data_viabilizacao ?? '',
+    organizador_nome: evento.organizador_nome ?? '',
+    organizador_descricao: evento.organizador_descricao ?? '',
+    organizador_endereco: evento.organizador_endereco ?? '',
+    organizador_contato: evento.organizador_contato ?? '',
+    organizador_horario: evento.organizador_horario ?? '',
+    organizador_link: evento.organizador_link ?? '',
   }
 }
 
@@ -632,6 +638,63 @@ export default function DashboardClient({ evento, rsvps, isNovo, userName, userA
                     {' '}Vira matéria no blog (tag #VamoAí?) — a equipe vaikeuvou revisa antes de publicar.
                   </span>
                 </label>
+              )}
+              {form.max_depth === 999 && form.divulgar_blog && (
+                <div className="mt-3 space-y-3 bg-gray-50 rounded-xl p-4">
+                  <p className="text-xs font-bold text-gray-700">Quem está organizando? *</p>
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Nome do organizador/empresa</label>
+                    <input
+                      value={form.organizador_nome}
+                      onChange={e => set('organizador_nome', e.target.value)}
+                      className="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 outline-none focus:border-brand text-sm"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Sobre o organizador</label>
+                    <textarea
+                      value={form.organizador_descricao}
+                      onChange={e => set('organizador_descricao', e.target.value)}
+                      rows={2}
+                      className="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 outline-none focus:border-brand text-sm resize-none"
+                    />
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Endereço/base</label>
+                      <input
+                        value={form.organizador_endereco}
+                        onChange={e => set('organizador_endereco', e.target.value)}
+                        className="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 outline-none focus:border-brand text-sm"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Contato/WhatsApp</label>
+                      <input
+                        value={form.organizador_contato}
+                        onChange={e => set('organizador_contato', e.target.value)}
+                        className="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 outline-none focus:border-brand text-sm"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Horário de funcionamento</label>
+                      <input
+                        value={form.organizador_horario}
+                        onChange={e => set('organizador_horario', e.target.value)}
+                        className="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 outline-none focus:border-brand text-sm"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Site</label>
+                      <input
+                        value={form.organizador_link}
+                        onChange={e => set('organizador_link', e.target.value)}
+                        type="url"
+                        className="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 outline-none focus:border-brand text-sm"
+                      />
+                    </div>
+                  </div>
+                </div>
               )}
             </div>
 

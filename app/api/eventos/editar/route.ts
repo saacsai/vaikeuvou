@@ -11,7 +11,7 @@ export async function PATCH(req: NextRequest) {
   const { edit_token, ...fields } = await req.json()
   if (!edit_token) return NextResponse.json({ error: 'edit_token obrigatório' }, { status: 400 })
 
-  const allowed = ['external_url', 'external_url_label', 'video_url', 'title', 'location', 'description', 'event_date', 'event_date_fim', 'duration_minutes', 'bg_image_url', 'max_depth', 'cidade', 'valor', 'descricao_pacote', 'programacao', 'max_parcelas', 'vagas_minimas', 'vagas_maximas', 'data_viabilizacao']
+  const allowed = ['external_url', 'external_url_label', 'video_url', 'title', 'location', 'description', 'event_date', 'event_date_fim', 'duration_minutes', 'bg_image_url', 'max_depth', 'cidade', 'valor', 'descricao_pacote', 'programacao', 'max_parcelas', 'vagas_minimas', 'vagas_maximas', 'data_viabilizacao', 'organizador_nome', 'organizador_descricao', 'organizador_endereco', 'organizador_contato', 'organizador_horario', 'organizador_link']
   const updates: Record<string, unknown> = {}
   for (const key of allowed) {
     if (key in fields) updates[key] = fields[key] || null
@@ -25,14 +25,24 @@ export async function PATCH(req: NextRequest) {
 
   // Busca o evento atual sempre que algum dado dele for necessário pra decidir
   // a atualização: contagem de troca de data e/ou entrada na fila editorial.
-  let evento: { id: string; event_date: string; date_changes_count: number; location: string | null; description: string | null; cidade: string | null; valor: number | null; slug: string; title: string; divulgar_blog: boolean } | null = null
+  let evento: { id: string; event_date: string; date_changes_count: number; location: string | null; description: string | null; cidade: string | null; valor: number | null; slug: string; title: string; divulgar_blog: boolean; organizador_nome: string | null; organizador_descricao: string | null; organizador_endereco: string | null; organizador_contato: string | null; organizador_horario: string | null; organizador_link: string | null } | null = null
   if ('event_date' in updates || 'divulgar_blog' in updates) {
     const { data } = await sb
       .from('events')
-      .select('id, event_date, date_changes_count, location, description, cidade, valor, slug, title, divulgar_blog')
+      .select('id, event_date, date_changes_count, location, description, cidade, valor, slug, title, divulgar_blog, organizador_nome, organizador_descricao, organizador_endereco, organizador_contato, organizador_horario, organizador_link')
       .eq('edit_token', edit_token)
       .single()
     evento = data
+  }
+
+  // #VamoAí? precisa do nome do organizador pra creditar no post — se está
+  // ativando divulgação agora e nem o dado novo nem o já salvo tem isso,
+  // bloqueia (mesma regra de /api/eventos na criação).
+  if (updates.divulgar_blog === true) {
+    const nomeOrganizador = (updates.organizador_nome as string | null) ?? evento?.organizador_nome
+    if (!nomeOrganizador?.trim()) {
+      return NextResponse.json({ error: 'Preencha o nome do organizador pra divulgar no blog.' }, { status: 400 })
+    }
   }
 
   // Troca de data é livre, sem limite — só registramos a contagem por
@@ -62,6 +72,12 @@ export async function PATCH(req: NextRequest) {
         cidade: (updates.cidade as string | null) ?? evento.cidade,
         valor: (updates.valor as number | null) ?? evento.valor,
         slug: evento.slug,
+        organizador_nome: (updates.organizador_nome as string | null) ?? evento.organizador_nome,
+        organizador_descricao: (updates.organizador_descricao as string | null) ?? evento.organizador_descricao,
+        organizador_endereco: (updates.organizador_endereco as string | null) ?? evento.organizador_endereco,
+        organizador_contato: (updates.organizador_contato as string | null) ?? evento.organizador_contato,
+        organizador_horario: (updates.organizador_horario as string | null) ?? evento.organizador_horario,
+        organizador_link: (updates.organizador_link as string | null) ?? evento.organizador_link,
       }),
       status: 'pendente',
       event_id: evento.id,
