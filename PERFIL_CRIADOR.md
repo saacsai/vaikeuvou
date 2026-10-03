@@ -79,15 +79,26 @@ primeiro #VamoAí? de verdade do blog, 2026-10) — seguir essa estrutura exata 
    **Isso substitui a regra antiga de link de texto puro** — manter sempre o widget daqui pra
    frente, não regredir pra link simples.
 
-   **Exceção — evento com checkout externo** (`external_url` preenchido no evento, ver sessão de
-   brainstorming 2026-10-03 sobre parceiros com pagamento próprio): o widget embedado confirma
-   presença NO vaikeuvou, mas não compra o ingresso de verdade — usar o widget aí seria enganoso
-   (RSVP grátis não é a mesma coisa que garantir vaga num evento pago por fora). Nesse caso, CTA
-   vira **link de texto simples** pra página do evento (que já mostra o botão de compra externa
-   com destaque) — testado no post 290 (Show do Deep Purple, ingresso via Viagogo).
-   Se a pergunta de pré-requisito (item 4) também não fizer sentido pro tipo de evento, adaptar
-   pra "Onde comprar o ingresso?" — além de responder a dúvida real, ainda vira entrada do
-   FAQPage automático.
+   **Vale até pra evento com checkout externo** (`external_url` preenchido, ingresso comprado por
+   fora) — cheguei a achar que nesse caso o widget seria enganoso (RSVP no vaikeuvou não é a
+   mesma coisa que garantir o ingresso) e documentei uma exceção pra link de texto simples, mas o
+   Luciano corrigiu isso de volta pro widget no post 290 (Show do Deep Purple, ingresso via
+   Viagogo) — **regra fechada: widget é sempre o CTA, mesmo com checkout externo**. A confirmação
+   no vaikeuvou tem valor próprio (social, "quem vai"), independente de onde o ingresso é
+   comprado. Se a pergunta de pré-requisito (item 4) não fizer sentido pro tipo de evento, ainda
+   vale adaptar pro que for mais útil (ex: "Onde comprar o ingresso?" num show) — isso sim o
+   Luciano manteve como fiz.
+
+   **Lição real (post 290)**: `vkv_event_date`/`event_date` do evento vem em UTC — escrevi
+   "06/12" no título e no corpo lendo os dígitos crus do ISO (`2026-12-06T00:00:00+00:00`), mas
+   convertido pra America/Sao_Paulo esse mesmo instante é **05/12 às 21h** (a virada de meia-noite
+   UTC cai do lado errado da data em horário de Brasília). Luciano corrigiu na mão. **Nunca ler
+   a data de um evento direto do ISO — sempre converter pro fuso de exibição antes de escrever
+   título/corpo do post** (mesmo cuidado que `parseEventDate()` em `DashboardClient.tsx` já tem
+   pra isso — usar o mesmo padrão: `Intl.DateTimeFormat` com `timeZone: 'America/Sao_Paulo'`).
+   Detalhe também bom de replicar: ele acrescentou horário de abertura dos portões + previsão de
+   início (ex: "abertura às 19h, início às 21h") — vale perguntar/pesquisar esse dado quando
+   disponível, dá mais corpo pro "O que é o show/passeio".
 
 ### `#VaikeuFui` — resenhas em primeira pessoa
 - Só lugares onde a gente foi e gostou. **Regra fixa: nunca publicar review negativa** — os
