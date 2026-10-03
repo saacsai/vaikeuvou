@@ -19,6 +19,8 @@ const PRIVACIDADE = [
   { value: 999, label: 'Aberto',           desc: 'Viralização ilimitada' },
 ]
 
+const ETAPAS = ['Básico', 'Preço', 'Vagas', 'Capa', 'Revisão']
+
 type Form = EventFormFields
 
 type Props = {
@@ -46,6 +48,7 @@ export default function CriarClient({ userName, userAvatar, userBio, userInstagr
   const [multiDia, setMultiDia] = useState(false)
   const [saving, setSaving] = useState(false)
   const [erro,   setErro]   = useState('')
+  const [etapa,  setEtapa]  = useState(1)
 
   // Assinatura do convite — só pergunta o que ainda não está no perfil,
   // pra não obrigar a pessoa a sair daqui e ir preencher /perfil antes
@@ -77,38 +80,60 @@ export default function CriarClient({ userName, userAvatar, userBio, userInstagr
     set('bg_image_url', previewUrl)
   }
 
+  // Validação é por etapa — cada "Continuar" só checa o que pertence àquela
+  // etapa, pra não despejar erro de campo que a pessoa ainda nem viu.
+  function validarEtapa(n: number): string | null {
+    if (n === 1) {
+      if (!form.title || !form.event_date || (multiDia ? !form.event_date_fim : !form.event_time)) {
+        return multiDia ? 'Preencha o título, a data de início e a data de término.' : 'Preencha pelo menos o título, a data e o horário.'
+      }
+      if (multiDia && form.event_date_fim < form.event_date) {
+        return 'A data de término precisa ser igual ou depois da data de início.'
+      }
+    }
+    if (n === 3) {
+      // Quórum (mín/máx de pessoas) é obrigatório — exceto quando o checkout é
+      // externo, porque aí quem controla viabilização é o organizador, fora do
+      // nosso alcance (decisão da sessão de brainstorming 2026-10-03).
+      if (!form.external_url) {
+        if (!form.vagas_minimas || !form.vagas_maximas || !form.data_viabilizacao) {
+          return 'Preencha vagas mínimas, máximas e a data de viabilização do evento.'
+        }
+        if (Number(form.vagas_minimas) > Number(form.vagas_maximas)) {
+          return 'O mínimo de vagas não pode ser maior que o máximo.'
+        }
+        if (form.data_viabilizacao >= form.event_date) {
+          return 'A data de viabilização precisa ser antes da data do evento.'
+        }
+      }
+      if (form.divulgar_blog && !form.organizador_nome.trim()) {
+        return 'Preencha ao menos o nome do organizador pra divulgar no blog.'
+      }
+    }
+    return null
+  }
+
+  function continuar() {
+    const msg = validarEtapa(etapa)
+    if (msg) { setErro(msg); return }
+    setErro('')
+    setEtapa(e => Math.min(e + 1, ETAPAS.length))
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
+  function voltar() {
+    setErro('')
+    setEtapa(e => Math.max(e - 1, 1))
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
   async function criar() {
-    if (!form.title || !form.event_date || (multiDia ? !form.event_date_fim : !form.event_time)) {
-      setErro(multiDia ? 'Preencha o título, a data de início e a data de término.' : 'Preencha pelo menos o título, a data e o horário.')
-      return
-    }
-
-    if (multiDia && form.event_date_fim < form.event_date) {
-      setErro('A data de término precisa ser igual ou depois da data de início.')
-      return
-    }
-
-    // Quórum (mín/máx de pessoas) é obrigatório — exceto quando o checkout é
-    // externo, porque aí quem controla viabilização é o organizador, fora do
-    // nosso alcance (decisão da sessão de brainstorming 2026-10-03).
-    if (!form.external_url) {
-      if (!form.vagas_minimas || !form.vagas_maximas || !form.data_viabilizacao) {
-        setErro('Preencha vagas mínimas, máximas e a data de viabilização do evento.')
-        return
-      }
-      if (Number(form.vagas_minimas) > Number(form.vagas_maximas)) {
-        setErro('O mínimo de vagas não pode ser maior que o máximo.')
-        return
-      }
-      if (form.data_viabilizacao >= form.event_date) {
-        setErro('A data de viabilização precisa ser antes da data do evento.')
-        return
-      }
-    }
-
-    if (form.divulgar_blog && !form.organizador_nome.trim()) {
-      setErro('Preencha ao menos o nome do organizador pra divulgar no blog.')
-      return
+    // Revalida tudo na etapa final, não só a etapa 5 — garante que nada
+    // escapou (ex: pessoa editou um campo de uma etapa anterior usando o
+    // histórico do navegador).
+    for (let n = 1; n <= ETAPAS.length; n++) {
+      const msg = validarEtapa(n)
+      if (msg) { setErro(msg); setEtapa(n); return }
     }
 
     if (!termsAccepted && !aceitouTermos) {
@@ -170,7 +195,7 @@ export default function CriarClient({ userName, userAvatar, userBio, userInstagr
 
   return (
     <div className="min-h-screen bg-white text-gray-900 flex flex-col">
-      <div className="flex-1 max-w-5xl w-full mx-auto px-4 py-8">
+      <div className="flex-1 max-w-xl w-full mx-auto px-4 py-8">
 
         <div className="flex flex-col md:flex-row md:items-center gap-x-2 gap-y-1 mb-8">
           <div className="flex items-center justify-between md:contents">
@@ -194,245 +219,253 @@ export default function CriarClient({ userName, userAvatar, userBio, userInstagr
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
-
-          {/* Formulário — mesma ordem do card real */}
-          <div className="space-y-5">
-
-            <div>
-              <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Nome do evento *</label>
-              <input
-                value={form.title}
-                onChange={e => set('title', e.target.value)}
-                placeholder="Ex: Churrasco de Sábado"
-                autoFocus
-                className="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 outline-none focus:border-brand text-base"
-              />
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div className="min-w-0">
-                <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">{multiDia ? 'Data de início *' : 'Data *'}</label>
-                <DatePicker value={form.event_date} onChange={v => set('event_date', v)} />
-              </div>
-              {multiDia ? (
-                <div className="min-w-0">
-                  <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Data de término *</label>
-                  <DatePicker value={form.event_date_fim} onChange={v => set('event_date_fim', v)} />
+        {/* Indicador de etapa */}
+        <div className="flex items-center justify-center gap-2 mb-2">
+          {ETAPAS.map((_, i) => {
+            const n = i + 1
+            return (
+              <div key={n} className="flex items-center">
+                <div
+                  className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold ${
+                    n === etapa ? 'bg-brand text-white' : n < etapa ? 'bg-brand/15 text-brand' : 'bg-gray-100 text-gray-400'
+                  }`}
+                >
+                  {n < etapa ? '✓' : n}
                 </div>
-              ) : (
+                {i < ETAPAS.length - 1 && <div className={`w-5 h-px ${n < etapa ? 'bg-brand/30' : 'bg-gray-200'}`} />}
+              </div>
+            )
+          })}
+        </div>
+        <p className="text-center text-xs font-bold text-gray-400 uppercase tracking-wide mb-8">
+          Passo {etapa} de {ETAPAS.length} — {ETAPAS[etapa - 1]}
+        </p>
+
+        <div className="space-y-5">
+
+          {etapa === 1 && (
+            <>
+              <div>
+                <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Nome do evento *</label>
+                <input
+                  value={form.title}
+                  onChange={e => set('title', e.target.value)}
+                  placeholder="Ex: Churrasco de Sábado"
+                  autoFocus
+                  className="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 outline-none focus:border-brand text-base"
+                />
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div className="min-w-0">
-                  <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Horário *</label>
-                  <TimePicker value={form.event_time} onChange={v => set('event_time', v)} />
+                  <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">{multiDia ? 'Data de início *' : 'Data *'}</label>
+                  <DatePicker value={form.event_date} onChange={v => set('event_date', v)} />
+                </div>
+                {multiDia ? (
+                  <div className="min-w-0">
+                    <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Data de término *</label>
+                    <DatePicker value={form.event_date_fim} onChange={v => set('event_date_fim', v)} />
+                  </div>
+                ) : (
+                  <div className="min-w-0">
+                    <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Horário *</label>
+                    <TimePicker value={form.event_time} onChange={v => set('event_time', v)} />
+                  </div>
+                )}
+              </div>
+
+              <label className="flex items-center gap-2 text-xs text-gray-500 -mt-2">
+                <input
+                  type="checkbox"
+                  checked={multiDia}
+                  onChange={e => {
+                    const v = e.target.checked
+                    setMultiDia(v)
+                    if (!v) set('event_date_fim', '')
+                  }}
+                  className="rounded border-gray-300 text-brand focus:ring-brand"
+                />
+                Evento com mais de um dia (pacote/viagem)
+              </label>
+
+              {!multiDia && (
+                <div>
+                  <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Duração</label>
+                  <select
+                    value={form.duration_minutes}
+                    onChange={e => set('duration_minutes', e.target.value ? Number(e.target.value) : '')}
+                    className="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-gray-900 outline-none focus:border-brand text-sm"
+                  >
+                    <option value="">Não informar</option>
+                    {DURACAO_OPCOES.map((o, i) => (
+                      <option key={i} value={o.value}>{o.label}</option>
+                    ))}
+                  </select>
                 </div>
               )}
-            </div>
 
-            <label className="flex items-center gap-2 text-xs text-gray-500 -mt-2">
-              <input
-                type="checkbox"
-                checked={multiDia}
-                onChange={e => {
-                  const v = e.target.checked
-                  setMultiDia(v)
-                  if (!v) set('event_date_fim', '')
-                }}
-                className="rounded border-gray-300 text-brand focus:ring-brand"
-              />
-              Evento com mais de um dia (pacote/viagem)
-            </label>
-
-            {!multiDia && (
               <div>
-                <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Duração</label>
-                <select
-                  value={form.duration_minutes}
-                  onChange={e => set('duration_minutes', e.target.value ? Number(e.target.value) : '')}
-                  className="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-gray-900 outline-none focus:border-brand text-sm"
-                >
-                  <option value="">Não informar</option>
-                  {DURACAO_OPCOES.map((o, i) => (
-                    <option key={i} value={o.value}>{o.label}</option>
-                  ))}
-                </select>
-              </div>
-            )}
-
-            <div>
-              <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Local</label>
-              <input
-                value={form.location}
-                onChange={e => set('location', e.target.value)}
-                placeholder="Endereço ou nome do lugar"
-                className="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 outline-none focus:border-brand text-sm"
-              />
-            </div>
-
-            <div>
-              <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Cidade (opcional)</label>
-              <input
-                value={form.cidade}
-                onChange={e => set('cidade', e.target.value)}
-                placeholder="Só pra eventos ligados a um QG/destino turístico"
-                className="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 outline-none focus:border-brand text-sm"
-              />
-            </div>
-
-            <div>
-              <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Valor por pessoa (opcional)</label>
-              <input
-                value={form.valor}
-                onChange={e => set('valor', e.target.value ? Number(e.target.value) : '')}
-                placeholder="Deixe em branco pra evento grátis"
-                type="number" min={0} step="0.01"
-                className="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 outline-none focus:border-brand text-sm"
-              />
-              <p className="text-[10px] text-gray-400 mt-0.5">Com valor definido, confirmar presença (BORA) exige pagamento — é rateio ou ticket, não só RSVP.</p>
-            </div>
-
-            {!!form.valor && (
-              <>
-                <div>
-                  <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Parcelamento em até</label>
-                  <input
-                    value={form.max_parcelas}
-                    onChange={e => set('max_parcelas', Number(e.target.value))}
-                    type="number" min={1} max={12} step="1"
-                    className="w-32 bg-white border border-gray-300 rounded-xl px-4 py-3 text-gray-900 outline-none focus:border-brand text-sm"
-                  />
-                  <p className="text-[10px] text-gray-400 mt-0.5">Padrão 3x — usado no destaque de preço no evento.</p>
-                </div>
-
-                <div>
-                  <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">O que está incluso (opcional)</label>
-                  <MiniEditor
-                    value={form.descricao_pacote}
-                    onChange={v => set('descricao_pacote', v)}
-                    placeholder="Ex: churrasco completo + bebida, ida e volta de barco, welcome drink..."
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Programação detalhada (opcional)</label>
-                  <MiniEditor
-                    value={form.programacao}
-                    onChange={v => set('programacao', v)}
-                    placeholder="Ex: 9h chegada, 10h saída do barco, 13h almoço, 17h volta..."
-                  />
-                </div>
-              </>
-            )}
-
-            {/* Link externo */}
-            <div>
-              <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Link externo</label>
-              <input
-                value={form.external_url}
-                onChange={e => set('external_url', e.target.value)}
-                placeholder="https://...(ingresso, mais informações, etc...)"
-                type="url"
-                className="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 outline-none focus:border-brand text-sm"
-              />
-            </div>
-
-            {form.external_url && (
-              <div>
-                <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Texto do botão</label>
+                <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Local</label>
                 <input
-                  value={form.external_url_label}
-                  onChange={e => set('external_url_label', e.target.value)}
-                  placeholder="Ex: Comprar ingresso 🎟️"
+                  value={form.location}
+                  onChange={e => set('location', e.target.value)}
+                  placeholder="Endereço ou nome do lugar"
                   className="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 outline-none focus:border-brand text-sm"
                 />
               </div>
-            )}
 
-            {/* Quórum — obrigatório pra viabilização, exceto checkout externo
-                (aí quem controla isso é o organizador, fora do vaikeuvou). */}
-            {form.external_url ? (
-              <p className="text-[11px] text-gray-400 bg-gray-50 rounded-xl px-4 py-3">
-                Com link externo, vagas mínimas/máximas e a decisão de viabilizar o evento ficam
-                por conta do seu próprio sistema de checkout.
-              </p>
-            ) : (
-              <div className="space-y-3 bg-gray-50 rounded-xl p-4">
-                <p className="text-xs font-bold text-gray-700">Quórum do evento *</p>
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Vagas mínimas</label>
-                    <input
-                      value={form.vagas_minimas}
-                      onChange={e => set('vagas_minimas', e.target.value ? Number(e.target.value) : '')}
-                      placeholder="Ex: 10"
-                      type="number" min={1} step="1"
-                      className="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 outline-none focus:border-brand text-sm"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Vagas máximas</label>
-                    <input
-                      value={form.vagas_maximas}
-                      onChange={e => set('vagas_maximas', e.target.value ? Number(e.target.value) : '')}
-                      placeholder="Ex: 30"
-                      type="number" min={1} step="1"
-                      className="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 outline-none focus:border-brand text-sm"
-                    />
-                  </div>
-                </div>
-                <div>
-                  <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Data limite pra decidir se o evento vai acontecer</label>
-                  <DatePicker value={form.data_viabilizacao} onChange={v => set('data_viabilizacao', v)} />
-                  <p className="text-[10px] text-gray-400 mt-1">
-                    Precisa ser antes da data do evento. Até lá, você decide se bateu gente
-                    suficiente pra valer a pena — o botão de confirmar fica liberado assim que
-                    atingir o mínimo, não precisa esperar essa data se já bateu antes.
-                  </p>
-                </div>
-              </div>
-            )}
-
-            {/* Assinatura — só pergunta o que falta no perfil */}
-            {!avatarUrl && (
               <div>
-                <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Sua foto</label>
-                <AvatarCropUpload
-                  avatar={avatarUrl}
-                  onUploaded={setAvatarUrl}
-                  fallbackInitials={initials}
+                <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Cidade (opcional)</label>
+                <input
+                  value={form.cidade}
+                  onChange={e => set('cidade', e.target.value)}
+                  placeholder="Só pra eventos ligados a um QG/destino turístico"
+                  className="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 outline-none focus:border-brand text-sm"
                 />
-                <p className="text-[10px] text-gray-400 mt-1 text-center">Aparece na assinatura do seu evento — sem ela fica sem graça.</p>
               </div>
-            )}
 
-            <div>
-              <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Comentários</label>
-              <MiniEditor
-                value={form.description}
-                onChange={v => set('description', v)}
-                placeholder="Personalize a mensagem com um convite especial para quem está recebendo."
-              />
-            </div>
-
-            <div>
-              <label className="block text-xs font-semibold text-gray-500 mb-2 uppercase tracking-wide">Quem pode convidar?</label>
-              <div className="grid grid-cols-3 gap-2">
-                {PRIVACIDADE.map(p => (
-                  <button
-                    key={p.value}
-                    onClick={() => set('max_depth', p.value)}
-                    className={`rounded-xl p-3 text-left border transition-colors ${
-                      form.max_depth === p.value
-                        ? 'border-brand bg-brand/5'
-                        : 'border-gray-200 bg-white hover:border-gray-300'
-                    }`}
-                  >
-                    <p className="text-xs font-bold text-gray-900">{p.label}</p>
-                    <p className="text-[10px] text-gray-400 mt-0.5">{p.desc}</p>
-                  </button>
-                ))}
+              <div>
+                <label className="block text-xs font-semibold text-gray-500 mb-2 uppercase tracking-wide">Quem pode convidar?</label>
+                <div className="grid grid-cols-3 gap-2">
+                  {PRIVACIDADE.map(p => (
+                    <button
+                      key={p.value}
+                      onClick={() => set('max_depth', p.value)}
+                      className={`rounded-xl p-3 text-left border transition-colors ${
+                        form.max_depth === p.value
+                          ? 'border-brand bg-brand/5'
+                          : 'border-gray-200 bg-white hover:border-gray-300'
+                      }`}
+                    >
+                      <p className="text-xs font-bold text-gray-900">{p.label}</p>
+                      <p className="text-[10px] text-gray-400 mt-0.5">{p.desc}</p>
+                    </button>
+                  ))}
+                </div>
               </div>
+            </>
+          )}
+
+          {etapa === 2 && (
+            <>
+              <div>
+                <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Valor por pessoa (opcional)</label>
+                <input
+                  value={form.valor}
+                  onChange={e => set('valor', e.target.value ? Number(e.target.value) : '')}
+                  placeholder="Deixe em branco pra evento grátis"
+                  type="number" min={0} step="0.01"
+                  className="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 outline-none focus:border-brand text-sm"
+                />
+                <p className="text-[10px] text-gray-400 mt-0.5">Com valor definido, confirmar presença (BORA) exige pagamento — é rateio ou ticket, não só RSVP.</p>
+              </div>
+
+              {!!form.valor && (
+                <>
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Parcelamento em até</label>
+                    <input
+                      value={form.max_parcelas}
+                      onChange={e => set('max_parcelas', Number(e.target.value))}
+                      type="number" min={1} max={12} step="1"
+                      className="w-32 bg-white border border-gray-300 rounded-xl px-4 py-3 text-gray-900 outline-none focus:border-brand text-sm"
+                    />
+                    <p className="text-[10px] text-gray-400 mt-0.5">Padrão 3x — usado no destaque de preço no evento.</p>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">O que está incluso (opcional)</label>
+                    <MiniEditor
+                      value={form.descricao_pacote}
+                      onChange={v => set('descricao_pacote', v)}
+                      placeholder="Ex: churrasco completo + bebida, ida e volta de barco, welcome drink..."
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Programação detalhada (opcional)</label>
+                    <MiniEditor
+                      value={form.programacao}
+                      onChange={v => set('programacao', v)}
+                      placeholder="Ex: 9h chegada, 10h saída do barco, 13h almoço, 17h volta..."
+                    />
+                  </div>
+                </>
+              )}
+            </>
+          )}
+
+          {etapa === 3 && (
+            <>
+              <div>
+                <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Link externo</label>
+                <input
+                  value={form.external_url}
+                  onChange={e => set('external_url', e.target.value)}
+                  placeholder="https://...(ingresso, mais informações, etc...)"
+                  type="url"
+                  className="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 outline-none focus:border-brand text-sm"
+                />
+              </div>
+
+              {form.external_url && (
+                <div>
+                  <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Texto do botão</label>
+                  <input
+                    value={form.external_url_label}
+                    onChange={e => set('external_url_label', e.target.value)}
+                    placeholder="Ex: Comprar ingresso 🎟️"
+                    className="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 outline-none focus:border-brand text-sm"
+                  />
+                </div>
+              )}
+
+              {/* Quórum — obrigatório pra viabilização, exceto checkout externo
+                  (aí quem controla isso é o organizador, fora do vaikeuvou). */}
+              {form.external_url ? (
+                <p className="text-[11px] text-gray-400 bg-gray-50 rounded-xl px-4 py-3">
+                  Com link externo, vagas mínimas/máximas e a decisão de viabilizar o evento ficam
+                  por conta do seu próprio sistema de checkout.
+                </p>
+              ) : (
+                <div className="space-y-3 bg-gray-50 rounded-xl p-4">
+                  <p className="text-xs font-bold text-gray-700">Quórum do evento *</p>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Vagas mínimas</label>
+                      <input
+                        value={form.vagas_minimas}
+                        onChange={e => set('vagas_minimas', e.target.value ? Number(e.target.value) : '')}
+                        placeholder="Ex: 10"
+                        type="number" min={1} step="1"
+                        className="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 outline-none focus:border-brand text-sm"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Vagas máximas</label>
+                      <input
+                        value={form.vagas_maximas}
+                        onChange={e => set('vagas_maximas', e.target.value ? Number(e.target.value) : '')}
+                        placeholder="Ex: 30"
+                        type="number" min={1} step="1"
+                        className="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 outline-none focus:border-brand text-sm"
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Data limite pra decidir se o evento vai acontecer</label>
+                    <DatePicker value={form.data_viabilizacao} onChange={v => set('data_viabilizacao', v)} />
+                    <p className="text-[10px] text-gray-400 mt-1">
+                      Precisa ser antes da data do evento. Até lá, você decide se bateu gente
+                      suficiente pra valer a pena — o botão de confirmar fica liberado assim que
+                      atingir o mínimo, não precisa esperar essa data se já bateu antes.
+                    </p>
+                  </div>
+                </div>
+              )}
+
               {form.max_depth === 999 && (
-                <label className="mt-3 flex items-start gap-2.5 rounded-xl border border-gray-200 bg-gray-50 p-3 cursor-pointer">
+                <label className="flex items-start gap-2.5 rounded-xl border border-gray-200 bg-gray-50 p-3 cursor-pointer">
                   <input
                     type="checkbox"
                     checked={form.divulgar_blog}
@@ -446,7 +479,7 @@ export default function CriarClient({ userName, userAvatar, userBio, userInstagr
                 </label>
               )}
               {form.max_depth === 999 && form.divulgar_blog && (
-                <div className="mt-3 space-y-3 bg-gray-50 rounded-xl p-4">
+                <div className="space-y-3 bg-gray-50 rounded-xl p-4">
                   <p className="text-xs font-bold text-gray-700">Quem está organizando? *</p>
                   <p className="text-[10px] text-gray-400">
                     O post do blog credita quem organiza o evento — preenche uma vez aqui.
@@ -508,106 +541,147 @@ export default function CriarClient({ userName, userAvatar, userBio, userInstagr
                   </div>
                 </div>
               )}
-            </div>
+            </>
+          )}
 
-            {!userName && (
+          {etapa === 4 && (
+            <>
               <div>
-                <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Como quer ser chamado?</label>
-                <input
-                  value={profileName}
-                  onChange={e => setProfileName(e.target.value)}
-                  placeholder="Seu nome"
-                  className="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 outline-none focus:border-brand text-base"
+                <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Imagem de cabeçalho</label>
+                <BgSelector value={form.bg_image_url} onChange={onBgChange} title={form.title} onCropped={onHeaderImageCropped} hasAvatar={!!userAvatar} />
+              </div>
+
+              {!avatarUrl && (
+                <div>
+                  <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Sua foto</label>
+                  <AvatarCropUpload
+                    avatar={avatarUrl}
+                    onUploaded={setAvatarUrl}
+                    fallbackInitials={initials}
+                  />
+                  <p className="text-[10px] text-gray-400 mt-1 text-center">Aparece na assinatura do seu evento — sem ela fica sem graça.</p>
+                </div>
+              )}
+
+              <div>
+                <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Comentários</label>
+                <MiniEditor
+                  value={form.description}
+                  onChange={v => set('description', v)}
+                  placeholder="Personalize a mensagem com um convite especial para quem está recebendo."
                 />
               </div>
-            )}
 
-            {!userBio && (
-              <div>
-                <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Bio</label>
-                <textarea
-                  value={profileBio}
-                  onChange={e => setProfileBio(e.target.value.slice(0, 140))}
-                  placeholder="Você pode usar a mesma do Instagram"
-                  rows={2}
-                  className="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 outline-none focus:border-brand text-sm resize-none"
-                />
-                <p className="text-[10px] text-gray-400 mt-1">Aparece na assinatura do seu evento.</p>
-              </div>
-            )}
-
-            {!userInstagram && (
-              <div>
-                <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Instagram</label>
-                <div className="flex items-center bg-white border border-gray-300 rounded-xl px-4 focus-within:border-brand">
-                  <span className="text-gray-400 text-sm">@</span>
+              {!userName && (
+                <div>
+                  <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Como quer ser chamado?</label>
                   <input
-                    value={profileInstagram}
-                    onChange={e => setProfileInstagram(e.target.value)}
-                    placeholder="seu.instagram"
-                    className="w-full bg-transparent py-3 pl-1 text-gray-900 placeholder-gray-400 outline-none text-sm"
+                    value={profileName}
+                    onChange={e => setProfileName(e.target.value)}
+                    placeholder="Seu nome"
+                    className="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 outline-none focus:border-brand text-base"
                   />
                 </div>
-                <p className="text-[10px] text-gray-400 mt-1">Também aparece na assinatura do seu evento.</p>
-              </div>
-            )}
+              )}
 
-            {/* BG selector — mobile (some antes do botão, no desktop fica junto ao preview) */}
-            <div className="lg:hidden">
-              <BgSelector value={form.bg_image_url} onChange={onBgChange} title={form.title} onCropped={onHeaderImageCropped} hasAvatar={!!userAvatar} />
-            </div>
+              {!userBio && (
+                <div>
+                  <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Bio</label>
+                  <textarea
+                    value={profileBio}
+                    onChange={e => setProfileBio(e.target.value.slice(0, 140))}
+                    placeholder="Você pode usar a mesma do Instagram"
+                    rows={2}
+                    className="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 outline-none focus:border-brand text-sm resize-none"
+                  />
+                  <p className="text-[10px] text-gray-400 mt-1">Aparece na assinatura do seu evento.</p>
+                </div>
+              )}
 
-            <div>
-              <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">
-                Vídeo do evento
-              </label>
-              <input
-                value={form.video_url}
-                onChange={e => set('video_url', e.target.value)}
-                placeholder="Cole o link do vídeo do YouTube/Vimeo"
-                type="url"
-                className="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 outline-none focus:border-brand text-sm"
-              />
-              <p className="text-[10px] text-gray-400 mt-1">Aparece abaixo do botão BORA na página do evento</p>
-            </div>
+              {!userInstagram && (
+                <div>
+                  <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Instagram</label>
+                  <div className="flex items-center bg-white border border-gray-300 rounded-xl px-4 focus-within:border-brand">
+                    <span className="text-gray-400 text-sm">@</span>
+                    <input
+                      value={profileInstagram}
+                      onChange={e => setProfileInstagram(e.target.value)}
+                      placeholder="seu.instagram"
+                      className="w-full bg-transparent py-3 pl-1 text-gray-900 placeholder-gray-400 outline-none text-sm"
+                    />
+                  </div>
+                  <p className="text-[10px] text-gray-400 mt-1">Também aparece na assinatura do seu evento.</p>
+                </div>
+              )}
 
-            {!termsAccepted && (
-              <label className="flex items-start gap-1.5 text-xs text-gray-500 leading-relaxed cursor-pointer">
+              <div>
+                <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">
+                  Vídeo do evento
+                </label>
                 <input
-                  type="checkbox"
-                  checked={aceitouTermos}
-                  onChange={e => setAceitouTermos(e.target.checked)}
-                  className="mt-0.5 w-4 h-4 flex-shrink-0 accent-brand"
+                  value={form.video_url}
+                  onChange={e => set('video_url', e.target.value)}
+                  placeholder="Cole o link do vídeo do YouTube/Vimeo"
+                  type="url"
+                  className="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 outline-none focus:border-brand text-sm"
                 />
-                <span>
-                  Li e concordo com os{' '}
-                  <a href="https://vaikeuvou.app/termos-de-uso/" target="_blank" rel="noopener noreferrer" className="text-brand font-semibold hover:underline">Termos de Uso</a>
-                  {' '}e a{' '}
-                  <a href="https://vaikeuvou.app/politica-de-privacidade/" target="_blank" rel="noopener noreferrer" className="text-brand font-semibold hover:underline">Política de Privacidade</a>
-                </span>
-              </label>
-            )}
+                <p className="text-[10px] text-gray-400 mt-1">Aparece abaixo do botão BORA na página do evento</p>
+              </div>
+            </>
+          )}
 
-            {erro && <p className="text-red-500 text-sm">{erro}</p>}
-
-            <button
-              onClick={criar}
-              disabled={saving}
-              className="w-full py-4 rounded-xl bg-brand hover:bg-brand-dark disabled:opacity-50 text-white font-bold text-lg uppercase tracking-wide transition-colors"
-            >
-              {saving ? 'Criando…' : 'Criar evento'}
-            </button>
-          </div>
-
-          {/* Preview — desktop only */}
-          <div className="hidden lg:block">
-            <p className="text-xs text-gray-400 uppercase tracking-widest font-semibold mb-3 text-center">Preview</p>
-            <div className="sticky top-6 space-y-3">
+          {etapa === 5 && (
+            <>
+              <p className="text-xs text-gray-400 uppercase tracking-widest font-semibold text-center">Confira antes de criar</p>
               <EventPreviewCard form={form} userName={previewName} userAvatar={avatarUrl} userBio={previewBio} userInstagram={previewInstagram} />
-              <BgSelector value={form.bg_image_url} onChange={onBgChange} title={form.title} onCropped={onHeaderImageCropped} hasAvatar={!!userAvatar} />
-            </div>
-          </div>
 
+              {!termsAccepted && (
+                <label className="flex items-start gap-1.5 text-xs text-gray-500 leading-relaxed cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={aceitouTermos}
+                    onChange={e => setAceitouTermos(e.target.checked)}
+                    className="mt-0.5 w-4 h-4 flex-shrink-0 accent-brand"
+                  />
+                  <span>
+                    Li e concordo com os{' '}
+                    <a href="https://vaikeuvou.app/termos-de-uso/" target="_blank" rel="noopener noreferrer" className="text-brand font-semibold hover:underline">Termos de Uso</a>
+                    {' '}e a{' '}
+                    <a href="https://vaikeuvou.app/politica-de-privacidade/" target="_blank" rel="noopener noreferrer" className="text-brand font-semibold hover:underline">Política de Privacidade</a>
+                  </span>
+                </label>
+              )}
+            </>
+          )}
+
+          {erro && <p className="text-red-500 text-sm">{erro}</p>}
+
+          <div className="flex gap-3 pt-2">
+            {etapa > 1 && (
+              <button
+                onClick={voltar}
+                className="px-5 py-4 rounded-xl border border-gray-200 text-gray-600 font-bold text-sm uppercase tracking-wide hover:bg-gray-50 transition-colors"
+              >
+                Voltar
+              </button>
+            )}
+            {etapa < ETAPAS.length ? (
+              <button
+                onClick={continuar}
+                className="flex-1 py-4 rounded-xl bg-brand hover:bg-brand-dark text-white font-bold text-lg uppercase tracking-wide transition-colors"
+              >
+                Continuar
+              </button>
+            ) : (
+              <button
+                onClick={criar}
+                disabled={saving}
+                className="flex-1 py-4 rounded-xl bg-brand hover:bg-brand-dark disabled:opacity-50 text-white font-bold text-lg uppercase tracking-wide transition-colors"
+              >
+                {saving ? 'Criando…' : 'Criar evento'}
+              </button>
+            )}
+          </div>
         </div>
       </div>
 
