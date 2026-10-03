@@ -49,16 +49,35 @@ GEO/AEO): `#VaikeuFui`, `#Tendeu`, `#VamoAí?`, `#ProntoFalei`, `#SouFã`.
 - **Disparo**: automático, quando um evento no `live.vaikeuvou.app` é marcado "Aberto" (`max_depth
   = 999`, ver `CriarClient.tsx`) **e** o organizador autoriza a divulgação no opt-in do blog.
 - Tom jornalístico, não programático/listagem — é uma chamada, não um cartaz.
-- Estrutura: contexto do evento (o quê, quando, onde) → por que ir (gancho social: quem
-  confirmou, tipo de público) → CTA claro pro `live.vaikeuvou.app`.
-- **Regra fixa de encerramento**: todo post `#VamoAí?`, sem exceção, termina com um CTA explícito
-  linkado direto pra página DAQUELE evento específico (`https://live.vaikeuvou.app/e/<slug>` — o
-  link já vem pronto no brief, campo "Link do evento" de `composeVamoAiBrief`), nunca um link
-  genérico pro app ou pra home. O texto do CTA é livre (varia com o tom do post — "Confirma
-  presença aqui", "Garante o seu", etc.), mas o destino do link é sempre esse, sem variação.
 - A "ideia central" já vem pronta (é o evento em si) — a IA só pesquisa contexto ao redor
   (região, o que cerca o local) e escreve. Não precisa de brief manual do Luciano.
 - Marcar com Schema.org `Event` (data, local, preço, `offers` com link de compra).
+
+**Template real, validado e publicado** (post 266, `cachoeira-do-elefante-trilha-mirante-vamoai`,
+primeiro #VamoAí? de verdade do blog, 2026-10) — seguir essa estrutura exata daqui pra frente:
+
+1. **Título**: `Dia DD/MM/AAAA Cidade-UF: Nome do evento #VamoAí?` — data e cidade/UF na frente,
+   hashtag no final (mantém a regra geral de assinatura no final).
+2. **Parágrafo de abertura**: se já existir um `#VaikeuFui` sobre o mesmo lugar/tema, abre linkando
+   pra ele ("Quem já leu por aqui [link] sabe...") — amarra a vivência pessoal antiga com o evento
+   novo, deixa claro se é a mesma experiência ou uma rota/operador diferente (nunca confundir os
+   dois). Fecha o parágrafo anunciando data/hora do evento.
+3. **H2 "O que é o passeio/evento"**: logística objetiva — distância/duração se for atividade
+   física, o que está incluso no pacote, ponto de encontro com endereço completo, estacionamento.
+4. **H2 em formato de pergunta de pré-requisito** (ex: "Precisa ter experiência pra fazer essa
+   trilha?") — mesmo padrão H2-pergunta do `#Tendeu`, ativa o FAQPage automático de graça.
+   Responde requisito/segurança/restrição de idade, depois um parágrafo curto na voz pessoal do
+   Luciano conectando com vivência própria na região (não é só repassar a ficha do organizador).
+5. **H2 "Quem está organizando?"**: crédito completo de quem organiza — nome + link do site,
+   descrição de quem é, endereço, contato/WhatsApp, horário de funcionamento. Trata o organizador
+   como parceiro credenciado, não como nota de rodapé.
+6. **H2 "VamoAí?"** (repete o nome do pilar, é sempre a última seção): **CTA é o widget embedado**
+   (`<iframe src="https://live.vaikeuvou.app/embed/<slug>" width="320" height="70" frameborder="0">`,
+   mesmo código que `/dashboard` já oferece como "código de incorporação"), não um link de texto
+   simples — mostra confirmação ao vivo direto no post. Frase de abertura fixa: "Confirma sua
+   presença direto na página do evento — é lá que você garante sua vaga e acompanha quem mais vai".
+   **Isso substitui a regra antiga de link de texto puro** — manter sempre o widget daqui pra
+   frente, não regredir pra link simples.
 
 ### `#VaikeuFui` — resenhas em primeira pessoa
 - Só lugares onde a gente foi e gostou. **Regra fixa: nunca publicar review negativa** — os
