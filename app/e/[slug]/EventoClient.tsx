@@ -168,7 +168,23 @@ export default function EventoClient({ evento, rsvps, parentRsvpId, criador, con
     <div className="min-h-screen flex flex-col items-center" style={{ backgroundColor: header.bg }}>
       <div className="relative w-full max-w-lg md:max-w-xl lg:max-w-2xl bg-white sm:my-8 sm:rounded-lg sm:shadow-xl overflow-hidden">
 
-        {isPast && (
+        {evento.cancelado_em ? (
+          <div className="absolute inset-0 z-10 bg-white/90 backdrop-blur-[2px] flex items-center justify-center p-8">
+            <div className="text-center">
+              <p className="text-3xl mb-2">⚠️</p>
+              <p className="text-gray-700 font-bold text-lg">Esse evento foi cancelado.</p>
+              {evento.motivo_cancelamento && <p className="text-gray-400 text-sm mt-1">{evento.motivo_cancelamento}</p>}
+            </div>
+          </div>
+        ) : evento.data_a_definir ? (
+          <div className="absolute inset-0 z-10 bg-white/90 backdrop-blur-[2px] flex items-center justify-center p-8">
+            <div className="text-center">
+              <p className="text-3xl mb-2">📅</p>
+              <p className="text-gray-700 font-bold text-lg">Esse evento foi adiado.</p>
+              <p className="text-gray-400 text-sm mt-1">Nova data em breve{evento.motivo_adiamento ? ` — ${evento.motivo_adiamento}` : ''}.</p>
+            </div>
+          </div>
+        ) : isPast && (
           <div className="absolute inset-0 z-10 bg-white/90 backdrop-blur-[2px] flex items-center justify-center p-8">
             <div className="text-center">
               <p className="text-3xl mb-2">🕓</p>

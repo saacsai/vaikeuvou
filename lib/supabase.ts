@@ -48,6 +48,10 @@ export type Event = {
   data_viabilizacao: string | null
   viabilizacao_confirmada_em: string | null
   cancelado_em: string | null
+  motivo_cancelamento: string | null
+  adiado_em: string | null
+  motivo_adiamento: string | null
+  data_a_definir: boolean
   organizador_nome: string | null
   organizador_descricao: string | null
   organizador_endereco: string | null

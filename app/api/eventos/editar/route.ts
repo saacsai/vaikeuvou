@@ -53,6 +53,9 @@ export async function PATCH(req: NextRequest) {
     if (changed) {
       updates.date_changes_count = evento.date_changes_count + 1
     }
+    // Editar a data de verdade resolve o "a definir" deixado por um
+    // adiamento sem nova data ainda (ver /api/eventos/adiar).
+    updates.data_a_definir = false
   }
 
   const { error } = await sb.from('events').update(updates).eq('edit_token', edit_token)

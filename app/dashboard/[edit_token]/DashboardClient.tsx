@@ -142,6 +142,53 @@ export default function DashboardClient({ evento, rsvps, isNovo, userName, userA
     setSecoesAbertas(p => p.includes(s) ? p.filter(x => x !== s) : [...p, s])
   }
 
+  // Cancelar/adiar evento — separado da edição normal, ação de maior risco
+  // (avisa todo mundo por WhatsApp, decisão 2026-10-03).
+  const [painelAcao,  setPainelAcao]  = useState<'cancelar' | 'adiar' | null>(null)
+  const [motivoAcao,  setMotivoAcao]  = useState('')
+  const [novaDataAcao, setNovaDataAcao] = useState('')
+  const [confirmarCancelar, setConfirmarCancelar] = useState(false)
+  const [salvandoAcao, setSalvandoAcao] = useState(false)
+  const [erroAcao,     setErroAcao]     = useState('')
+
+  function abrirPainelAcao(acao: 'cancelar' | 'adiar') {
+    setPainelAcao(acao)
+    setMotivoAcao('')
+    setNovaDataAcao('')
+    setConfirmarCancelar(false)
+    setErroAcao('')
+  }
+
+  async function executarCancelar() {
+    if (!motivoAcao.trim()) { setErroAcao('Informe o motivo do cancelamento.'); return }
+    if (pagos.length > 0 && !confirmarCancelar) { setConfirmarCancelar(true); return }
+    setSalvandoAcao(true)
+    setErroAcao('')
+    const res = await fetch('/api/eventos/cancelar', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ edit_token: evento.edit_token, motivo: motivoAcao }),
+    })
+    const json = await res.json()
+    if (!res.ok) { setErroAcao(json.error ?? 'Erro ao cancelar.'); setSalvandoAcao(false); return }
+    router.refresh()
+  }
+
+  async function executarAdiar() {
+    if (!motivoAcao.trim()) { setErroAcao('Informe o motivo do adiamento.'); return }
+    setSalvandoAcao(true)
+    setErroAcao('')
+    const event_date_iso = novaDataAcao ? `${novaDataAcao}T${form.event_time || '00:00'}:00-03:00` : null
+    const res = await fetch('/api/eventos/adiar', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ edit_token: evento.edit_token, motivo: motivoAcao, nova_data: event_date_iso }),
+    })
+    const json = await res.json()
+    if (!res.ok) { setErroAcao(json.error ?? 'Erro ao adiar.'); setSalvandoAcao(false); return }
+    router.refresh()
+  }
+
   function onHeaderImageUploaded(url: string) {
     setForm(p => ({ ...p, bg_image_url: url }))
     setInitial(p => ({ ...p, bg_image_url: url }))
@@ -410,7 +457,12 @@ export default function DashboardClient({ evento, rsvps, isNovo, userName, userA
 
         {/* Edição completa — mesma estrutura do /criar (eventos futuros); eventos
             passados mostram só o preview mascarado, sem editar nem compartilhar */}
-        {isPast ? (
+        {evento.cancelado_em ? (
+          <div className="mb-12 bg-red-50 border border-red-200 rounded-xl p-4">
+            <p className="text-red-700 font-bold text-sm">⚠️ Evento cancelado</p>
+            {evento.motivo_cancelamento && <p className="text-red-600 text-xs mt-1">{evento.motivo_cancelamento}</p>}
+          </div>
+        ) : isPast ? (
           <div className="mb-12 max-w-sm">
             <div className="relative">
               <EventPreviewCard form={initial} userName={userName} userAvatar={userAvatar} userBio={userBio} userInstagram={userInstagram} />
@@ -420,14 +472,95 @@ export default function DashboardClient({ evento, rsvps, isNovo, userName, userA
             </div>
           </div>
         ) : !editando ? (
-          <div className="mb-12">
-            <button
-              onClick={() => setEditando(true)}
-              className="flex items-center gap-2 px-5 py-3 rounded-xl border border-gray-200 hover:border-brand hover:bg-brand/5 text-gray-700 font-semibold text-sm uppercase tracking-wide transition-colors"
-            >
-              Editar evento
-              <EditIcon className="w-4 h-4" />
-            </button>
+          <div className="mb-12 space-y-4">
+            {evento.adiado_em && (
+              <div className="bg-amber-50 border border-amber-200 rounded-xl p-4">
+                <p className="text-amber-800 font-bold text-sm">📅 Evento já foi adiado</p>
+                {evento.motivo_adiamento && <p className="text-amber-700 text-xs mt-1">{evento.motivo_adiamento}</p>}
+                {evento.data_a_definir && <p className="text-amber-700 text-xs mt-1 font-semibold">Nova data ainda não definida — confirmações ficam bloqueadas até você editar a data.</p>}
+              </div>
+            )}
+
+            <div className="flex flex-wrap gap-2">
+              <button
+                onClick={() => setEditando(true)}
+                className="flex items-center gap-2 px-5 py-3 rounded-xl border border-gray-200 hover:border-brand hover:bg-brand/5 text-gray-700 font-semibold text-sm uppercase tracking-wide transition-colors"
+              >
+                Editar evento
+                <EditIcon className="w-4 h-4" />
+              </button>
+              <button
+                onClick={() => abrirPainelAcao('adiar')}
+                className="px-5 py-3 rounded-xl border border-gray-200 hover:border-amber-400 hover:bg-amber-50 text-gray-700 font-semibold text-sm uppercase tracking-wide transition-colors"
+              >
+                Adiar evento
+              </button>
+              <button
+                onClick={() => abrirPainelAcao('cancelar')}
+                className="px-5 py-3 rounded-xl border border-gray-200 hover:border-red-400 hover:bg-red-50 text-red-600 font-semibold text-sm uppercase tracking-wide transition-colors"
+              >
+                Cancelar evento
+              </button>
+            </div>
+
+            {painelAcao && (
+              <div className={`rounded-xl border p-4 space-y-3 ${painelAcao === 'cancelar' ? 'border-red-200 bg-red-50' : 'border-amber-200 bg-amber-50'}`}>
+                <div className="flex items-center justify-between">
+                  <p className="text-sm font-bold text-gray-900">
+                    {painelAcao === 'cancelar' ? 'Cancelar evento' : 'Adiar evento'}
+                  </p>
+                  <button onClick={() => setPainelAcao(null)} className="text-xs font-bold text-gray-400 hover:text-gray-600 uppercase">Fechar ✕</button>
+                </div>
+
+                {rsvps.length > 0 && (
+                  <p className="text-xs text-gray-600">
+                    {rsvps.length} pessoa{rsvps.length > 1 ? 's' : ''} confirmada{rsvps.length > 1 ? 's' : ''}
+                    {pagos.length > 0 && <> — <strong>{pagos.length} já pagou</strong></>} — todas serão avisadas por WhatsApp.
+                  </p>
+                )}
+
+                <div>
+                  <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Motivo *</label>
+                  <textarea
+                    value={motivoAcao}
+                    onChange={e => { setMotivoAcao(e.target.value); setConfirmarCancelar(false) }}
+                    rows={2}
+                    placeholder={painelAcao === 'cancelar' ? 'Ex: fornecedor cancelou, não bateu o mínimo...' : 'Ex: previsão de chuva forte, precisamos remarcar...'}
+                    className="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 outline-none focus:border-brand text-sm resize-none"
+                  />
+                </div>
+
+                {painelAcao === 'adiar' && (
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Nova data (opcional)</label>
+                    <DatePicker value={novaDataAcao} onChange={setNovaDataAcao} />
+                    <p className="text-[10px] text-gray-400 mt-1">Sem data: avisa "nova data em breve" e bloqueia novas confirmações até você editar a data depois.</p>
+                  </div>
+                )}
+
+                {painelAcao === 'cancelar' && pagos.length > 0 && (
+                  <p className="text-xs text-red-700 bg-red-100 rounded-lg px-3 py-2">
+                    {pagos.length} pessoa{pagos.length > 1 ? 's' : ''} já pagou — o reembolso <strong>não é automático</strong>, você precisa processar pelo painel do Mercado Pago depois de cancelar.
+                  </p>
+                )}
+
+                {erroAcao && <p className="text-xs text-red-600">{erroAcao}</p>}
+
+                <button
+                  onClick={painelAcao === 'cancelar' ? executarCancelar : executarAdiar}
+                  disabled={salvandoAcao}
+                  className={`w-full py-3 rounded-xl font-bold text-sm uppercase tracking-wide text-white disabled:opacity-50 ${
+                    painelAcao === 'cancelar' ? 'bg-red-600 hover:bg-red-700' : 'bg-amber-600 hover:bg-amber-700'
+                  }`}
+                >
+                  {salvandoAcao
+                    ? 'Salvando…'
+                    : painelAcao === 'cancelar' && confirmarCancelar
+                    ? 'Tem certeza? Clique de novo pra confirmar'
+                    : painelAcao === 'cancelar' ? 'Cancelar evento' : 'Confirmar adiamento'}
+                </button>
+              </div>
+            )}
           </div>
         ) : (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start mb-12">
