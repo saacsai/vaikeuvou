@@ -1,6 +1,32 @@
 # vaikeuvou.app — Status
 
-Última atualização: 2026-10-02
+Última atualização: 2026-10-03
+
+## Sessão 2026-10-03 — fonte do WordPress trocada pra Arial/Helvetica (igual ao app)
+
+Luciano perguntou qual fonte o app Next.js usa (Arial/Helvetica, hardcoded em
+`app/globals.css`) e qual o WordPress usa — achei **Jost** (Google Font do tema NewsBlogger/
+NewsCrunch, aplicada quase em tudo: body/botão/input/título de post/breadcrumb) + **Anton+Jost**
+e **Poppins** em alguns widgets específicos (incluindo meu próprio `.vkv-fan-btn`/`.vkv-fan-count`
+do botão #SouFã) — fontes diferentes entre app e blog. Pediu pra unificar tudo pra Arial/Helvetica.
+
+**Feito** (fora do repo Next.js — arquivos do tema WordPress, Hostinger via SSH):
+- `newsblogger/style.css` e `style-rtl.css`: 45 e 43 ocorrências de `font-family: Jost/jost/
+  Anton+Jost/Poppins/[stack system-ui]` trocadas por `Arial, Helvetica, sans-serif` — editei em
+  local (`/tmp/vkv-theme-fix/`, Python/regex, verificado antes de subir), não no servidor direto.
+- `inc/theme-color/custom-color.php` (CSS gerado dinamicamente via PHP, hookado em `wp_footer`,
+  sobrescreve `style.css` normal): 1 ocorrência (`.spnc-highlights-1 .spnc-highlights-title h3`)
+  também trocada.
+- **Preservado de propósito**: `font-family: FontAwesome` (ícones, não é fonte de texto — trocar
+  quebraria os glifos) — confirmei que ficou intacto nos 2 arquivos CSS.
+- Backups no servidor: `style.css.bak-2026-10-03-pre-arial`, `style-rtl.css.bak-2026-10-03-pre-
+  arial`, `custom-color.php.bak-2026-10-03-pre-arial`.
+- Como são edições em arquivo de tema, não precisou de `!important` pra vencer especificidade
+  (diferente de injetar uma regra nova) — só troquei o valor dentro da regra já existente.
+- Confirmado ao vivo: `wp cache flush` + o hook de versionamento por `filemtime()` (já existia de
+  sessão anterior) já forçou `style.css?ver=<novo timestamp>` automaticamente — zero Jost/Anton/
+  Poppins no CSS servido, FontAwesome intacto.
+
 
 ## Sessão 2026-10-02 (5ª parte) — correção: marca certa era a quarta evolução, não a terceira
 
