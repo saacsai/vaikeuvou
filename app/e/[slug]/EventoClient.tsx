@@ -9,6 +9,7 @@ function fmtBRL(v: number): string {
 }
 import type { Event, Rsvp } from '@/lib/supabase'
 import { fmtDate, fmtDateRange } from '@/lib/slug'
+import { renderMiniMarkup } from '@/lib/miniMarkup'
 
 function fmtHora(iso: string): string {
   return new Intl.DateTimeFormat('pt-BR', { hour: '2-digit', minute: '2-digit', timeZone: 'America/Sao_Paulo' }).format(new Date(iso))
@@ -245,13 +246,13 @@ export default function EventoClient({ evento, rsvps, parentRsvpId, criador, con
               {evento.descricao_pacote && (
                 <div>
                   <p className="text-sm font-extrabold text-gray-900 uppercase tracking-wide mb-1.5">O que está incluso</p>
-                  <p className="text-sm text-gray-600 whitespace-pre-line">{evento.descricao_pacote}</p>
+                  <p className="text-sm text-gray-600" dangerouslySetInnerHTML={{ __html: renderMiniMarkup(evento.descricao_pacote) }} />
                 </div>
               )}
               {evento.programacao && (
                 <div className="mt-[30px]">
                   <p className="text-sm font-extrabold text-gray-900 uppercase tracking-wide mb-1.5">Programação</p>
-                  <p className="text-sm text-gray-600 whitespace-pre-line">{evento.programacao}</p>
+                  <p className="text-sm text-gray-600" dangerouslySetInnerHTML={{ __html: renderMiniMarkup(evento.programacao) }} />
                 </div>
               )}
             </div>

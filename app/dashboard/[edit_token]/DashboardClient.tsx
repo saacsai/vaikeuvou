@@ -10,6 +10,7 @@ import { ProfilePopover, GridIcon } from '@/components/AppHeaderNav'
 import AppFooter from '@/components/AppFooter'
 import EventPreviewCard from '@/components/EventPreviewCard'
 import BgSelector from '@/components/BgSelector'
+import MiniEditor from '@/components/MiniEditor'
 import { fmtDate, fmtDateRange } from '@/lib/slug'
 import { DURACAO_OPCOES, type EventFormFields } from '@/lib/eventForm'
 
@@ -514,23 +515,19 @@ export default function DashboardClient({ evento, rsvps, isNovo, userName, userA
 
                 <div>
                   <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">O que está incluso (opcional)</label>
-                  <textarea
+                  <MiniEditor
                     value={form.descricao_pacote}
-                    onChange={e => set('descricao_pacote', e.target.value)}
+                    onChange={v => set('descricao_pacote', v)}
                     placeholder="Ex: churrasco completo + bebida, ida e volta de barco, welcome drink..."
-                    rows={3}
-                    className="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 outline-none focus:border-brand text-sm resize-none"
                   />
                 </div>
 
                 <div>
                   <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Programação detalhada (opcional)</label>
-                  <textarea
+                  <MiniEditor
                     value={form.programacao}
-                    onChange={e => set('programacao', e.target.value)}
+                    onChange={v => set('programacao', v)}
                     placeholder="Ex: 9h chegada, 10h saída do barco, 13h almoço, 17h volta..."
-                    rows={3}
-                    className="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 outline-none focus:border-brand text-sm resize-none"
                   />
                 </div>
               </>
