@@ -2,6 +2,30 @@
 
 Última atualização: 2026-10-03
 
+## Sessão 2026-10-03 (16ª parte) — conteúdo: fix rodapé + #SouFã São Paulo
+
+**Fix**: rodapé da LP do evento (`app/e/[slug]/EventoClient.tsx`) tinha texto "vaikeuvou.app" mas
+o link ia pra `live.vaikeuvou.app` (resolvido em runtime via `window.location.origin`) — trocado
+pra `href="https://vaikeuvou.app"` fixo, já commitado (`9296e9c`).
+
+**#SouFã São Paulo** (post 298, WordPress, `draft`): gerado a partir do `blog_brief`
+`d56d8933-1f6b-409a-b4bf-512ed07f6b21` (status → `gerado`), que o Luciano subiu inspirado em ter
+acabado de editar o #VamoAí? do Deep Purple. Categoria "São Paulo" (id 40, reaproveitada do post
+do Deep Purple — regra de 1 post por destino) + tag `#SouFã` (id 36). Imagem destacada importada
+da URL que ele já tinha subido no brief (attachment 299), não gerada por IA.
+
+Conteúdo: abertura pessoal (paulistano, São Paulo Futebol Clube, prós>>contras), ideia central do
+Luciano foi deixar 2 músicas "falarem" pela cidade em vez de resenha exaustiva (dentro da regra do
+pilar — "não tenta ser exaustivo, é o mapa geral") — `[embed]` do vídeo oficial de cada uma:
+"São Paulo, São Paulo" (Premeditando o Breque, 1983) e "São Paulo" (365, 1987, clipe oficial
+remasterizado) — links achados por busca real, não inventados. Fecho seguiu as 2 partes
+obrigatórias do pilar: CTA explícito pro botão "Sou Fã" + trocadilho de assinatura inédito
+("Vaikeuvou São Paulo, a gente se cruza no meio do trânsito mesmo").
+
+**Pendente**: Luciano revisar o draft antes de publicar (mesmo padrão de todo #VamoAí?/#SouFã
+anterior — ele edita, eu leio e adoto como correção de template se for o caso).
+
+
 ## Sessão 2026-10-03 (14ª parte) — Cancelar evento / Adiar evento
 
 Dois botões novos no painel, ao lado de "Editar evento" (`app/dashboard/[edit_token]/
