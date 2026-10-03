@@ -2,6 +2,16 @@
 
 Última atualização: 2026-10-03
 
+## Sessão 2026-10-03 (3ª parte) — logo 5px mais alto, nos dois lugares
+
+Ajuste fino pedido por causa da proporção da marca nova (quarta evolução). **App Next.js**:
+`-mt-[15px]` → `-mt-[20px]` nos 6 lugares onde o logo fica ao lado do breadcrumb/nav
+(`InfoPageShell`, `CriarClient`, `DashboardClient`, `convidados/page`, `meus-convites/page`) —
+mesmo valor que já vinha sendo fine-tuned desde o rebrand anterior. **WordPress**: `.custom-logo,
+.dark-custom-logo { transform: translateY(-5px); }` novo em `style.css` do tema filho (não
+existia ajuste de posição vertical no logo antes). Confirmado ao vivo nos dois.
+
+
 ## Sessão 2026-10-03 (2ª parte) — preloader trocado pra símbolo da mãozinha
 
 Preloader nativo do tema (`#preloader1`, tela branca de carregamento inicial) mostrava bolinha
