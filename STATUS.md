@@ -2,6 +2,27 @@
 
 Última atualização: 2026-10-03
 
+## Sessão 2026-10-03 (14ª parte) — Cancelar evento / Adiar evento
+
+Dois botões novos no painel, ao lado de "Editar evento" (`app/dashboard/[edit_token]/
+DashboardClient.tsx`), fechando o fio da conversa de hoje sobre quórum/reembolso. Perguntei
+direto ao Luciano as duas decisões de risco antes de construir:
+
+- **Reembolso em cancelamento com vendas pagas: fica MANUAL** (confirmado) — sistema cancela,
+  avisa todo mundo por WhatsApp (`lib/evolution.ts`), sinaliza quantas pessoas pagaram, mas o
+  estorno em si o organizador processa direto no Mercado Pago. Dois cliques pra confirmar quando
+  há venda envolvida (`confirmarCancelar`).
+- **Adiar sem nova data: permitido** (confirmado) — campo de nova data é opcional, sem ela marca
+  `data_a_definir=true` (bloqueia nova confirmação na página pública até alguém editar a data de
+  verdade — resolvido automaticamente em `/api/eventos/editar` quando `event_date` muda de novo).
+
+`cancelado_em` reaproveitado do fluxo de quórum (já existia) como flag geral de cancelamento.
+Página pública (`EventoClient.tsx`) ganhou overlay de cancelado/adiado, mesmo padrão visual do
+"evento já aconteceu" que já existia, bloqueando confirmação nos dois casos.
+
+**Migration pendente**: `supabase_migration_cancelar_adiar_evento.sql` revelada no Finder.
+
+
 ## Sessão 2026-10-03 (13ª parte) — edição do evento vira seções recolhíveis
 
 Mesmo motivo de poluição visual do `/criar`, mas solução diferente: edição não vira wizard forçado
