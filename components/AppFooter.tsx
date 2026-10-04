@@ -5,6 +5,8 @@ export default function AppFooter() {
         <a href="https://vaikeuvou.app/termos-de-uso/" target="_blank" rel="noopener noreferrer">Termos de uso</a>
         <span>·</span>
         <a href="https://vaikeuvou.app/politica-de-privacidade/" target="_blank" rel="noopener noreferrer">Política de Privacidade</a>
+        <span>·</span>
+        <a href="https://vaikeuvou.app/fale-conosco/" target="_blank" rel="noopener noreferrer">Fale conosco</a>
       </div>
       <p className="text-gray-300 text-xs">© 2026 vaikeuvou.app</p>
     </div>
