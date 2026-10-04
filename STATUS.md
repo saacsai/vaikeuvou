@@ -1,6 +1,45 @@
 # vaikeuvou.app — Status
 
-Última atualização: 2026-10-03
+Última atualização: 2026-10-04
+
+## Sessão 2026-10-04 (2ª parte) — monitor WhatsApp por email + calendário (.ics/Google) + fix RSVP grátis sem confirmação
+
+**Monitor de desconexão WhatsApp** (`app/api/cron/monitor-evolution/route.ts`): o Luciano reportou
+"erro no envio de WhatsApp de novo" — instância `vaikeuvou` tinha caído (`state: close`).
+Investigando o porquê do alerta automático (roda a cada ~30min via GH Actions) não ter avisado:
+o alerta usava uma instância de OUTRO produto (`Bia fazdireito.ai`) pra mandar o aviso — e ela
+TAMBÉM estava desconectada, então o envio falhava em silêncio (rota não checava o resultado).
+**Fix**: alerta trocado pra email (`lib/email.ts`, novo, via SMTP Hostinger — mesma caixa
+`fale@vaikeuvou.app` já usada no WordPress, ver memória `feedback_evolution_api_webhook` e sessão
+2026-09-28 parte 4), não depende mais de nenhuma instância Evolution. Rota também loga se o
+próprio envio do alerta falhar. Testado com envio real, confirmado recebido. Env vars novas
+(`SMTP_HOST/PORT/USER/PASS`, `ADMIN_EMAIL`) em `.env.local` e Vercel produção.
+
+**Links de calendário** (`.ics` + Google Calendar) — pedido do Luciano depois de perguntar como
+adicionar confirmação de evento na agenda:
+- `lib/calendar.ts` (novo): `gerarIcsContent()` gera RFC 5545 em UTC puro (sufixo `Z`, sem precisar
+  declarar `VTIMEZONE`); `googleCalendarUrl()` monta a URL de template do Google
+  (`calendar.google.com/calendar/render`); `fmtDataConfirmacao()` migrado de dentro do webhook MP
+  pra cá (reaproveitado também no RSVP grátis agora).
+- `GET /api/eventos/[slug]/ics` (novo) — endpoint público, mesmo padrão de leitura anônima por
+  slug de `app/e/[slug]/page.tsx`. `DTEND` usa `event_date_fim` se existir, senão
+  `duration_minutes`, senão default de 3h.
+- `components/CalendarLinks.tsx` (novo) — os 2 botões, reaproveitados na tela de sucesso inline
+  do RSVP (`EventoClient.tsx`) e no `SucessoConviteModal`.
+- `lib/miniMarkup.ts` ganhou `stripMiniMarkup()` — descrição do evento em contexto de texto puro
+  (`.ics`, WhatsApp) não pode mostrar os marcadores `**`/`_`/`++` crus, só no HTML renderizado.
+
+**Bug real encontrado nessa investigação**: o Luciano reportou que confirmou presença no próprio
+evento e não recebeu nada por WhatsApp. Causa: `app/api/rsvp/route.ts` (RSVP **gratuito**) NUNCA
+mandou confirmação por WhatsApp — só `app/api/webhooks/mercadopago/route.ts` (fluxo **pago**)
+mandava. Não era específico de ele ser o criador, acontecia pra qualquer RSVP grátis. **Fix**:
+RSVP grátis agora manda a mesma confirmação (texto + os 2 links de calendário); webhook MP também
+ganhou os links na mensagem que já mandava.
+
+Tudo testado (`tsc --noEmit` + `npm run build` limpos, endpoint `.ics` testado local e em produção
+com o evento real "Show do Deep Purple", email de teste confirmado recebido) e já em produção
+(`ef1025c`, `3f8ff85`).
+
 
 ## Sessão 2026-10-03 (16ª parte) — conteúdo: fix rodapé + #SouFã São Paulo
 
