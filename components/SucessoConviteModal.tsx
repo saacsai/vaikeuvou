@@ -3,6 +3,8 @@
 import { useState } from 'react'
 import AvatarCropUpload from '@/components/AvatarCropUpload'
 import MiniEditor from '@/components/MiniEditor'
+import CalendarLinks from '@/components/CalendarLinks'
+import type { Event } from '@/lib/supabase'
 
 type Props = {
   rsvpId: string
@@ -10,12 +12,13 @@ type Props = {
   pago: boolean
   linkConvite: string
   whatsappTxt: string
+  evento: Pick<Event, 'title' | 'slug' | 'event_date' | 'event_date_fim' | 'duration_minutes' | 'location' | 'description'>
   onClose: () => void
 }
 
 const TOTAL_ETAPAS = 3
 
-export default function SucessoConviteModal({ rsvpId, nome, pago, linkConvite, whatsappTxt, onClose }: Props) {
+export default function SucessoConviteModal({ rsvpId, nome, pago, linkConvite, whatsappTxt, evento, onClose }: Props) {
   const [etapa,      setEtapa]      = useState(1)
   const [fotoUrl,    setFotoUrl]    = useState<string | null>(null)
   const [mensagem,   setMensagem]   = useState('')
@@ -73,6 +76,7 @@ export default function SucessoConviteModal({ rsvpId, nome, pago, linkConvite, w
               <h2 className="text-xl font-bold text-gray-900 mb-1">{pago ? 'Pagamento confirmado!' : 'BORA confirmado!'}</h2>
               <p className="text-gray-500 text-sm">Sua inscrição foi realizada. Nos vemos lá!</p>
             </div>
+            <CalendarLinks evento={evento} />
             <button
               onClick={() => setEtapa(2)}
               className="w-full py-3 rounded-xl bg-brand hover:bg-brand-dark text-white font-bold text-sm uppercase tracking-wide"

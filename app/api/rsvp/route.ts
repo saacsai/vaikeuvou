@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getSupabaseAdmin } from '@/lib/supabase'
 import { normalizePhone } from '@/lib/auth'
+import { enviarWhatsapp } from '@/lib/evolution'
+import { fmtDataConfirmacao, linksCalendarioTxt } from '@/lib/calendar'
 
 export async function POST(req: NextRequest) {
   const { event_id, user_name, user_phone, parent_rsvp_id } = await req.json()
@@ -19,7 +21,7 @@ export async function POST(req: NextRequest) {
   // Valida se evento existe e pega max_depth
   const { data: evento } = await sb
     .from('events')
-    .select('id, max_depth, title')
+    .select('id, max_depth, title, slug, event_date, event_date_fim, duration_minutes, location, description')
     .eq('id', event_id)
     .single()
 
@@ -74,6 +76,12 @@ export async function POST(req: NextRequest) {
   }
   if (!rsvp) {
     return NextResponse.json({ error: 'Erro ao confirmar presença' }, { status: 500 })
+  }
+
+  const texto = `🎉 BORA confirmado!\n\nSua presença está confirmada em *${evento.title}*, dia ${fmtDataConfirmacao(evento.event_date)}${evento.location ? ` no local ${evento.location}` : ''}.\n\n${linksCalendarioTxt(evento)}\n\nNos vemos lá!`
+  const envio = await enviarWhatsapp(phone, texto)
+  if (!envio.ok) {
+    console.error('Falha ao enviar confirmação de RSVP por WhatsApp:', envio.error)
   }
 
   return NextResponse.json({ ok: true, rsvp_id: rsvp.id, depth_level: rsvp.depth_level })

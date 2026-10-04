@@ -2,17 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createHmac, timingSafeEqual } from 'crypto'
 import { getSupabaseAdmin } from '@/lib/supabase'
 import { enviarWhatsapp } from '@/lib/evolution'
-
-// "20 de setembro de 2026 (sábado), 09:30" — ordem específica pedida pro
-// texto de confirmação por WhatsApp, diferente do fmtDate() padrão do app.
-function fmtDataConfirmacao(iso: string): string {
-  const partes = new Intl.DateTimeFormat('pt-BR', {
-    weekday: 'long', day: '2-digit', month: 'long', year: 'numeric',
-    hour: '2-digit', minute: '2-digit', timeZone: 'America/Sao_Paulo',
-  }).formatToParts(new Date(iso))
-  const get = (t: string) => partes.find(p => p.type === t)?.value ?? ''
-  return `${get('day')} de ${get('month')} de ${get('year')} (${get('weekday')}), ${get('hour')}:${get('minute')}`
-}
+import { fmtDataConfirmacao, linksCalendarioTxt } from '@/lib/calendar'
 
 // Validação manual da assinatura — o WebhookSignatureValidator oficial do SDK
 // não converte o id pra minúsculo antes de montar o manifest, e a Mercado
@@ -108,7 +98,7 @@ export async function POST(req: NextRequest) {
   if (!error) {
     const { data: evento } = await sb
       .from('events')
-      .select('title, event_date, slug, location')
+      .select('id, title, event_date, event_date_fim, duration_minutes, slug, location, description')
       .eq('id', pendente.event_id)
       .single()
 
@@ -123,8 +113,11 @@ export async function POST(req: NextRequest) {
         if (pagamento.installments && pagamento.installments > 1) meioTxt += ` em ${pagamento.installments}x`
       }
 
-      const texto = `🎉 Pagamento confirmado! (${valorTxt}${meioTxt ? ` ${meioTxt}` : ''})\n\nSua presença está confirmada em *${evento.title}*, dia ${fmtDataConfirmacao(evento.event_date)}${evento.location ? ` no local ${evento.location}` : ''}.\n\nDúvidas entre em contato através do e-mail fale@vaikeuvou.app\n\nNos vemos lá!`
-      await enviarWhatsapp(pendente.user_phone, texto)
+      const texto = `🎉 Pagamento confirmado! (${valorTxt}${meioTxt ? ` ${meioTxt}` : ''})\n\nSua presença está confirmada em *${evento.title}*, dia ${fmtDataConfirmacao(evento.event_date)}${evento.location ? ` no local ${evento.location}` : ''}.\n\n${linksCalendarioTxt(evento)}\n\nDúvidas entre em contato através do e-mail fale@vaikeuvou.app\n\nNos vemos lá!`
+      const envio = await enviarWhatsapp(pendente.user_phone, texto)
+      if (!envio.ok) {
+        console.error('Falha ao enviar confirmação de pagamento por WhatsApp:', envio.error)
+      }
     }
   }
 

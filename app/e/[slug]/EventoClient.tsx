@@ -16,6 +16,7 @@ function fmtHora(iso: string): string {
 }
 import { titleToHeader } from '@/lib/headers'
 import SucessoConviteModal from '@/components/SucessoConviteModal'
+import CalendarLinks from '@/components/CalendarLinks'
 import ConfirmarPresencaModal from '@/components/ConfirmarPresencaModal'
 
 type Criador = { name: string | null; avatar_url: string | null; bio: string | null; instagram: string | null }
@@ -375,6 +376,7 @@ export default function EventoClient({ evento, rsvps, parentRsvpId, criador, con
                 <h2 className="text-xl font-bold text-gray-900 mb-1">{pago ? 'Pagamento confirmado!' : 'BORA confirmado!'}</h2>
                 <p className="text-gray-500 text-sm">Você está na lista. Nos vemos lá!</p>
               </div>
+              <CalendarLinks evento={evento} />
             </div>
           )}
 
@@ -385,6 +387,7 @@ export default function EventoClient({ evento, rsvps, parentRsvpId, criador, con
               pago={pago}
               linkConvite={linkConvite}
               whatsappTxt={whatsappTxt}
+              evento={evento}
               onClose={() => setModalAberto(false)}
             />
           )}
