@@ -150,15 +150,52 @@ primeiro #VamoAí? de verdade do blog, 2026-10) — seguir essa estrutura exata 
   razão própria de existir pra quem visita ("se sustenta por si"), não só divulgação de evento.
   Capricho extra na escrita se justifica aqui mais que nos outros pilares.
 - **Regra fixa de fecho** (calibrada comparando o rascunho de "#SouFã Ubatuba" com a edição real
-  do Luciano, 2026-09-28): o parágrafo final tem 2 partes obrigatórias, nessa ordem —
+  do Luciano, 2026-09-28; refinada com "#SouFã São Paulo", 2026-10-04 — a edição com mais
+  intervenção dele até hoje, por refletir "exatamente" o estilo dele de escrever): o parágrafo
+  final tem 2 partes obrigatórias, nessa ordem —
   1. **CTA explícito pro botão**, nomeando a ação, não só sugerindo ("Comenta aí e clica em Sou
-     Fã." — não basta um "deixa registrado aí embaixo" vago).
-  2. **Trocadilho de assinatura juntando a marca com o destino** (ex: "Vaikeuvou Ubatuba, a gente
-     se cruza lá no calçadão do Itaguá") — inédito nesse pilar, funciona como fecho-bordão
-     específico de cada `#SouFã`, não repete a mesma frase de post pra post.
+     Fã." — não basta um "deixa registrado aí embaixo" vago). Pode vir precedido de uma pergunta
+     direta ao leitor ecoando o `#SouFã` dele mesmo — "Por isso Sou fã desta cidade. E você?"
+     (post São Paulo) — não é só afirmação da própria torcida, convida quem lê a se colocar.
+  2. **Trocadilho de assinatura juntando a marca com o destino** — mas tem que ser um **lugar
+     real, específico e icônico do destino**, não uma piada abstrata/genérica sobre o lugar (ex:
+     "Vaikeuvou Ubatuba, a gente se cruza lá no calçadão do Itaguá"; "A gente se cruza na Av.
+     Paulista lá no Masp" — ele TROCOU de propósito um fecho meu mais genérico sobre trânsito por
+     esse, âncora física real é o que importa). Inédito a cada post, nunca repete a mesma frase.
+  - Sign-off pessoal ("Forte abraço!") depois do CTA é regra 10 geral de voz — vale aqui também,
+    eu tinha esquecido de aplicar no rascunho de São Paulo.
+- **Antes do fecho fixo, ele gosta de um parágrafo meta** amarrando a FORMA como contou o post
+  (ex: "tudo junto e misturado, passado, presente e futuro") à própria marca — "quis contar São
+  Paulo no estilo vaikeuvou de contar (...) Isso é São Paulo, isso é vaikeuvou." Não é obrigatório
+  em todo `#SouFã` (só apareceu nesse, que ele mesmo marcou como o que mais reflete seu estilo),
+  mas é um recurso bom de propor quando o post usa alguma estrutura narrativa diferente do padrão
+  (mistura de tempos, formato colagem, etc) — a marca vira comentário sobre a própria técnica.
 - Reforçar o próprio `#SouFã` no corpo do texto, não só no título — ex: trocar "motivo a mais"
   solto por "motivo a mais de ser fã desta cidade", ecoar no fecho ("Por isso Sou fã desta
   cidade").
+- **Quando o post usa um dispositivo externo como núcleo do conteúdo (música, foto, poema)**: ele
+  gosta de abrir com uma ponte cultural/literária real e linkada (regra 14 — ex: linkou
+  *Pauliceia Desvairada*, de Mário de Andrade, explicando que o poeta "aproxima a poesia da
+  música") e then se autodepreciar pra justificar o próprio recurso mais simples ("E eu, como não
+  sou poeta nem nada, vou pegar carona na ideia e falar de São Paulo através de 2 músicas") —
+  combinação das regras 5 (desconstrói a própria seriedade) + 14 (referência cultural com link),
+  não uma regra isolada nova, mas um combo específico que ele usa quando o "produto cultural"
+  (música/foto) é o corpo principal do post, não só ilustração.
+- **Letra/texto do conteúdo embedado pode entrar por extenso no corpo do post**, não só o embed —
+  no caso de música, ele colou a letra inteira da faixa que considerou "central" (a que tem
+  "pérolas" que quer destacar, "Num fim de semana em São Paulo... Lavar um carro comendo um churro
+  é bom pra burro"), mas NÃO fez isso pra segunda música, que tratou como "mais nostalgia" sem
+  destrinchar. Decisão é dele, caso a caso — a IA deve perguntar/sugerir incluir a letra quando a
+  música tiver trecho citável, mas não assumir que toda música do post precisa do texto completo.
+- **Hedge específico contra o clichê de nostalgia** ("antigamente era melhor"): quando o post
+  flerta com nostalgia (ex: comparar decadas), ele sempre dispara a defesa antes de fazer o ponto
+  mesmo assim — "sem papinho furado de que antigamente as coisas eram mais legais, mas repara:
+  ..." — reforça a regra 1 geral (nunca afirma em absoluto) só que com fraseado específico pra
+  esse tipo de observação.
+- **Hashtag pontual de identidade pessoal, não reutilizável**: às vezes cria uma hashtag só pra
+  aquele post, amarrada a algo bem pessoal dele (`#ShowdeBola`, trocadilho com futebol — ele é
+  torcedor do São Paulo FC) — diferente das 5 pautas oficiais e do `#ficaAdica`/`#ProntoFalei`
+  recorrentes, é descartável, não precisa reaparecer em outro post pra ser "correto".
 
 ## Regras de voz
 
