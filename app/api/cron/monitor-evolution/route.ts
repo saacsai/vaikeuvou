@@ -1,10 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { checarEstadoConexao, enviarWhatsappViaInstancia } from '@/lib/evolution'
+import { checarEstadoConexao } from '@/lib/evolution'
+import { enviarEmail } from '@/lib/email'
 
-// Instância separada só pra mandar o alerta — se a própria vaikeuvou caiu,
-// não dá pra avisar por ela mesma.
-const ALERT_INSTANCE = 'Bia fazdireito.ai'
-const ALERT_NUMBER = '5511964480411'
+// Alerta por email em vez de WhatsApp de outra instância — se a própria
+// vaikeuvou caiu, não dá pra avisar por WhatsApp mesmo (e depender de uma
+// instância de OUTRO produto pra avisar já causou um alerta silenciosamente
+// perdido quando aquela instância também caiu, 2026-10-04).
+const ALERT_EMAIL = process.env.ADMIN_EMAIL || 'luciano.maeda@saacs.com.br'
 
 export async function GET(req: NextRequest) {
   const auth = req.headers.get('authorization')
@@ -14,13 +16,17 @@ export async function GET(req: NextRequest) {
 
   const estado = await checarEstadoConexao(process.env.EVOLUTION_INSTANCE!)
 
+  let alerta: { ok: boolean; error?: string } | null = null
   if (estado !== 'open') {
-    await enviarWhatsappViaInstancia(
-      ALERT_INSTANCE,
-      ALERT_NUMBER,
-      `⚠️ Instância WhatsApp do vaikeuvou está desconectada (estado: ${estado}).\nProvavelmente o celular ficou sem carga/internet. Reconectar via QR na Evolution.`
+    alerta = await enviarEmail(
+      ALERT_EMAIL,
+      '⚠️ WhatsApp do vaikeuvou desconectou',
+      `A instância WhatsApp do vaikeuvou está desconectada (estado: ${estado}).\n\nProvavelmente o celular ficou sem carga/internet. Reconectar via QR na Evolution.`
     )
+    if (!alerta.ok) {
+      console.error('Falha ao enviar alerta de desconexão por email:', alerta.error)
+    }
   }
 
-  return NextResponse.json({ ok: true, estado })
+  return NextResponse.json({ ok: true, estado, alertaEnviado: alerta?.ok ?? null })
 }
