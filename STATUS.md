@@ -1,6 +1,37 @@
 # vaikeuvou.app — Status
 
-Última atualização: 2026-10-04
+Última atualização: 2026-10-06
+
+## Sessão 2026-10-06 — fix tradução/pingback de comentários (WordPress) + seção "Você confirmou presença"
+
+**WordPress, tema `newsblogger`/`functions.php`**: Luciano reportou "2 comments" sem traduzir e
+sem listar nada embaixo num post. Causa 1: o texto vem de `_nx()` (plural+contexto) no tema pai
+`newscrunch/comments.php`, domínio `newscrunch` — diferente das strings simples que o Loco
+Translate normalmente pega, por isso ele não achava pra traduzir pela UI. Fix: filtro
+`ngettext_with_context_newscrunch` no child theme (mesmo padrão já usado pro `gettext_newscrunch`
+simples), mais `'1 comment' => '1 comentário'` no map existente. Causa 2 (achada investigando o
+"por que não lista nada"): os "2" eram **pingback** (aviso automático entre posts), não comentário
+de leitor — o tema já filtra a LISTA por `type=comment`, mas a CONTAGEM (`get_comments_number()`)
+soma todo tipo junto. Fix: filtro `get_comments_number` recalcula só comentário real, e
+`comments_template_query_args` restringe o loop inteiro a `type=comment` — quando não há
+comentário real nenhum, `have_comments()` dá false e o bloco de título+lista desaparece sozinho
+(formulário de comentar continua aparecendo normal).
+
+**Achado no caminho, documentado em `[[vaikeuvou_hostinger_ssh]]`**: `wp-cli` estava quebrado
+(PHP 8.1 do PATH vs Contact Form 7 exigindo 8.3 no Composer) — binário certo é
+`/opt/alt/php83/usr/bin/php /usr/local/bin/wp-cli-2.12.0.phar`, nunca `wp` solto.
+
+**`/meus-convites`** (`app/meus-convites/page.tsx`): insight real do Luciano — confirmou presença
+num evento, apagou a mensagem de WhatsApp com o link, não lembrava data/local, e a página só
+mostrava eventos que ele ORGANIZA. Nova seção "Você confirmou presença" (futuro/passado, mesma
+paginação dos organizados) casando RSVP por telefone da sessão, excluindo eventos que a própria
+pessoa organiza (já aparecem na seção de cima). `EventoSection` ganhou suporte a `edit_token` nulo
+(sem botão Painel nesse caso, só Ver evento). Validado com dados reais dele no banco (2 eventos
+confirmados sem organizar, ambos já passados).
+
+`tsc --noEmit` + `npm run build` limpos nas duas frentes. Commits `2b680f3` (meus-convites);
+fixes de WordPress só no servidor (sem git, tema não versionado).
+
 
 ## Sessão 2026-10-04 (2ª parte) — monitor WhatsApp por email + calendário (.ics/Google) + fix RSVP grátis sem confirmação
 
