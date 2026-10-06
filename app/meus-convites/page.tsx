@@ -8,22 +8,44 @@ import AppFooter from '@/components/AppFooter'
 
 const PAGE_SIZE = 15
 
-type Evento = { id: string; title: string; slug: string; event_date: string; edit_token: string; location: string | null }
+type Evento = { id: string; title: string; slug: string; event_date: string; edit_token: string | null; location: string | null }
 
-type Props = { searchParams: Promise<{ futuro?: string; passado?: string; mp_conectado?: string; mp_erro?: string }> }
+type Props = {
+  searchParams: Promise<{
+    futuro?: string; passado?: string
+    confirmFuturo?: string; confirmPassado?: string
+    mp_conectado?: string; mp_erro?: string
+  }>
+}
 
 export default async function MeusEventosPage({ searchParams }: Props) {
   const session = await getSession()
   if (!session) redirect('/login?next=/meus-convites')
 
-  const { futuro: futuroParam, passado: passadoParam, mp_conectado, mp_erro } = await searchParams
+  const {
+    futuro: futuroParam, passado: passadoParam,
+    confirmFuturo: confirmFuturoParam, confirmPassado: confirmPassadoParam,
+    mp_conectado, mp_erro,
+  } = await searchParams
   const pageFuturo  = Math.max(1, parseInt(futuroParam ?? '1', 10) || 1)
   const pagePassado = Math.max(1, parseInt(passadoParam ?? '1', 10) || 1)
+  const pageConfirmFuturo  = Math.max(1, parseInt(confirmFuturoParam ?? '1', 10) || 1)
+  const pageConfirmPassado = Math.max(1, parseInt(confirmPassadoParam ?? '1', 10) || 1)
 
   const agora = new Date().toISOString()
   const sb = getSupabaseAdmin()
 
-  const [futurosRes, passadosRes] = await Promise.all([
+  // IDs dos eventos em que a pessoa confirmou presença (RSVP) — casando pelo
+  // telefone da sessão, igual ao resto do app faz pra identidade. Exclui os
+  // que ela mesma organiza (já aparecem na seção de cima, não precisa
+  // duplicar). Volume por pessoa é pequeno, não precisa paginar essa busca.
+  const { data: minhasRsvps } = await sb
+    .from('rsvps')
+    .select('event_id')
+    .eq('user_phone', session.users.phone)
+  const idsConfirmados = Array.from(new Set((minhasRsvps ?? []).map(r => r.event_id)))
+
+  const [futurosRes, passadosRes, confirmFuturosRes, confirmPassadosRes] = await Promise.all([
     sb.from('events')
       .select('id, title, slug, event_date, edit_token, location', { count: 'exact' })
       .eq('user_id', session.user_id)
@@ -36,21 +58,43 @@ export default async function MeusEventosPage({ searchParams }: Props) {
       .lt('event_date', agora)
       .order('event_date', { ascending: false })
       .range((pagePassado - 1) * PAGE_SIZE, pagePassado * PAGE_SIZE - 1),
+    idsConfirmados.length === 0 ? { data: [], count: 0 } : sb.from('events')
+      .select('id, title, slug, event_date, location', { count: 'exact' })
+      .in('id', idsConfirmados)
+      .neq('user_id', session.user_id)
+      .gte('event_date', agora)
+      .order('event_date', { ascending: true })
+      .range((pageConfirmFuturo - 1) * PAGE_SIZE, pageConfirmFuturo * PAGE_SIZE - 1),
+    idsConfirmados.length === 0 ? { data: [], count: 0 } : sb.from('events')
+      .select('id, title, slug, event_date, location', { count: 'exact' })
+      .in('id', idsConfirmados)
+      .neq('user_id', session.user_id)
+      .lt('event_date', agora)
+      .order('event_date', { ascending: false })
+      .range((pageConfirmPassado - 1) * PAGE_SIZE, pageConfirmPassado * PAGE_SIZE - 1),
   ])
 
   const futuros  = (futurosRes.data ?? []) as Evento[]
   const passados = (passadosRes.data ?? []) as Evento[]
+  const confirmFuturos  = (confirmFuturosRes.data ?? []) as Evento[]
+  const confirmPassados = (confirmPassadosRes.data ?? []) as Evento[]
   const totalFuturos  = futurosRes.count ?? 0
   const totalPassados = passadosRes.count ?? 0
+  const totalConfirmFuturos  = confirmFuturosRes.count ?? 0
+  const totalConfirmPassados = confirmPassadosRes.count ?? 0
   const totalPagesFuturo  = Math.max(1, Math.ceil(totalFuturos / PAGE_SIZE))
   const totalPagesPassado = Math.max(1, Math.ceil(totalPassados / PAGE_SIZE))
+  const totalPagesConfirmFuturo  = Math.max(1, Math.ceil(totalConfirmFuturos / PAGE_SIZE))
+  const totalPagesConfirmPassado = Math.max(1, Math.ceil(totalConfirmPassados / PAGE_SIZE))
 
   if (pageFuturo > totalPagesFuturo && totalFuturos > 0) redirect(`/meus-convites?futuro=${totalPagesFuturo}`)
   if (pagePassado > totalPagesPassado && totalPassados > 0) redirect(`/meus-convites?passado=${totalPagesPassado}`)
+  if (pageConfirmFuturo > totalPagesConfirmFuturo && totalConfirmFuturos > 0) redirect(`/meus-convites?confirmFuturo=${totalPagesConfirmFuturo}`)
+  if (pageConfirmPassado > totalPagesConfirmPassado && totalConfirmPassados > 0) redirect(`/meus-convites?confirmPassado=${totalPagesConfirmPassado}`)
 
   const user = session.users
   const podeCriarPost = canAccessPautas(user)
-  const semConvites = totalFuturos === 0 && totalPassados === 0
+  const semConvites = totalFuturos === 0 && totalPassados === 0 && totalConfirmFuturos === 0 && totalConfirmPassados === 0
 
   return (
     <div className="min-h-screen bg-white text-gray-900 flex flex-col">
@@ -115,6 +159,28 @@ export default async function MeusEventosPage({ searchParams }: Props) {
                   encerrado
                 />
               )}
+
+              {totalConfirmFuturos > 0 && (
+                <EventoSection
+                  titulo="Você confirmou presença"
+                  eventos={confirmFuturos}
+                  page={pageConfirmFuturo}
+                  totalPages={totalPagesConfirmFuturo}
+                  paramName="confirmFuturo"
+                  encerrado={false}
+                />
+              )}
+
+              {totalConfirmPassados > 0 && (
+                <EventoSection
+                  titulo="Você confirmou presença (já aconteceu)"
+                  eventos={confirmPassados}
+                  page={pageConfirmPassado}
+                  totalPages={totalPagesConfirmPassado}
+                  paramName="confirmPassado"
+                  encerrado
+                />
+              )}
             </>
           )}
 
@@ -133,7 +199,7 @@ function EventoSection({
   eventos: Evento[]
   page: number
   totalPages: number
-  paramName: 'futuro' | 'passado'
+  paramName: 'futuro' | 'passado' | 'confirmFuturo' | 'confirmPassado'
   encerrado: boolean
 }) {
   return (
@@ -155,12 +221,14 @@ function EventoSection({
                 {e.location && <p className="text-gray-400 text-xs mt-0.5 truncate">📍 {e.location}</p>}
               </div>
               <div className="flex flex-col gap-2 shrink-0">
-                <a
-                  href={`/dashboard/${e.edit_token}`}
-                  className="px-3 py-1.5 rounded-lg bg-gray-100 hover:bg-gray-200 text-xs font-semibold text-gray-700 uppercase tracking-wide text-center"
-                >
-                  Painel
-                </a>
+                {e.edit_token && (
+                  <a
+                    href={`/dashboard/${e.edit_token}`}
+                    className="px-3 py-1.5 rounded-lg bg-gray-100 hover:bg-gray-200 text-xs font-semibold text-gray-700 uppercase tracking-wide text-center"
+                  >
+                    Painel
+                  </a>
+                )}
                 <a
                   href={`/e/${e.slug}`}
                   className="px-3 py-1.5 rounded-lg bg-gray-50 hover:bg-gray-100 text-xs font-semibold text-gray-500 uppercase tracking-wide text-center"
