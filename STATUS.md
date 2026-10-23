@@ -1,6 +1,47 @@
 # vaikeuvou.app — Status
 
-Última atualização: 2026-10-06
+Última atualização: 2026-10-23
+
+## Sessão 2026-10-23 — Ingresso "pago com produtos" (terceiro tipo de ticket)
+
+Nasceu de uma elucubração sobre o **LIXOLUTION** (negócio novo do Luciano, troca de "lixo" por
+dinheiro/crédito via parceria com a BLZera — ver `~/LIXOLUTION/` e memória
+`project_lixolution`) e um caso de uso real: o **17º Festival do Cambuci** (Rede Biosol,
+Parelheiros, 28-29/11) como piloto conjunto vaikeuvou+LIXOLUTION. A ideia evoluiu em várias
+voltas de conversa até chegar no formato final: **"entrada = produto" é praxe em evento
+gratuito/beneficente** (tipo "1kg de alimento não perecível"), e vale como terceiro tipo de
+ingresso genérico do vaikeuvou — não é feature específica de LIXOLUTION, serve qualquer evento
+desse gênero.
+
+**Modelo final** (importante — não é um gate como o pago em dinheiro): organizador define o que
+aceita (ex: "10 latinhas de alumínio ou 10 garrafas PET") e qual vantagem oferece em troca (ex:
+"Fila preferencial", "muda de árvore de brinde"). Confirmar presença (BORA) continua funcionando
+normal — é uma opção extra que a pessoa marca ao confirmar, não trava a entrada. O organizador
+confirma o recebimento de verdade no dia, pela lista de convidados.
+
+**Implementado**:
+- `supabase_evento_produto.sql` — `events.produto_descricao`/`produto_vantagem`,
+  `rsvps.vai_levar_produto`/`produto_confirmado`/`produto_confirmado_em`, e
+  `vkv_confirmar_rsvp` (a função que grava o RSVP, usada tanto pelo fluxo grátis quanto pela
+  confirmação pós-pagamento) ganhou o parâmetro `p_vai_levar_produto` no final, com default —
+  não quebrou nenhuma chamada existente.
+- `/criar` (etapa 2) e o dashboard de edição ganharam seletor de tipo de ingresso
+  (Grátis/Pago/Pago com produtos) — mutuamente exclusivo, trocar de tipo limpa os campos do
+  outro.
+- Página pública do evento mostra a oferta acima do botão BORA; modal de confirmação tem
+  checkbox opcional pra marcar que vai participar da troca.
+- Lista de convidados (`/dashboard/[edit_token]/convidados`) ganhou
+  `components/ConfirmarProdutoButton.tsx` — organizador bate "recebido" por pessoa no dia,
+  via `/api/rsvp/confirmar-produto` (mesmo padrão de auth por `edit_token`, sem sessão própria,
+  já usado em `/api/eventos/cancelar`).
+
+`tsc --noEmit` + `npm run build` limpos, migration rodada em produção pelo Luciano, testado e
+confirmado funcionando (criação de evento com o novo seletor). Commit `603b88d`.
+
+**Pendente**: nenhuma linha de código do LIXOLUTION em si foi escrita — esse recurso é só a
+infraestrutura de ticket que o piloto do Cambuci vai usar. Ver `~/LIXOLUTION/STATUS.md` pro
+racional completo do piloto (escopo de itens, voucher nas barracas da Rede Biosol, convergência
+com Prefeitura de SP/parque).
 
 ## Sessão 2026-10-06 — fix tradução/pingback de comentários (WordPress) + seção "Você confirmou presença"
 
