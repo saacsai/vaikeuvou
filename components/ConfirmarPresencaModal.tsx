@@ -20,11 +20,16 @@ type Props = {
   onClose: () => void
   saving: boolean
   erro: string
+  produtoDescricao?: string | null
+  produtoVantagem?: string | null
+  vaiLevarProduto: boolean
+  onVaiLevarProdutoChange: (v: boolean) => void
 }
 
 export default function ConfirmarPresencaModal({
   tituloEvento, pago, valor, maxParcelas, nome, telefone,
   onNomeChange, onTelefoneChange, onConfirmar, onClose, saving, erro,
+  produtoDescricao, produtoVantagem, vaiLevarProduto, onVaiLevarProdutoChange,
 }: Props) {
   const [passo, setPasso] = useState(pago ? 1 : 2)
   const totalPassos = pago ? 2 : 1
@@ -96,6 +101,21 @@ export default function ConfirmarPresencaModal({
               <p className="text-xs text-gray-500 bg-gray-50 rounded-lg px-3 py-2">
                 💳 Confirmar abre o pagamento de {fmtBRL(valor)} — sua presença só fica garantida depois de pago.
               </p>
+            )}
+            {!!produtoDescricao && (
+              <label className="flex items-start gap-2.5 bg-green-50 border border-green-100 rounded-lg px-3 py-2.5 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={vaiLevarProduto}
+                  onChange={e => onVaiLevarProdutoChange(e.target.checked)}
+                  className="mt-0.5 rounded border-gray-300 text-brand focus:ring-brand flex-shrink-0"
+                />
+                <span className="text-xs text-gray-700">
+                  🌱 Leve <strong>{produtoDescricao}</strong>
+                  {produtoVantagem ? <> e ganhe: <strong>{produtoVantagem}</strong></> : null}
+                  . Confirmado na entrada do evento, não trava sua presença.
+                </span>
+              </label>
             )}
             <p className="text-[10px] text-gray-400 leading-relaxed">
               Ao confirmar, você concorda com os{' '}

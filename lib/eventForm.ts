@@ -16,6 +16,8 @@ export type EventFormFields = {
   descricao_pacote: string
   programacao: string
   max_parcelas: number
+  produto_descricao: string
+  produto_vantagem: string
   divulgar_blog: boolean
   vagas_minimas: number | ''
   vagas_maximas: number | ''

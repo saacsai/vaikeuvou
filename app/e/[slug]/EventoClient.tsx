@@ -47,6 +47,7 @@ export default function EventoClient({ evento, rsvps, parentRsvpId, criador, con
   const [erro,     setErro]     = useState('')
   const [meuRsvpId, setMeuRsvpId] = useState('')
   const [modalAberto, setModalAberto] = useState(true)
+  const [vaiLevarProduto, setVaiLevarProduto] = useState(false)
 
   const searchParams = useSearchParams()
   const pago = !!evento.valor && evento.valor > 0
@@ -125,6 +126,7 @@ export default function EventoClient({ evento, rsvps, parentRsvpId, criador, con
       user_name:      nome.trim(),
       user_phone:     telefone,
       parent_rsvp_id: parentRsvpId,
+      vai_levar_produto: vaiLevarProduto,
     }
 
     // Evento pago: abre o checkout do Mercado Pago — o RSVP só é criado depois que o
@@ -256,6 +258,15 @@ export default function EventoClient({ evento, rsvps, parentRsvpId, criador, con
                 )}
               </div>
             )}
+            {!!evento.produto_descricao && (
+              <div className="bg-green-50 border border-green-100 rounded-xl px-3 py-2.5">
+                <p className="flex items-center gap-1.5 flex-wrap text-sm">
+                  <span>🌱</span>
+                  <span className="text-gray-700">Leve <strong>{evento.produto_descricao}</strong>{evento.produto_vantagem ? <> e ganhe: <strong>{evento.produto_vantagem}</strong></> : null}</span>
+                </p>
+                <p className="text-[11px] text-gray-400 mt-0.5">Entrada continua grátis — é uma opção extra na hora de confirmar presença.</p>
+              </div>
+            )}
           </div>
 
           {(evento.descricao_pacote || evento.programacao) && (
@@ -357,6 +368,10 @@ export default function EventoClient({ evento, rsvps, parentRsvpId, criador, con
               onConfirmar={confirmar}
               onClose={() => setEtapa('convite')}
               saving={saving}
+              produtoDescricao={evento.produto_descricao}
+              produtoVantagem={evento.produto_vantagem}
+              vaiLevarProduto={vaiLevarProduto}
+              onVaiLevarProdutoChange={setVaiLevarProduto}
               erro={erro}
             />
           )}

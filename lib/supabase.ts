@@ -58,6 +58,10 @@ export type Event = {
   organizador_contato: string | null
   organizador_horario: string | null
   organizador_link: string | null
+  /** Preenchido = evento oferece troca de produto por vantagem (ex: "10 latinhas + 10 PET") */
+  produto_descricao: string | null
+  /** O que a pessoa ganha em troca (ex: "Fila preferencial", "Muda de árvore de brinde") */
+  produto_vantagem: string | null
 }
 
 export type BlogBriefTipo = 'VaikeuFui' | 'Tendeu' | 'ProntoFalei' | 'VamoAi' | 'Revisar' | 'SouFa'
@@ -92,4 +96,7 @@ export type Rsvp = {
   foto_url: string | null
   mensagem: string | null
   mp_payment_id: string | null
+  vai_levar_produto: boolean
+  produto_confirmado: boolean
+  produto_confirmado_em: string | null
 }

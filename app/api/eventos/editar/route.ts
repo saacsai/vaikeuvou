@@ -11,7 +11,7 @@ export async function PATCH(req: NextRequest) {
   const { edit_token, ...fields } = await req.json()
   if (!edit_token) return NextResponse.json({ error: 'edit_token obrigatório' }, { status: 400 })
 
-  const allowed = ['external_url', 'external_url_label', 'video_url', 'title', 'location', 'description', 'event_date', 'event_date_fim', 'duration_minutes', 'bg_image_url', 'max_depth', 'cidade', 'valor', 'descricao_pacote', 'programacao', 'max_parcelas', 'vagas_minimas', 'vagas_maximas', 'data_viabilizacao', 'organizador_nome', 'organizador_descricao', 'organizador_endereco', 'organizador_contato', 'organizador_horario', 'organizador_link']
+  const allowed = ['external_url', 'external_url_label', 'video_url', 'title', 'location', 'description', 'event_date', 'event_date_fim', 'duration_minutes', 'bg_image_url', 'max_depth', 'cidade', 'valor', 'descricao_pacote', 'programacao', 'max_parcelas', 'vagas_minimas', 'vagas_maximas', 'data_viabilizacao', 'organizador_nome', 'organizador_descricao', 'organizador_endereco', 'organizador_contato', 'organizador_horario', 'organizador_link', 'produto_descricao', 'produto_vantagem']
   const updates: Record<string, unknown> = {}
   for (const key of allowed) {
     if (key in fields) updates[key] = fields[key] || null

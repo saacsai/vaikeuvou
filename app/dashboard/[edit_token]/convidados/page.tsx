@@ -4,6 +4,7 @@ import { getSupabaseAdmin } from '@/lib/supabase'
 import { getSession, canAccessPautas } from '@/lib/auth'
 import { ProfilePopover } from '@/components/AppHeaderNav'
 import AppFooter from '@/components/AppFooter'
+import ConfirmarProdutoButton from '@/components/ConfirmarProdutoButton'
 import type { Rsvp } from '@/lib/supabase'
 
 type Props = { params: Promise<{ edit_token: string }> }
@@ -20,7 +21,7 @@ function fmtHora(iso: string) {
   return new Date(iso).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })
 }
 
-function TreeNode({ rsvp, byParent, avatarByPhone, isPast }: { rsvp: Rsvp; byParent: Map<string, Rsvp[]>; avatarByPhone: Map<string, string>; isPast: boolean }) {
+function TreeNode({ rsvp, byParent, avatarByPhone, isPast, editToken }: { rsvp: Rsvp; byParent: Map<string, Rsvp[]>; avatarByPhone: Map<string, string>; isPast: boolean; editToken: string }) {
   const filhos = byParent.get(rsvp.id) ?? []
   const cor = NIVEL_COR[(rsvp.depth_level - 1) % NIVEL_COR.length]
   const avatar = avatarByPhone.get(rsvp.user_phone)
@@ -49,6 +50,9 @@ function TreeNode({ rsvp, byParent, avatarByPhone, isPast }: { rsvp: Rsvp; byPar
         </div>
         <p className="text-xs font-semibold text-gray-900 text-center leading-tight truncate w-full">{rsvp.user_name}</p>
         <p className="text-[10px] text-gray-400">{fmtHora(rsvp.created_at)}</p>
+        {rsvp.vai_levar_produto && (
+          <ConfirmarProdutoButton editToken={editToken} rsvpId={rsvp.id} confirmadoInicial={rsvp.produto_confirmado} />
+        )}
       </div>
 
       {filhos.length > 0 && (
@@ -62,7 +66,7 @@ function TreeNode({ rsvp, byParent, avatarByPhone, isPast }: { rsvp: Rsvp; byPar
                   className="absolute top-0 h-px bg-gray-200"
                   style={{ left: i === 0 ? '50%' : 0, right: i === filhos.length - 1 ? '50%' : 0 }}
                 />
-                <TreeNode rsvp={f} byParent={byParent} avatarByPhone={avatarByPhone} isPast={isPast} />
+                <TreeNode rsvp={f} byParent={byParent} avatarByPhone={avatarByPhone} isPast={isPast} editToken={editToken} />
               </div>
             ))}
           </div>
@@ -161,7 +165,7 @@ export default async function ConvidadosPage({ params }: Props) {
         ) : (
           <div className="bg-white border border-gray-100 rounded-xl p-5 shadow-sm overflow-x-auto">
             <div className="flex justify-center gap-6 min-w-fit mx-auto">
-              {raizes.map(r => <TreeNode key={r.id} rsvp={r} byParent={byParent} avatarByPhone={avatarByPhone} isPast={isPast} />)}
+              {raizes.map(r => <TreeNode key={r.id} rsvp={r} byParent={byParent} avatarByPhone={avatarByPhone} isPast={isPast} editToken={edit_token} />)}
             </div>
           </div>
         )}

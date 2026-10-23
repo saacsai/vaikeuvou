@@ -40,12 +40,14 @@ export default function CriarClient({ userName, userAvatar, userBio, userInstagr
     external_url: '', external_url_label: '', video_url: '',
     bg_image_url: '', cidade: '',
     valor: '', descricao_pacote: '', programacao: '', max_parcelas: 3,
+    produto_descricao: '', produto_vantagem: '',
     divulgar_blog: false,
     vagas_minimas: '', vagas_maximas: '', data_viabilizacao: '',
     organizador_nome: '', organizador_descricao: '', organizador_endereco: '',
     organizador_contato: '', organizador_horario: '', organizador_link: '',
   })
   const [multiDia, setMultiDia] = useState(false)
+  const [tipoIngresso, setTipoIngresso] = useState<'gratis' | 'pago' | 'produto'>('gratis')
   const [saving, setSaving] = useState(false)
   const [erro,   setErro]   = useState('')
   const [etapa,  setEtapa]  = useState(1)
@@ -349,46 +351,104 @@ export default function CriarClient({ userName, userAvatar, userBio, userInstagr
           {etapa === 2 && (
             <>
               <div>
-                <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Valor por pessoa (opcional)</label>
-                <input
-                  value={form.valor}
-                  onChange={e => set('valor', e.target.value ? Number(e.target.value) : '')}
-                  placeholder="Deixe em branco pra evento grátis"
-                  type="number" min={0} step="0.01"
-                  className="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 outline-none focus:border-brand text-sm"
-                />
-                <p className="text-[10px] text-gray-400 mt-0.5">Com valor definido, confirmar presença (BORA) exige pagamento — é rateio ou ticket, não só RSVP.</p>
+                <label className="block text-xs font-semibold text-gray-500 mb-2 uppercase tracking-wide">Tipo de ingresso</label>
+                <div className="grid grid-cols-3 gap-2">
+                  {([
+                    { value: 'gratis' as const,  label: 'Grátis',             desc: 'Só confirmar presença' },
+                    { value: 'pago' as const,    label: 'Pago',               desc: 'Rateio/ticket em R$' },
+                    { value: 'produto' as const, label: 'Pago com produtos',  desc: 'Troca por vantagem' },
+                  ]).map(t => (
+                    <button
+                      key={t.value}
+                      onClick={() => {
+                        setTipoIngresso(t.value)
+                        // Mutuamente exclusivo — troca de tipo limpa os campos do outro,
+                        // pra nunca mandar valor + produto_descricao juntos sem querer.
+                        if (t.value !== 'pago') set('valor', '')
+                        if (t.value !== 'produto') { set('produto_descricao', ''); set('produto_vantagem', '') }
+                      }}
+                      className={`rounded-xl p-3 text-left border transition-colors ${
+                        tipoIngresso === t.value ? 'border-brand bg-brand/5' : 'border-gray-200 bg-white hover:border-gray-300'
+                      }`}
+                    >
+                      <p className="text-xs font-bold text-gray-900">{t.label}</p>
+                      <p className="text-[10px] text-gray-400 mt-0.5">{t.desc}</p>
+                    </button>
+                  ))}
+                </div>
               </div>
 
-              {!!form.valor && (
+              {tipoIngresso === 'pago' && (
                 <>
                   <div>
-                    <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Parcelamento em até</label>
+                    <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Valor por pessoa</label>
                     <input
-                      value={form.max_parcelas}
-                      onChange={e => set('max_parcelas', Number(e.target.value))}
-                      type="number" min={1} max={12} step="1"
-                      className="w-32 bg-white border border-gray-300 rounded-xl px-4 py-3 text-gray-900 outline-none focus:border-brand text-sm"
+                      value={form.valor}
+                      onChange={e => set('valor', e.target.value ? Number(e.target.value) : '')}
+                      placeholder="0,00"
+                      type="number" min={0} step="0.01"
+                      className="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 outline-none focus:border-brand text-sm"
                     />
-                    <p className="text-[10px] text-gray-400 mt-0.5">Padrão 3x — usado no destaque de preço no evento.</p>
+                    <p className="text-[10px] text-gray-400 mt-0.5">Com valor definido, confirmar presença (BORA) exige pagamento — é rateio ou ticket, não só RSVP.</p>
                   </div>
 
+                  {!!form.valor && (
+                    <>
+                      <div>
+                        <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Parcelamento em até</label>
+                        <input
+                          value={form.max_parcelas}
+                          onChange={e => set('max_parcelas', Number(e.target.value))}
+                          type="number" min={1} max={12} step="1"
+                          className="w-32 bg-white border border-gray-300 rounded-xl px-4 py-3 text-gray-900 outline-none focus:border-brand text-sm"
+                        />
+                        <p className="text-[10px] text-gray-400 mt-0.5">Padrão 3x — usado no destaque de preço no evento.</p>
+                      </div>
+
+                      <div>
+                        <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">O que está incluso (opcional)</label>
+                        <MiniEditor
+                          value={form.descricao_pacote}
+                          onChange={v => set('descricao_pacote', v)}
+                          placeholder="Ex: churrasco completo + bebida, ida e volta de barco, welcome drink..."
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Programação detalhada (opcional)</label>
+                        <MiniEditor
+                          value={form.programacao}
+                          onChange={v => set('programacao', v)}
+                          placeholder="Ex: 9h chegada, 10h saída do barco, 13h almoço, 17h volta..."
+                        />
+                      </div>
+                    </>
+                  )}
+                </>
+              )}
+
+              {tipoIngresso === 'produto' && (
+                <>
                   <div>
-                    <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">O que está incluso (opcional)</label>
-                    <MiniEditor
-                      value={form.descricao_pacote}
-                      onChange={v => set('descricao_pacote', v)}
-                      placeholder="Ex: churrasco completo + bebida, ida e volta de barco, welcome drink..."
+                    <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">O que aceita como ingresso</label>
+                    <input
+                      value={form.produto_descricao}
+                      onChange={e => set('produto_descricao', e.target.value)}
+                      placeholder="Ex: 10 latinhas de alumínio ou 10 garrafas PET"
+                      className="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 outline-none focus:border-brand text-sm"
                     />
                   </div>
-
                   <div>
-                    <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Programação detalhada (opcional)</label>
-                    <MiniEditor
-                      value={form.programacao}
-                      onChange={v => set('programacao', v)}
-                      placeholder="Ex: 9h chegada, 10h saída do barco, 13h almoço, 17h volta..."
+                    <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Vantagem oferecida</label>
+                    <input
+                      value={form.produto_vantagem}
+                      onChange={e => set('produto_vantagem', e.target.value)}
+                      placeholder="Ex: Fila preferencial, muda de árvore de brinde, 10% de desconto..."
+                      className="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 outline-none focus:border-brand text-sm"
                     />
+                    <p className="text-[10px] text-gray-400 mt-0.5">
+                      Confirmar presença (BORA) continua normal — isso aparece como uma opção extra, não trava a entrada. Você confirma quem trouxe de verdade na lista de convidados, no dia.
+                    </p>
                   </div>
                 </>
               )}

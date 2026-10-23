@@ -5,7 +5,7 @@ import { enviarWhatsapp } from '@/lib/evolution'
 import { fmtDataConfirmacao, linksCalendarioTxt } from '@/lib/calendar'
 
 export async function POST(req: NextRequest) {
-  const { event_id, user_name, user_phone, parent_rsvp_id } = await req.json()
+  const { event_id, user_name, user_phone, parent_rsvp_id, vai_levar_produto } = await req.json()
 
   if (!event_id || !user_name || !user_phone) {
     return NextResponse.json({ error: 'event_id, nome e telefone são obrigatórios' }, { status: 400 })
@@ -61,6 +61,7 @@ export async function POST(req: NextRequest) {
       p_user_name: user_name.trim(),
       p_user_phone: phone,
       p_parent_rsvp_id: parent_rsvp_id || null,
+      p_vai_levar_produto: !!vai_levar_produto,
     })
     .select('id, depth_level')
     .single()

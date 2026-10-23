@@ -111,6 +111,8 @@ function toForm(evento: Event): EventFormFields {
     valor: evento.valor ?? '',
     descricao_pacote: evento.descricao_pacote ?? '',
     programacao: evento.programacao ?? '',
+    produto_descricao: evento.produto_descricao ?? '',
+    produto_vantagem: evento.produto_vantagem ?? '',
     max_parcelas: evento.max_parcelas,
     divulgar_blog: evento.divulgar_blog,
     vagas_minimas: evento.vagas_minimas ?? '',
@@ -717,6 +719,30 @@ export default function DashboardClient({ evento, rsvps, isNovo, userName, userA
                     />
                   </div>
                 </>
+              )}
+            </AccordionSection>
+
+            <AccordionSection titulo="Troca por produto" aberta={secoesAbertas.includes('produto')} onToggle={() => toggleSecao('produto')}>
+              <div>
+                <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">O que aceita como ingresso (opcional)</label>
+                <input
+                  value={form.produto_descricao}
+                  onChange={e => set('produto_descricao', e.target.value)}
+                  placeholder="Ex: 10 latinhas de alumínio ou 10 garrafas PET"
+                  className="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 outline-none focus:border-brand text-sm"
+                />
+                <p className="text-[10px] text-gray-400 mt-0.5">Não trava o BORA — aparece como opção extra. Confirmar presença continua normal.</p>
+              </div>
+              {!!form.produto_descricao && (
+                <div>
+                  <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Vantagem oferecida</label>
+                  <input
+                    value={form.produto_vantagem}
+                    onChange={e => set('produto_vantagem', e.target.value)}
+                    placeholder="Ex: Fila preferencial, muda de árvore de brinde, 10% de desconto..."
+                    className="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 outline-none focus:border-brand text-sm"
+                  />
+                </div>
               )}
             </AccordionSection>
 
