@@ -83,11 +83,27 @@ export default async function EventoPage({ params, searchParams }: Props) {
   if (ref) {
     const { data: rsvpRef } = await sb
       .from('rsvps')
-      .select('user_name, foto_url, mensagem')
+      .select('user_name, foto_url, mensagem, user_phone')
       .eq('id', ref)
       .eq('event_id', evento.id)
       .single()
     convidador = rsvpRef
+
+    // Quem reenvia pode já ter avatar no perfil e nunca ter passado pelo
+    // upload específico do convite (achado real: Sandro trocou a mensagem,
+    // pulou a foto, ficou com iniciais mesmo já tendo foto cadastrada) —
+    // sem foto_url próprio, cai no avatar do perfil em vez de iniciais.
+    if (convidador && !convidador.foto_url && convidador.user_phone) {
+      const { data: user } = await sbAdmin
+        .from('users')
+        .select('avatar_url')
+        .eq('phone', convidador.user_phone)
+        .single()
+      if (user?.avatar_url) convidador.foto_url = user.avatar_url
+    }
+    // user_phone só serviu pro lookup acima — nunca deve ir pro client
+    // component (a página é pública, isso vazaria o telefone de quem convidou).
+    if (convidador) delete (convidador as { user_phone?: string }).user_phone
   }
 
   return (
@@ -97,7 +113,7 @@ export default async function EventoPage({ params, searchParams }: Props) {
       parentRsvpId={ref ?? null}
       criador={criador}
       convidador={convidador}
-      sessionUser={session ? { name: session.users.name ?? '', phone: session.users.phone } : null}
+      sessionUser={session ? { name: session.users.name ?? '', phone: session.users.phone, avatar_url: session.users.avatar_url } : null}
     />
   )
 }

@@ -13,14 +13,19 @@ type Props = {
   linkConvite: string
   whatsappTxt: string
   evento: Pick<Event, 'title' | 'slug' | 'event_date' | 'event_date_fim' | 'duration_minutes' | 'location' | 'description'>
+  /** Avatar já cadastrado no perfil — pré-preenche pra quem já tem foto não
+   *  precisar subir de novo achando que não tem nenhuma (achado real: o
+   *  Sandro já tinha avatar, viu o campo vazio, pulou, ficou sem foto no
+   *  convite). Quem quiser pode trocar normalmente. */
+  fotoInicial?: string | null
   onClose: () => void
 }
 
 const TOTAL_ETAPAS = 3
 
-export default function SucessoConviteModal({ rsvpId, nome, pago, linkConvite, whatsappTxt, evento, onClose }: Props) {
+export default function SucessoConviteModal({ rsvpId, nome, pago, linkConvite, whatsappTxt, evento, fotoInicial, onClose }: Props) {
   const [etapa,      setEtapa]      = useState(1)
-  const [fotoUrl,    setFotoUrl]    = useState<string | null>(null)
+  const [fotoUrl,    setFotoUrl]    = useState<string | null>(fotoInicial ?? null)
   const [mensagem,   setMensagem]   = useState('')
   const [recortando, setRecortando] = useState(false)
   const [salvando,   setSalvando]   = useState(false)
@@ -88,8 +93,12 @@ export default function SucessoConviteModal({ rsvpId, nome, pago, linkConvite, w
 
         {etapa === 2 && (
           <div className="space-y-3 text-left">
-            <p className="font-bold text-gray-900 text-sm">📸 Coloque sua foto</p>
-            <p className="text-xs text-gray-500">Pra seus amigos te reconhecerem quando você convidar — em vez da foto de quem criou o evento.</p>
+            <p className="font-bold text-gray-900 text-sm">📸 {fotoInicial ? 'Sua foto' : 'Coloque sua foto'}</p>
+            <p className="text-xs text-gray-500">
+              {fotoInicial
+                ? 'Usamos a foto do seu perfil — toque nela se quiser trocar.'
+                : 'Pra seus amigos te reconhecerem quando você convidar — em vez da foto de quem criou o evento.'}
+            </p>
 
             <div className="flex justify-center py-1">
               <AvatarCropUpload

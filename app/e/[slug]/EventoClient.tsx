@@ -28,7 +28,7 @@ type Props = {
   parentRsvpId: string | null
   criador: Criador | null
   convidador: Convidador
-  sessionUser: { name: string; phone: string } | null
+  sessionUser: { name: string; phone: string; avatar_url: string | null } | null
 }
 
 function getVideoEmbed(url: string): string | null {
@@ -410,6 +410,7 @@ export default function EventoClient({ evento, rsvps, parentRsvpId, criador, con
               linkConvite={linkConvite}
               whatsappTxt={whatsappTxt}
               evento={evento}
+              fotoInicial={sessionUser?.avatar_url ?? null}
               onClose={() => setModalAberto(false)}
             />
           )}
