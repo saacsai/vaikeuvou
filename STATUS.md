@@ -2,6 +2,31 @@
 
 Última atualização: 2026-11-19
 
+## Sessão 2026-11-19 (parte 3) — bug real: foto de quem reenvia some, mesmo já tendo avatar
+
+Luciano reportou: Sandro confirmou presença, personalizou a MENSAGEM do convite pra reenviar,
+mas a foto dele não apareceu pra quem recebeu (mesmo ele já tendo avatar no perfil há tempos).
+
+**Causa raiz confirmada no banco**: `rsvps.foto_url` do Sandro estava `null` (a `mensagem`
+salvou normal) — o upload de foto do convite é um campo SEPARADO do avatar do perfil
+(`users.avatar_url`), exige passar pelo crop/upload específico em `SucessoConviteModal`. Sandro
+viu o campo vazio (mesmo já tendo foto em outro lugar do app), presumivelmente achou que não
+precisava e pulou — sem `foto_url` próprio, a página pública cai nas iniciais em vez da foto.
+
+**Dois ajustes, commit `1ccbe5f`**:
+1. `app/e/[slug]/page.tsx`: quando `rsvps.foto_url` é null, busca `users.avatar_url` pelo
+   `user_phone` do RSVP como fallback — nunca mais iniciais pra quem já tem avatar. `user_phone`
+   é removido do objeto antes de passar pro client component (não pode vazar telefone numa
+   página pública).
+2. `SucessoConviteModal`/`EventoClient`: o modal de personalização agora pré-preenche com a foto
+   do perfil (`sessionUser.avatar_url`) em vez de começar em branco — resolve na raiz (quem já
+   tem foto não precisa mais adivinhar que precisa subir de novo).
+
+Testado ao vivo no navegador com o RSVP real do Sandro (`?ref=bd6c3bf8-...`) — foto aparece
+certa. De quebra, confirmado visualmente que o horário do evento "Inauguração do Receptivo" está
+certo na página pública (18h-22h, BRT) — valida a conversão de fuso que apliquei no post do blog
+mais cedo na mesma sessão.
+
 ## Sessão 2026-11-19 (parte 2) — "post automático não funcionou": não era bug, era etapa manual
 
 Luciano reportou que a geração automática de post não funcionou pro evento "Inauguração do
