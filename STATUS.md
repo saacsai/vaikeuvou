@@ -2,6 +2,23 @@
 
 Última atualização: 2026-11-19
 
+## Sessão 2026-11-19 (parte 4) — quem já confirmou não vê mais o BORA de novo
+
+Mais um feedback do Sandro: confirmou presença, voltou no mesmo link depois, viu o botão BORA de
+novo e ficou em dúvida se precisava confirmar outra vez — nada avisava que já estava confirmado.
+
+**Corrigido, commit `5b0c532`**: `page.tsx` detecta de cara (telefone da sessão × `rsvps` do
+evento) se a pessoa já confirmou e já renderiza o estado "sucesso" direto, sem precisar clicar em
+BORA/preencher nome e telefone de novo. O modal de personalizar foto/mensagem (`SucessoConviteModal`)
+só abre sozinho numa confirmação **genuinamente nova** agora (antes abria sempre que `etapa`
+virava `sucesso`, inclusive em revisita) — quem só voltou no link vê a versão fixa, sempre
+visível na própria página: "Você já confirmou presença!" + link de convite com botão Copiar +
+atalho direto pro WhatsApp.
+
+Testado ao vivo em produção com conta+sessão+RSVP descartáveis (cookie `vkv_session` setado via
+JS no navegador, sem tocar em conta real) — confirmado: visitar o link direto (sem `?ref=`, sem
+clicar BORA) já mostra o estado certo. Dados de teste apagados depois.
+
 ## Sessão 2026-11-19 (parte 3) — bug real: foto de quem reenvia some, mesmo já tendo avatar
 
 Luciano reportou: Sandro confirmou presença, personalizou a MENSAGEM do convite pra reenviar,
