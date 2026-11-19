@@ -1,6 +1,23 @@
 # vaikeuvou.app — Status
 
-Última atualização: 2026-10-23
+Última atualização: 2026-11-19
+
+## Sessão 2026-11-19 — campo "Descrição do evento" de volta (separado do recado pessoal)
+
+Luciano reportou sentir falta de um campo de descrição no passo a passo de criar evento.
+Investigando, achei a causa: não era bug, era decisão de copy do próprio Luciano de 16/08/2026
+(commit `8d393be`) — o campo que hoje se chama "Comentários" (coluna `description`) nasceu como
+"Detalhes" (descrição geral) e foi renomeado pra virar o recado pessoal do anfitrião (exibido
+como citação, entre aspas, do lado do avatar na página pública). Desde então não sobrou nenhum
+campo de descrição neutra do evento.
+
+**Resolvido criando um 2º campo, sem tocar no "Comentários"**: `events.descricao_evento` (coluna
+nova, migration `supabase_migration_descricao_evento.sql`, já rodada em produção) — aparece no
+`/criar` e no dashboard de edição logo após "Cidade", e na página pública como seção própria
+"Sobre o evento" (texto normal, sem aspas de citação — diferente do recado pessoal, que continua
+existindo do jeito que está). `tsc`/`build` limpos, commit `196e7fc`, push feito depois de
+confirmar a migration rodada (`curl` direto confirmando a coluna existe antes de subir — evento
+só quebraria se o código subisse antes do banco).
 
 ## Sessão 2026-10-23 — Ingresso "pago com produtos" (terceiro tipo de ticket)
 
