@@ -120,7 +120,7 @@ export async function POST(req: NextRequest) {
       tipo: 'VamoAi',
       titulo: title,
       ideias_centrais: composeVamoAiBrief({
-        event_date, location, description, cidade, valor, slug: data.slug,
+        event_date, location, description, descricao_evento, cidade, valor, slug: data.slug,
         organizador_nome, organizador_descricao, organizador_endereco,
         organizador_contato, organizador_horario, organizador_link,
       }),

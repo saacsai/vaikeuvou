@@ -25,11 +25,11 @@ export async function PATCH(req: NextRequest) {
 
   // Busca o evento atual sempre que algum dado dele for necessário pra decidir
   // a atualização: contagem de troca de data e/ou entrada na fila editorial.
-  let evento: { id: string; event_date: string; date_changes_count: number; location: string | null; description: string | null; cidade: string | null; valor: number | null; slug: string; title: string; divulgar_blog: boolean; organizador_nome: string | null; organizador_descricao: string | null; organizador_endereco: string | null; organizador_contato: string | null; organizador_horario: string | null; organizador_link: string | null } | null = null
+  let evento: { id: string; event_date: string; date_changes_count: number; location: string | null; description: string | null; descricao_evento: string | null; cidade: string | null; valor: number | null; slug: string; title: string; divulgar_blog: boolean; organizador_nome: string | null; organizador_descricao: string | null; organizador_endereco: string | null; organizador_contato: string | null; organizador_horario: string | null; organizador_link: string | null } | null = null
   if ('event_date' in updates || 'divulgar_blog' in updates) {
     const { data } = await sb
       .from('events')
-      .select('id, event_date, date_changes_count, location, description, cidade, valor, slug, title, divulgar_blog, organizador_nome, organizador_descricao, organizador_endereco, organizador_contato, organizador_horario, organizador_link')
+      .select('id, event_date, date_changes_count, location, description, descricao_evento, cidade, valor, slug, title, divulgar_blog, organizador_nome, organizador_descricao, organizador_endereco, organizador_contato, organizador_horario, organizador_link')
       .eq('edit_token', edit_token)
       .single()
     evento = data
@@ -72,6 +72,7 @@ export async function PATCH(req: NextRequest) {
         event_date: (updates.event_date as string) ?? evento.event_date,
         location: (updates.location as string | null) ?? evento.location,
         description: (updates.description as string | null) ?? evento.description,
+        descricao_evento: (updates.descricao_evento as string | null) ?? evento.descricao_evento,
         cidade: (updates.cidade as string | null) ?? evento.cidade,
         valor: (updates.valor as number | null) ?? evento.valor,
         slug: evento.slug,

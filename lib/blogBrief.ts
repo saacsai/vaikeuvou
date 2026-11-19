@@ -6,6 +6,7 @@ export function composeVamoAiBrief(evento: {
   event_date: string
   location: string | null
   description: string | null
+  descricao_evento?: string | null
   cidade: string | null
   valor: number | null
   slug: string
@@ -26,7 +27,8 @@ export function composeVamoAiBrief(evento: {
   if (evento.cidade) partes.push(`Cidade: ${evento.cidade}`)
   if (evento.location) partes.push(`Local: ${evento.location}`)
   if (evento.valor) partes.push(`Valor: R$ ${evento.valor}`)
-  if (evento.description) partes.push(`Descrição do organizador: ${evento.description}`)
+  if (evento.description) partes.push(`Recado pessoal de quem criou o convite: ${evento.description}`)
+  if (evento.descricao_evento) partes.push(`Descrição do evento: ${evento.descricao_evento}`)
 
   // Seção "Quem está organizando?" do post #VamoAí? depende disso — sem
   // esse dado o post fica sem crédito de quem organiza (ver PERFIL_CRIADOR.md).
