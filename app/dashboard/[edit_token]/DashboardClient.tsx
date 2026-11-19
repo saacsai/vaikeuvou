@@ -102,6 +102,7 @@ function toForm(evento: Event): EventFormFields {
     duration_minutes: evento.duration_minutes ?? '',
     location: evento.location ?? '',
     description: evento.description ?? '',
+    descricao_evento: evento.descricao_evento ?? '',
     max_depth: evento.max_depth,
     external_url: evento.external_url ?? '',
     external_url_label: evento.external_url_label ?? '',
@@ -651,6 +652,15 @@ export default function DashboardClient({ evento, rsvps, isNovo, userName, userA
                   onChange={e => set('cidade', e.target.value)}
                   placeholder="Só pra eventos ligados a um QG/destino turístico"
                   className="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 outline-none focus:border-brand text-sm"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Descrição do evento</label>
+                <MiniEditor
+                  value={form.descricao_evento}
+                  onChange={v => set('descricao_evento', v)}
+                  placeholder="O que é, o que esperar, programação — o que os convidados precisam saber."
                 />
               </div>
 

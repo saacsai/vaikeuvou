@@ -10,7 +10,7 @@ export async function POST(req: NextRequest) {
   if (!session) return NextResponse.json({ error: 'Não autenticado.' }, { status: 401 })
 
   const {
-    title, event_date, event_date_fim, duration_minutes, location, description, max_depth, bg_image_url,
+    title, event_date, event_date_fim, duration_minutes, location, description, descricao_evento, max_depth, bg_image_url,
     video_url, external_url, external_url_label, cidade,
     valor, descricao_pacote, programacao, max_parcelas, divulgar_blog,
     produto_descricao, produto_vantagem,
@@ -78,6 +78,7 @@ export async function POST(req: NextRequest) {
       duration_minutes:     duration_minutes || null,
       location:            location || null,
       description:         description || null,
+      descricao_evento:     descricao_evento || null,
       max_depth:            max_depth ?? 2,
       bg_image_url:         bg_image_url || null,
       video_url:            video_url || null,

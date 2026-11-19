@@ -269,6 +269,13 @@ export default function EventoClient({ evento, rsvps, parentRsvpId, criador, con
             )}
           </div>
 
+          {evento.descricao_evento && (
+            <div className="mb-[26px]">
+              <p className="text-sm font-extrabold text-gray-900 uppercase tracking-wide mb-1.5">Sobre o evento</p>
+              <p className="text-sm text-gray-600" dangerouslySetInnerHTML={{ __html: renderMiniMarkup(evento.descricao_evento) }} />
+            </div>
+          )}
+
           {(evento.descricao_pacote || evento.programacao) && (
             <div className="mb-[26px]">
               {evento.descricao_pacote && (

@@ -38,12 +38,17 @@ export default function EventPreviewCard({ form, userName, userAvatar, userBio, 
           {form.external_url && (
             <p>🔗 <span className="text-[#ff6600]">{form.external_url_label || 'Saiba mais'}</span></p>
           )}
-          {form.description && (
-            <p className="text-gray-500 mt-2 leading-relaxed italic">
-              &ldquo;<span dangerouslySetInnerHTML={{ __html: renderMiniMarkup(form.description) }} />&rdquo;
-            </p>
-          )}
         </div>
+
+        {form.descricao_evento && (
+          <p className="text-xs text-gray-600 leading-relaxed mb-4" dangerouslySetInnerHTML={{ __html: renderMiniMarkup(form.descricao_evento) }} />
+        )}
+
+        {form.description && (
+          <p className="text-gray-500 text-xs leading-relaxed italic mb-4">
+            &ldquo;<span dangerouslySetInnerHTML={{ __html: renderMiniMarkup(form.description) }} />&rdquo;
+          </p>
+        )}
 
         <div className="flex items-center gap-2 mb-4">
           {userAvatar ? (

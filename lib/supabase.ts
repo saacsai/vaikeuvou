@@ -22,6 +22,9 @@ export type Event = {
   duration_minutes: number | null
   location: string | null
   description: string | null
+  /** Descrição neutra do evento (o que é, o que esperar) — diferente de
+   *  `description`, que é o recado pessoal do anfitrião exibido como citação. */
+  descricao_evento: string | null
   bg_image_url: string | null
   external_url: string | null
   external_url_label: string | null

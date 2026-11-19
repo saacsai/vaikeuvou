@@ -6,6 +6,7 @@ export type EventFormFields = {
   duration_minutes: number | ''
   location: string
   description: string
+  descricao_evento: string
   max_depth: number
   external_url: string
   external_url_label: string

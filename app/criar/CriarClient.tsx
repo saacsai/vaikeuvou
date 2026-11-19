@@ -36,7 +36,7 @@ export default function CriarClient({ userName, userAvatar, userBio, userInstagr
   const router = useRouter()
   const [form, setForm] = useState<Form>({
     title: '', event_date: '', event_date_fim: '', event_time: '', duration_minutes: '',
-    location: '', description: '', max_depth: 2,
+    location: '', description: '', descricao_evento: '', max_depth: 2,
     external_url: '', external_url_label: '', video_url: '',
     bg_image_url: '', cidade: '',
     valor: '', descricao_pacote: '', programacao: '', max_parcelas: 3,
@@ -323,6 +323,15 @@ export default function CriarClient({ userName, userAvatar, userBio, userInstagr
                   onChange={e => set('cidade', e.target.value)}
                   placeholder="Só pra eventos ligados a um QG/destino turístico"
                   className="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 outline-none focus:border-brand text-sm"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Descrição do evento</label>
+                <MiniEditor
+                  value={form.descricao_evento}
+                  onChange={v => set('descricao_evento', v)}
+                  placeholder="O que é, o que esperar, programação — o que os convidados precisam saber."
                 />
               </div>
 
