@@ -2,6 +2,36 @@
 
 Última atualização: 2026-11-19
 
+## Sessão 2026-11-19 (parte 2) — "post automático não funcionou": não era bug, era etapa manual
+
+Luciano reportou que a geração automática de post não funcionou pro evento "Inauguração do
+Receptivo Turístico e da Praça da Cultura em Bertioga" (21/11, Aberto, opt-in blog). Conferido:
+a fila (`blog_briefs`) funcionou certinho — pauta `VamoAi` criada sozinha no momento da criação
+do evento, como sempre foi desenhado. O que não aconteceu foi a ESCRITA do post — essa etapa
+sempre foi manual (eu leio `PERFIL_CRIADOR.md`, escrevo, crio como rascunho, nunca publico
+sozinho), só que ninguém tinha pedido ainda.
+
+**Bug real achado no caminho**: `composeVamoAiBrief` (`lib/blogBrief.ts`) nunca foi atualizado
+pra incluir o campo novo `descricao_evento` (da sessão de hoje mais cedo) — só pegava o recado
+pessoal curto. Corrigido, `tsc` limpo, commit `f54b4f4`, push feito.
+
+**Processei a pauta pendente na hora**, já que o evento é em 2 dias: post 319 criado como
+RASCUNHO no WordPress (`Dia 21/11/2026 Bertioga-SP: Inauguração do Receptivo Turístico e da
+Praça da Cultura #VamoAí?`), seguindo o template validado (posts 266/290) — abre linkando pro
+"#SouFã Bertioga" (que já cita o Forte São João, achado útil de continuidade editorial), H2
+"O que é o evento"/pergunta de pré-requisito/"Quem está organizando?"/"VamoAí?" com o widget
+embedado. Categoria Bertioga, tag #VamoAí?, imagem destacada importada da capa real do evento,
+postmeta `vkv_event_*` setado pro Schema.org Event. Pauta marcada `gerado`. **Falta Luciano
+revisar/publicar** — nada foi ao ar sozinho, como sempre.
+
+**Achado técnico pra próxima vez que usar SSH neste servidor**: a conta Hostinger hospeda VÁRIOS
+domínios (bioeconomiasolidaria.com.br, cooperliga.com.br, lucianomaeda.com.br, saacs.com.br,
+unisolsp.org.br, vaikeuvou.app, entre outros) — `~/public_html` (raiz padrão do SSH) aponta pro
+domínio primário da conta (`nomarketing.com.br`), NÃO pro vaikeuvou.app. O caminho certo é
+`~/domains/vaikeuvou.app/public_html`. Rodar `wp` direto na raiz edita o site errado sem
+avisar — sempre `cd domains/vaikeuvou.app/public_html` antes de qualquer comando `wp-cli` daqui
+pra frente.
+
 ## Sessão 2026-11-19 — campo "Descrição do evento" de volta (separado do recado pessoal)
 
 Luciano reportou sentir falta de um campo de descrição no passo a passo de criar evento.
