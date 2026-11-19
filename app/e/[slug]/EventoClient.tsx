@@ -29,6 +29,10 @@ type Props = {
   criador: Criador | null
   convidador: Convidador
   sessionUser: { name: string; phone: string; avatar_url: string | null } | null
+  /** RSVP já existente dessa pessoa pra esse evento (detectado pelo telefone
+   *  da sessão) — pula direto pro estado "já confirmado", sem passar pelo
+   *  botão BORA de novo. */
+  meuRsvpExistente: string | null
 }
 
 function getVideoEmbed(url: string): string | null {
@@ -39,15 +43,20 @@ function getVideoEmbed(url: string): string | null {
   return null
 }
 
-export default function EventoClient({ evento, rsvps, parentRsvpId, criador, convidador, sessionUser }: Props) {
-  const [etapa,    setEtapa]    = useState<'convite' | 'form' | 'aguardando_pagamento' | 'sucesso'>('convite')
+export default function EventoClient({ evento, rsvps, parentRsvpId, criador, convidador, sessionUser, meuRsvpExistente }: Props) {
+  const [etapa,    setEtapa]    = useState<'convite' | 'form' | 'aguardando_pagamento' | 'sucesso'>(meuRsvpExistente ? 'sucesso' : 'convite')
   const [nome,     setNome]     = useState(sessionUser?.name ?? '')
   const [telefone, setTelefone] = useState(sessionUser?.phone ?? '')
   const [saving,   setSaving]   = useState(false)
   const [erro,     setErro]     = useState('')
-  const [meuRsvpId, setMeuRsvpId] = useState('')
-  const [modalAberto, setModalAberto] = useState(true)
+  const [meuRsvpId, setMeuRsvpId] = useState(meuRsvpExistente ?? '')
+  // Só abre sozinho (personalizar foto/mensagem) logo depois de uma
+  // confirmação NOVA — quem já tinha confirmado e só voltou no link não
+  // deve ver esse modal de novo toda vez, só a área fixa de convite abaixo.
+  const [modalAberto, setModalAberto] = useState(false)
+  const [recemConfirmado, setRecemConfirmado] = useState(false)
   const [vaiLevarProduto, setVaiLevarProduto] = useState(false)
+  const [linkCopiado, setLinkCopiado] = useState(false)
 
   const searchParams = useSearchParams()
   const pago = !!evento.valor && evento.valor > 0
@@ -70,6 +79,8 @@ export default function EventoClient({ evento, rsvps, parentRsvpId, criador, con
         sessionStorage.removeItem('vkv_pending_telefone')
         setMeuRsvpId(json.rsvp_id)
         setEtapa('sucesso')
+        setRecemConfirmado(true)
+        setModalAberto(true)
       } else if (tentativas >= 10) {
         clearInterval(intervalo)
         setErro('Pagamento recebido, mas a confirmação está demorando — atualize a página em instantes.')
@@ -83,6 +94,12 @@ export default function EventoClient({ evento, rsvps, parentRsvpId, criador, con
   const base        = typeof window !== 'undefined' ? window.location.origin : 'https://live.vaikeuvou.app'
   const linkConvite = `${base}/e/${evento.slug}?ref=${meuRsvpId}`
   const whatsappTxt = `Eu vou no "${evento.title}"! Vamo aí? 👉 ${linkConvite}`
+
+  function copiarLink() {
+    navigator.clipboard.writeText(linkConvite)
+    setLinkCopiado(true)
+    setTimeout(() => setLinkCopiado(false), 2000)
+  }
 
   const header = evento.bg_image_url
     ? { src: evento.bg_image_url, bg: '#f5f5f4' }
@@ -138,6 +155,8 @@ export default function EventoClient({ evento, rsvps, parentRsvpId, criador, con
       const json = await res.json().catch(() => null)
       if (!res.ok || !json) { setErro(json?.error ?? 'Erro ao abrir pagamento. Tente novamente.'); setSaving(false); return }
       if (json.ja_confirmado) { setMeuRsvpId(json.rsvp_id); setEtapa('sucesso'); setSaving(false); return }
+      // Daqui pra baixo é fluxo novo de pagamento — o sucesso real só chega
+      // depois do redirect da MP (polling acima), que já marca recém-confirmado.
       // O telefone some do estado no reload pós-redirect do MP — guarda pra
       // retomar o polling do pagamento quando a pessoa voltar.
       sessionStorage.setItem('vkv_pending_telefone', telefone)
@@ -164,6 +183,7 @@ export default function EventoClient({ evento, rsvps, parentRsvpId, criador, con
 
     setMeuRsvpId(json.rsvp_id)
     setEtapa('sucesso')
+    if (!json.ja_confirmado) { setRecemConfirmado(true); setModalAberto(true) }
     setSaving(false)
   }
 
@@ -395,10 +415,39 @@ export default function EventoClient({ evento, rsvps, parentRsvpId, criador, con
             <div className="text-center space-y-5">
               <div className="text-5xl">🎉</div>
               <div>
-                <h2 className="text-xl font-bold text-gray-900 mb-1">{pago ? 'Pagamento confirmado!' : 'BORA confirmado!'}</h2>
+                <h2 className="text-xl font-bold text-gray-900 mb-1">
+                  {pago ? 'Pagamento confirmado!' : recemConfirmado ? 'BORA confirmado!' : 'Você já confirmou presença!'}
+                </h2>
                 <p className="text-gray-500 text-sm">Você está na lista. Nos vemos lá!</p>
               </div>
               <CalendarLinks evento={evento} />
+
+              {podeConvidar && meuRsvpId && (
+                <div className="space-y-3 text-left bg-gray-50 rounded-xl p-4">
+                  <p className="font-bold text-gray-900 text-sm text-center">Convide seus amigos e contatos também 👇</p>
+                  <div className="flex gap-2">
+                    <input
+                      readOnly
+                      value={linkConvite}
+                      className="flex-1 bg-white border border-gray-200 rounded-xl px-3 py-2 text-xs text-gray-500 font-mono outline-none"
+                    />
+                    <button
+                      onClick={copiarLink}
+                      className="px-3 py-2 rounded-xl bg-gray-200 text-xs text-gray-700 font-semibold uppercase tracking-wide whitespace-nowrap hover:bg-gray-300"
+                    >
+                      {linkCopiado ? '✓' : 'Copiar'}
+                    </button>
+                  </div>
+                  <a
+                    href={`https://wa.me/?text=${encodeURIComponent(whatsappTxt)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center justify-center gap-2 w-full py-3 rounded-xl bg-[#25D366] text-white font-bold text-sm"
+                  >
+                    Enviar no WhatsApp
+                  </a>
+                </div>
+              )}
             </div>
           )}
 

@@ -65,6 +65,21 @@ export default async function EventoPage({ params, searchParams }: Props) {
     .eq('event_id', evento.id)
     .order('created_at', { ascending: true })
 
+  // Quem já confirmou e volta no mesmo link não devia ver o botão BORA de
+  // novo (achado real: Sandro confirmou, voltou depois, viu BORA de novo e
+  // achou que precisava confirmar outra vez) — detecta de cara pelo telefone
+  // da sessão, sem precisar clicar em nada pra "descobrir" que já confirmou.
+  let meuRsvpExistente: string | null = null
+  if (session) {
+    const { data: rsvpExistente } = await sb
+      .from('rsvps')
+      .select('id')
+      .eq('event_id', evento.id)
+      .eq('user_phone', session.users.phone)
+      .maybeSingle()
+    meuRsvpExistente = rsvpExistente?.id ?? null
+  }
+
   // Buscar avatar do criador (se evento vinculado a um user)
   let criador = null
   if (evento.user_id) {
@@ -114,6 +129,7 @@ export default async function EventoPage({ params, searchParams }: Props) {
       criador={criador}
       convidador={convidador}
       sessionUser={session ? { name: session.users.name ?? '', phone: session.users.phone, avatar_url: session.users.avatar_url } : null}
+      meuRsvpExistente={meuRsvpExistente}
     />
   )
 }
